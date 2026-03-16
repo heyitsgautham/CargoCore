@@ -43,9 +43,9 @@ class User(Base):
 
     role_id: Mapped[int] = mapped_column(Integer, ForeignKey("roles.id"), nullable=False)
 
-    # Nullable FK placeholder — FK constraint enforced in Phase 2 when warehouses table exists
+    # Linked to warehouses.id in Phase 2
     warehouse_id: Mapped[uuid.UUID | None] = mapped_column(
-        UUID(as_uuid=True), nullable=True
+        UUID(as_uuid=True), ForeignKey("warehouses.id"), nullable=True
     )
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
@@ -64,6 +64,11 @@ class User(Base):
 
     # Relationships
     role: Mapped["Role"] = relationship("Role", back_populates="users")
+    warehouse = relationship(
+        "Warehouse",
+        back_populates="users",
+        foreign_keys=[warehouse_id],
+    )
 
     def __repr__(self) -> str:
         return f"<User id={self.id} email={self.email} role={self.role_id}>"

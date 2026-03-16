@@ -57,15 +57,16 @@ BLOCKED_STATEMENT_TYPES: set[str] = {
     "DEALLOCATE",
     "DISCARD",
     "REASSIGN",
+    "DO",
     "SECURITY",
 }
 
 # Dangerous patterns that should never appear in any SQL string.
 DANGEROUS_PATTERNS: list[tuple[str, str]] = [
     (r"\bINTO\b", "INTO clause is not allowed"),
+    (r"\bpg_sleep\b", "pg_sleep() is not allowed"),
     (r"\bpg_", "Access to pg_ system catalogs is not allowed"),
     (r"\binformation_schema\b", "Access to information_schema is not allowed"),
-    (r"\bpg_sleep\b", "pg_sleep() is not allowed"),
     (r"\blo_export\b", "lo_export() is not allowed"),
     (r"\blo_import\b", "lo_import() is not allowed"),
     (r"\bCOPY\b", "COPY command is not allowed"),
@@ -107,11 +108,19 @@ def validate_sql(sql: str) -> str:
 
     if len(parsed_statements) != 1:
         raise SQLValidationError(
-            "Only single SQL statements are allowed. "
+            "Multiple statements are not allowed. "
             f"Got {len(parsed_statements)} statements."
         )
 
     stmt = parsed_statements[0]
+
+    # Catch blocked statement keywords early so error messages are explicit.
+    sql_upper = sql.upper().strip()
+    for blocked in BLOCKED_STATEMENT_TYPES:
+        if sql_upper.startswith(blocked):
+            raise SQLValidationError(
+                f"Statement type '{blocked}' is not allowed. Only SELECT is permitted."
+            )
 
     # ── Step 2: Verify statement type is SELECT ───────────────────────────────
     stmt_type = stmt.get_type()
@@ -119,15 +128,6 @@ def validate_sql(sql: str) -> str:
         raise SQLValidationError(
             f"Only SELECT statements are allowed. Got: {stmt_type or 'UNKNOWN'}"
         )
-
-    # Double-check: scan tokens for any blocked DML/DDL keywords at top level
-    sql_upper = sql.upper().strip()
-    for blocked in BLOCKED_STATEMENT_TYPES:
-        # Check if the statement starts with a blocked keyword
-        if sql_upper.startswith(blocked):
-            raise SQLValidationError(
-                f"Statement type '{blocked}' is not allowed. Only SELECT is permitted."
-            )
 
     # ── Step 3: Check for dangerous patterns ──────────────────────────────────
     for pattern, message in DANGEROUS_PATTERNS:

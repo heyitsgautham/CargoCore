@@ -12,6 +12,10 @@ from app.database import Base  # noqa: F401
 import app.models.user  # noqa: F401  registers User + Role with Base.metadata
 import app.models.ai_conversation  # noqa: F401  registers AIConversation with Base.metadata
 import app.models.escalation  # noqa: F401  registers Escalation with Base.metadata
+import app.models.warehouse  # noqa: F401
+import app.models.order  # noqa: F401
+import app.models.inventory  # noqa: F401
+import app.models.labour  # noqa: F401
 
 # Alembic Config object
 config = context.config

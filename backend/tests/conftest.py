@@ -5,11 +5,9 @@ Shared pytest fixtures for the entire test suite.
 Requires a running PostgreSQL instance (or use a local SQLite file for unit tests).
 For CI, a separate test database is used: logistics_db_test.
 """
-import asyncio
 from typing import AsyncGenerator
 from unittest.mock import AsyncMock
 
-import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
@@ -20,8 +18,8 @@ from app.config import get_settings
 from app.database import Base, get_db, get_ro_db
 from app.main import app
 from app.models import user as _  # noqa: F401 — registers models with Base
-import app.models.ai_conversation  # noqa: F401 — registers AIConversation with Base
-import app.models.escalation  # noqa: F401 — registers Escalation with Base
+from app.models import ai_conversation as _ai_conversation  # noqa: F401
+from app.models import escalation as _escalation  # noqa: F401
 from app.utils.redis import get_redis
 
 settings = get_settings()
@@ -62,7 +60,9 @@ async def setup_db():
         )
     yield
     async with test_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
+        # Drop schema with CASCADE to avoid FK-cycle ordering issues during teardown.
+        await conn.execute(text("DROP SCHEMA IF EXISTS public CASCADE"))
+        await conn.execute(text("CREATE SCHEMA public"))
     await test_engine.dispose()
 
 

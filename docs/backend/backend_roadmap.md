@@ -235,7 +235,7 @@ POST   /api/v1/auth/reset-password    # Confirm reset with token
 
 ### Milestones
 
-- [ ] **2.1 — User Management (Logistic Manager)**
+- [x] **2.1 — User Management (Logistic Manager)**
   - CRUD for users across all roles
   - Assign/revoke roles and warehouse affiliations
   - Activate / deactivate accounts
@@ -251,7 +251,7 @@ POST   /api/v1/auth/reset-password    # Confirm reset with token
   POST   /api/v1/users/{id}/assign-warehouse  # Assign to warehouse
   ```
 
-- [ ] **2.2 — Warehouse Management**
+- [x] **2.2 — Warehouse Management**
   - CRUD for warehouse hubs
   - Upload/store floor plan grid (JSON)
   - Warehouse capacity KPIs
@@ -266,7 +266,7 @@ POST   /api/v1/auth/reset-password    # Confirm reset with token
   GET    /api/v1/warehouses/{id}/kpis         # Capacity, utilization, staff stats
   ```
 
-- [ ] **2.3 — Order Management**
+- [x] **2.3 — Order Management**
   - Individual and Vendor booking flows
   - Full order status lifecycle: `DRAFT → CONFIRMED → ASSIGNED → IN_TRANSIT → DELIVERED → CLOSED`
   - Order item management
@@ -285,7 +285,7 @@ POST   /api/v1/auth/reset-password    # Confirm reset with token
   POST   /api/v1/orders/{id}/items             # Add/update items
   ```
 
-- [ ] **2.4 — Inventory Management (Warehouse Manager)**
+- [x] **2.4 — Inventory Management (Warehouse Manager)**
   - SKU CRUD with location (Aisle/Shelf/Bin)
   - Stock movement recording (inbound/outbound/adjustment)
   - Safety stock alerts
@@ -303,7 +303,7 @@ POST   /api/v1/auth/reset-password    # Confirm reset with token
   POST   /api/v1/inventory/pick-list/{order_id}        # Generate picking list for order
   ```
 
-- [ ] **2.5 — Labour Management (Warehouse Manager)**
+- [x] **2.5 — Labour Management (Warehouse Manager)**
   - Labourer roster CRUD
   - Assign labourers to orders
   - Attendance and check-in tracking
