@@ -1,0 +1,30 @@
+
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <script>
+        (function () {
+          try {
+            var storedTheme = window.localStorage.getItem('theme');
+            var resolvedTheme = storedTheme === 'light' ? 'light' : 'dark';
+            var isDark = resolvedTheme === 'dark';
+
+            document.documentElement.classList.toggle('dark', isDark);
+            document.documentElement.style.colorScheme = resolvedTheme;
+          } catch (error) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
+          }
+        })();
+      </script>
+      <title>Login Signup Flow Design</title>
+    </head>
+
+    <body>
+      <div id="root"></div>
+      <script type="module" src="/src/main.js"></script>
+    </body>
+  </html>
+  

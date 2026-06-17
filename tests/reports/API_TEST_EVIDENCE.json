@@ -1,0 +1,3348 @@
+[
+  {
+    "case_id": "AISUP-CON-001",
+    "test_name": "test_public_contact_submission_contract",
+    "endpoint": "POST /api/v1/ai/contact-submissions/public",
+    "input": {
+      "name": "Ava Customer",
+      "email": "ava@example.com",
+      "phone": "9999988888",
+      "subject": "Need help with delayed order",
+      "category": "support",
+      "priority": "high",
+      "message": "Please help me check my order status."
+    },
+    "expected_output": {
+      "status_code": 201,
+      "required_keys": [
+        "id",
+        "reference_code",
+        "subject",
+        "status"
+      ]
+    },
+    "actual_output": {
+      "status_code": 201,
+      "body": {
+        "id": "93eb5243-aa44-4b62-b142-d1e96d702d24",
+        "reference_code": "CS-1001",
+        "name": "Ava Customer",
+        "email": "ava@example.com",
+        "phone": "9999988888",
+        "subject": "Need help with delayed order",
+        "category": "support",
+        "message": "Please help me check my order status.",
+        "priority": "high",
+        "status": "new",
+        "notes": null,
+        "assigned_to_user_id": null,
+        "assigned_agent_name": null,
+        "created_at": "2026-04-18T07:53:29.173929Z",
+        "updated_at": "2026-04-18T07:53:29.173929Z"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:29.175328+00:00"
+  },
+  {
+    "case_id": "AISUP-CON-002",
+    "test_name": "test_tickets_list_contract",
+    "endpoint": "GET /api/v1/ai/tickets",
+    "input": {
+      "authorization": "Bearer <mocked>"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "required_keys": [
+        "tickets",
+        "stats",
+        "agents"
+      ]
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "tickets": [
+          {
+            "id": "bb338d45-bd41-4084-8e27-3c0fc37b30c5",
+            "reference_code": "TCK-1001",
+            "title": "Refund pending",
+            "description": "Customer refund has not arrived.",
+            "priority": "high",
+            "status": "new",
+            "category": "refund",
+            "customer_name": "Ava Customer",
+            "notes": null,
+            "assigned_to_user_id": null,
+            "assigned_agent_name": null,
+            "created_at": "2026-04-18T07:53:29.177124Z",
+            "updated_at": "2026-04-18T07:53:29.177124Z",
+            "resolved_at": null,
+            "source": "manual",
+            "source_label": "Manual",
+            "requester_type": null,
+            "issue_type": null,
+            "resolution_action": null,
+            "resolution_label": null,
+            "linked_vendor_ticket_id": null,
+            "linked_vendor_ticket_code": null,
+            "linked_damage_report_id": null,
+            "linked_order_id": null,
+            "linked_order_tracking_code": null,
+            "linked_vendor_replies": [],
+            "can_delete": true,
+            "lm_action_steps": []
+          }
+        ],
+        "stats": {
+          "total": 1,
+          "new": 1,
+          "in_progress": 0,
+          "resolved": 0,
+          "urgent": 1
+        },
+        "agents": []
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:29.177531+00:00"
+  },
+  {
+    "case_id": "AISUP-INT-001",
+    "test_name": "test_public_contact_submission_success",
+    "endpoint": "POST /api/v1/ai/contact-submissions/public",
+    "input": {
+      "name": "Ava Customer",
+      "email": "ava@example.com",
+      "phone": "9999988888",
+      "subject": "Need help with delayed order",
+      "category": "support",
+      "priority": "high",
+      "message": "Please help me check my order status."
+    },
+    "expected_output": {
+      "status_code": 201,
+      "reference_code": "CS-1001"
+    },
+    "actual_output": {
+      "status_code": 201,
+      "body": {
+        "id": "4a8ece45-5737-4d1e-9d6f-533379d80195",
+        "reference_code": "CS-1001",
+        "name": "Ava Customer",
+        "email": "ava@example.com",
+        "phone": "9999988888",
+        "subject": "Need help with delayed order",
+        "category": "support",
+        "message": "Please help me check my order status.",
+        "priority": "high",
+        "status": "new",
+        "notes": null,
+        "assigned_to_user_id": null,
+        "assigned_agent_name": null,
+        "created_at": "2026-04-18T07:53:45.628746Z",
+        "updated_at": "2026-04-18T07:53:45.628746Z"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.629151+00:00"
+  },
+  {
+    "case_id": "AISUP-INT-002",
+    "test_name": "test_contact_submissions_requires_authentication",
+    "endpoint": "GET /api/v1/ai/contact-submissions",
+    "input": {
+      "authorization": null
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Not authenticated"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.630875+00:00"
+  },
+  {
+    "case_id": "AISUP-INT-003",
+    "test_name": "test_public_contact_submission_validation_error_422",
+    "endpoint": "POST /api/v1/ai/contact-submissions/public",
+    "input": {},
+    "expected_output": {
+      "status_code": 422,
+      "error_key": "detail"
+    },
+    "actual_output": {
+      "status_code": 422,
+      "body": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "name"
+            ],
+            "msg": "Field required",
+            "input": {}
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "email"
+            ],
+            "msg": "Field required",
+            "input": {}
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "subject"
+            ],
+            "msg": "Field required",
+            "input": {}
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "message"
+            ],
+            "msg": "Field required",
+            "input": {}
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.632366+00:00"
+  },
+  {
+    "case_id": "AISUP-INT-004",
+    "test_name": "test_tickets_list_success",
+    "endpoint": "GET /api/v1/ai/tickets",
+    "input": {
+      "authorization": "Bearer <mocked>"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "stats.total": 1,
+      "first_reference": "TCK-1001"
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "tickets": [
+          {
+            "id": "4689d434-f591-4c7c-bd53-da4c474177ce",
+            "reference_code": "TCK-1001",
+            "title": "Refund pending",
+            "description": "Customer refund has not arrived.",
+            "priority": "high",
+            "status": "new",
+            "category": "refund",
+            "customer_name": "Ava Customer",
+            "notes": null,
+            "assigned_to_user_id": null,
+            "assigned_agent_name": null,
+            "created_at": "2026-04-18T07:53:45.634002Z",
+            "updated_at": "2026-04-18T07:53:45.634002Z",
+            "resolved_at": null,
+            "source": "manual",
+            "source_label": "Manual",
+            "requester_type": null,
+            "issue_type": null,
+            "resolution_action": null,
+            "resolution_label": null,
+            "linked_vendor_ticket_id": null,
+            "linked_vendor_ticket_code": null,
+            "linked_damage_report_id": null,
+            "linked_order_id": null,
+            "linked_order_tracking_code": null,
+            "linked_vendor_replies": [],
+            "can_delete": true,
+            "lm_action_steps": []
+          }
+        ],
+        "stats": {
+          "total": 1,
+          "new": 1,
+          "in_progress": 0,
+          "resolved": 0,
+          "urgent": 1
+        },
+        "agents": []
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.634362+00:00"
+  },
+  {
+    "case_id": "AISUP-INT-005",
+    "test_name": "test_tickets_list_requires_authentication",
+    "endpoint": "GET /api/v1/ai/tickets",
+    "input": {
+      "authorization": null
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Not authenticated"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.635844+00:00"
+  },
+  {
+    "case_id": "AISUP-INT-006",
+    "test_name": "test_contact_submissions_list_success",
+    "endpoint": "GET /api/v1/ai/contact-submissions",
+    "input": {
+      "authorization": "Bearer <mocked>"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "stats.total": 1,
+      "first_reference": "CS-1001"
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "submissions": [
+          {
+            "id": "260ecac1-d14f-4488-9f2a-9c42836449a9",
+            "reference_code": "CS-1001",
+            "name": "Ava Customer",
+            "email": "ava@example.com",
+            "phone": "9999988888",
+            "subject": "Need help with delayed order",
+            "category": "support",
+            "message": "Please help me check my order status.",
+            "priority": "high",
+            "status": "new",
+            "notes": null,
+            "assigned_to_user_id": null,
+            "assigned_agent_name": null,
+            "created_at": "2026-04-18T07:53:45.637435Z",
+            "updated_at": "2026-04-18T07:53:45.637435Z"
+          }
+        ],
+        "stats": {
+          "total": 1,
+          "new": 1,
+          "in_progress": 0,
+          "resolved": 0,
+          "urgent": 1
+        },
+        "agents": [
+          {
+            "id": "77f0ffe6-ba1c-444d-8fce-91704789dcbc",
+            "name": "Support One",
+            "email": "support@example.com"
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.637798+00:00"
+  },
+  {
+    "case_id": "AUTH-CON-002",
+    "test_name": "test_register_response_contract",
+    "endpoint": "POST /api/v1/auth/register",
+    "input": {
+      "name": "Bob",
+      "email": "bob@example.com",
+      "phone": "9999999999",
+      "password": "StrongPass123",
+      "role": "INDIVIDUAL"
+    },
+    "expected_output": {
+      "status_code": 201,
+      "required_keys": [
+        "access_token",
+        "refresh_token",
+        "token_type"
+      ]
+    },
+    "actual_output": {
+      "status_code": 201,
+      "body": {
+        "access_token": "access-token-123",
+        "refresh_token": "refresh-token-123",
+        "token_type": "bearer",
+        "user": {
+          "id": "dc59d215-a37f-4849-be00-e5e29ebb10b2",
+          "name": "Test User",
+          "username": "test.user",
+          "email": "test.user@example.com",
+          "phone": "9999999999",
+          "address": "123 Test Street",
+          "role": "INDIVIDUAL",
+          "warehouse_id": null,
+          "is_active": true,
+          "approval_status": "APPROVED",
+          "company_name": null,
+          "tax_id": null,
+          "contact_person": null,
+          "business_email": null,
+          "business_phone": null,
+          "created_at": "2026-04-18T07:53:30.004921Z"
+        },
+        "pending_approval": false,
+        "message": "Registration successful"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:30.005404+00:00"
+  },
+  {
+    "case_id": "AUTH-CON-003",
+    "test_name": "test_login_response_contract",
+    "endpoint": "POST /api/v1/auth/login",
+    "input": {
+      "email": "bob@example.com",
+      "password": "StrongPass123"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "required_keys": [
+        "access_token",
+        "refresh_token",
+        "user"
+      ]
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "access_token": "access-token-123",
+        "refresh_token": "refresh-token-123",
+        "token_type": "bearer",
+        "user": {
+          "id": "6f8d94b5-3ada-4b6c-876a-1de05b1d6e70",
+          "name": "Test User",
+          "username": "test.user",
+          "email": "test.user@example.com",
+          "phone": "9999999999",
+          "address": "123 Test Street",
+          "role": "INDIVIDUAL",
+          "warehouse_id": null,
+          "is_active": true,
+          "approval_status": "APPROVED",
+          "company_name": null,
+          "tax_id": null,
+          "contact_person": null,
+          "business_email": null,
+          "business_phone": null,
+          "created_at": "2026-04-18T07:53:30.007425Z"
+        }
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:30.007759+00:00"
+  },
+  {
+    "case_id": "AUTH-CON-004",
+    "test_name": "test_register_validation_error_contract",
+    "endpoint": "POST /api/v1/auth/register",
+    "input": {
+      "name": "Bob",
+      "email": "bob@example.com",
+      "password": "StrongPass123",
+      "role": "UNKNOWN_ROLE"
+    },
+    "expected_output": {
+      "status_code": 422,
+      "detail_type": "list"
+    },
+    "actual_output": {
+      "status_code": 422,
+      "body": {
+        "detail": [
+          {
+            "type": "literal_error",
+            "loc": [
+              "body",
+              "role"
+            ],
+            "msg": "Input should be 'INDIVIDUAL' or 'VENDOR'",
+            "input": "UNKNOWN_ROLE",
+            "ctx": {
+              "expected": "'INDIVIDUAL' or 'VENDOR'"
+            }
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:30.009699+00:00"
+  },
+  {
+    "case_id": "AUTH-INT-001",
+    "test_name": "test_auth_register_success",
+    "endpoint": "POST /api/v1/auth/register",
+    "input": {
+      "name": "Alice",
+      "email": "alice@example.com",
+      "phone": "9999999999",
+      "password": "StrongPass123",
+      "role": "INDIVIDUAL"
+    },
+    "expected_output": {
+      "status_code": 201,
+      "pending_approval": false
+    },
+    "actual_output": {
+      "status_code": 201,
+      "body": {
+        "access_token": "access-token-123",
+        "refresh_token": "refresh-token-123",
+        "token_type": "bearer",
+        "user": {
+          "id": "8445980a-46dc-4ea8-9846-a7fa933df8d3",
+          "name": "Test User",
+          "username": "test.user",
+          "email": "test.user@example.com",
+          "phone": "9999999999",
+          "address": "123 Test Street",
+          "role": "INDIVIDUAL",
+          "warehouse_id": null,
+          "is_active": true,
+          "approval_status": "APPROVED",
+          "company_name": null,
+          "tax_id": null,
+          "contact_person": null,
+          "business_email": null,
+          "business_phone": null,
+          "created_at": "2026-04-18T07:53:45.639327Z"
+        },
+        "pending_approval": false,
+        "message": "Registration successful"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.639752+00:00"
+  },
+  {
+    "case_id": "AUTH-INT-002",
+    "test_name": "test_auth_register_invalid_role_returns_422",
+    "endpoint": "POST /api/v1/auth/register",
+    "input": {
+      "name": "Alice",
+      "email": "alice@example.com",
+      "phone": "9999999999",
+      "password": "StrongPass123",
+      "role": "INVALID_ROLE"
+    },
+    "expected_output": {
+      "status_code": 422,
+      "error_key": "detail"
+    },
+    "actual_output": {
+      "status_code": 422,
+      "body": {
+        "detail": [
+          {
+            "type": "literal_error",
+            "loc": [
+              "body",
+              "role"
+            ],
+            "msg": "Input should be 'INDIVIDUAL' or 'VENDOR'",
+            "input": "INVALID_ROLE",
+            "ctx": {
+              "expected": "'INDIVIDUAL' or 'VENDOR'"
+            }
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.641580+00:00"
+  },
+  {
+    "case_id": "AUTH-INT-003",
+    "test_name": "test_auth_login_success",
+    "endpoint": "POST /api/v1/auth/login",
+    "input": {
+      "email": "alice@example.com",
+      "password": "StrongPass123"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "keys": [
+        "access_token",
+        "refresh_token",
+        "user"
+      ]
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "access_token": "access-token-123",
+        "refresh_token": "refresh-token-123",
+        "token_type": "bearer",
+        "user": {
+          "id": "6c81f3d7-2999-4116-8207-7aaa5f7196c9",
+          "name": "Test User",
+          "username": "test.user",
+          "email": "test.user@example.com",
+          "phone": "9999999999",
+          "address": "123 Test Street",
+          "role": "INDIVIDUAL",
+          "warehouse_id": null,
+          "is_active": true,
+          "approval_status": "APPROVED",
+          "company_name": null,
+          "tax_id": null,
+          "contact_person": null,
+          "business_email": null,
+          "business_phone": null,
+          "created_at": "2026-04-18T07:53:45.642907Z"
+        }
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.643187+00:00"
+  },
+  {
+    "case_id": "AUTH-INT-004",
+    "test_name": "test_auth_token_login_success",
+    "endpoint": "POST /api/v1/auth/token",
+    "input": {
+      "username": "alice@example.com",
+      "password": "StrongPass123"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "token_type": "bearer"
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "access_token": "access-token-123",
+        "refresh_token": "refresh-token-123",
+        "token_type": "bearer"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.647071+00:00"
+  },
+  {
+    "case_id": "AUTH-INT-005",
+    "test_name": "test_auth_logout_missing_header_returns_401",
+    "endpoint": "POST /api/v1/auth/logout",
+    "input": {
+      "authorization": null
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Missing or invalid Authorization header"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Missing or invalid Authorization header"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.648667+00:00"
+  },
+  {
+    "case_id": "AUTH-INT-006",
+    "test_name": "test_auth_me_requires_authentication",
+    "endpoint": "GET /api/v1/auth/me",
+    "input": {
+      "authorization": null
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Not authenticated"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.650002+00:00"
+  },
+  {
+    "case_id": "AUTH-INT-007",
+    "test_name": "test_auth_me_success",
+    "endpoint": "GET /api/v1/auth/me",
+    "input": {
+      "authorization": "Bearer <mocked>"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "keys": [
+        "id",
+        "email",
+        "role"
+      ]
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "id": "11111111-1111-1111-1111-111111111111",
+        "name": "Test User",
+        "username": "test.user",
+        "email": "test.user@example.com",
+        "phone": "9999999999",
+        "address": "123 Test Street",
+        "role": "LOGISTIC_MANAGER",
+        "warehouse_id": null,
+        "is_active": true,
+        "approval_status": "APPROVED",
+        "company_name": null,
+        "tax_id": null,
+        "contact_person": null,
+        "business_email": null,
+        "business_phone": null,
+        "created_at": "2026-04-18T07:53:45.650573Z"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.651202+00:00"
+  },
+  {
+    "case_id": "AUTH-INT-008",
+    "test_name": "test_auth_change_password_success",
+    "endpoint": "POST /api/v1/auth/change-password",
+    "input": {
+      "current_password": "old-pass-123",
+      "new_password": "new-pass-123"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "message": "Password changed successfully"
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "message": "Password changed successfully"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.652800+00:00"
+  },
+  {
+    "case_id": "AUTH-INT-009",
+    "test_name": "test_auth_send_otp_success",
+    "endpoint": "POST /api/v1/auth/send-otp",
+    "input": {
+      "email": "alice@example.com"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "message": "OTP sent"
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "message": "OTP sent",
+        "email": "alice@example.com",
+        "sent_at": "2026-04-03T00:00:00Z",
+        "debug_otp": "123456"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.655095+00:00"
+  },
+  {
+    "case_id": "AUTH-INT-010",
+    "test_name": "test_auth_verify_otp_success",
+    "endpoint": "POST /api/v1/auth/verify-otp",
+    "input": {
+      "email": "alice@example.com",
+      "otp": "123456"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "verified": true
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "verified": true,
+        "message": "OTP verified"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.656722+00:00"
+  },
+  {
+    "case_id": "CV-CON-001",
+    "test_name": "test_customer_settings_contract",
+    "endpoint": "GET /api/v1/customer/settings",
+    "input": {
+      "authorization": "Bearer <mocked>"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "required_keys": [
+        "settings"
+      ]
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "settings": {
+          "language": "en",
+          "currency": "INR",
+          "default_payment": "Full Payment",
+          "notification_prefs": {
+            "email": true
+          },
+          "privacy_prefs": {
+            "share_tracking": false
+          }
+        }
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:30.898243+00:00"
+  },
+  {
+    "case_id": "CV-CON-002",
+    "test_name": "test_vendor_settings_contract",
+    "endpoint": "GET /api/v1/vendor/settings",
+    "input": {
+      "authorization": "Bearer <mocked>"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "required_keys": [
+        "settings"
+      ]
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "settings": {
+          "company_name": "Vendor Co",
+          "tax_id": "GST-123",
+          "contact_person": "Vendor Lead",
+          "phone": "9999990000",
+          "email": "vendor@example.com",
+          "address": "Dock Road",
+          "notification_prefs": {
+            "email": true,
+            "sms": false
+          }
+        }
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:30.900474+00:00"
+  },
+  {
+    "case_id": "CV-INT-001",
+    "test_name": "test_customer_settings_success",
+    "endpoint": "GET /api/v1/customer/settings",
+    "input": {
+      "authorization": "Bearer <mocked>"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "settings.language": "en"
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "settings": {
+          "language": "en",
+          "currency": "INR",
+          "default_payment": "Full Payment",
+          "notification_prefs": {
+            "email": true
+          },
+          "privacy_prefs": {
+            "share_tracking": false
+          }
+        }
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.658173+00:00"
+  },
+  {
+    "case_id": "CV-INT-002",
+    "test_name": "test_customer_damage_report_validation_error_422",
+    "endpoint": "POST /api/v1/customer/damage-reports",
+    "input": {},
+    "expected_output": {
+      "status_code": 422,
+      "error_key": "detail"
+    },
+    "actual_output": {
+      "status_code": 422,
+      "body": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "order_id"
+            ],
+            "msg": "Field required",
+            "input": {}
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "description"
+            ],
+            "msg": "Field required",
+            "input": {}
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.660116+00:00"
+  },
+  {
+    "case_id": "CV-INT-003",
+    "test_name": "test_customer_requires_authentication",
+    "endpoint": "GET /api/v1/customer/settings",
+    "input": {
+      "authorization": null
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Not authenticated"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.661597+00:00"
+  },
+  {
+    "case_id": "CV-INT-004",
+    "test_name": "test_vendor_settings_success",
+    "endpoint": "GET /api/v1/vendor/settings",
+    "input": {
+      "authorization": "Bearer <mocked>"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "settings.email": "vendor@example.com"
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "settings": {
+          "company_name": "Vendor Co",
+          "tax_id": "GST-123",
+          "contact_person": "Vendor Lead",
+          "phone": "9999990000",
+          "email": "vendor@example.com",
+          "address": "Dock Road",
+          "notification_prefs": {
+            "email": true,
+            "sms": false
+          }
+        }
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.663126+00:00"
+  },
+  {
+    "case_id": "CV-INT-005",
+    "test_name": "test_vendor_support_ticket_validation_error_422",
+    "endpoint": "POST /api/v1/vendor/support-tickets",
+    "input": {},
+    "expected_output": {
+      "status_code": 422,
+      "error_key": "detail"
+    },
+    "actual_output": {
+      "status_code": 422,
+      "body": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "subject"
+            ],
+            "msg": "Field required",
+            "input": {}
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "description"
+            ],
+            "msg": "Field required",
+            "input": {}
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.664863+00:00"
+  },
+  {
+    "case_id": "CV-INT-006",
+    "test_name": "test_vendor_requires_authentication",
+    "endpoint": "GET /api/v1/vendor/settings",
+    "input": {
+      "authorization": null
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Not authenticated"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.666318+00:00"
+  },
+  {
+    "case_id": "FR-CON-001",
+    "test_name": "test_finance_summary_contract",
+    "endpoint": "GET /api/v1/finance/summary",
+    "input": {
+      "authorization": "Bearer <mocked>"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "required_keys": [
+        "total_revenue",
+        "total_expenses",
+        "net_profit",
+        "pending_cod"
+      ]
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "total_revenue": 10000.0,
+        "total_expenses": 5000.0,
+        "net_profit": 5000.0,
+        "pending_cod": 1000.0
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:31.732135+00:00"
+  },
+  {
+    "case_id": "FR-CON-002",
+    "test_name": "test_rates_get_contract",
+    "endpoint": "GET /api/v1/rates",
+    "input": {},
+    "expected_output": {
+      "status_code": 200,
+      "required_keys": [
+        "baseBookingFee",
+        "perKmRate",
+        "dynamic"
+      ]
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "baseBookingFee": 220,
+        "perKmRate": 12,
+        "dynamic": {
+          "peak": 1.2
+        }
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:31.734629+00:00"
+  },
+  {
+    "case_id": "FR-INT-001",
+    "test_name": "test_finance_summary_success",
+    "endpoint": "GET /api/v1/finance/summary",
+    "input": {
+      "authorization": "Bearer <mocked>"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "net_profit": 6000.0
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "total_revenue": 10000.0,
+        "total_expenses": 4000.0,
+        "net_profit": 6000.0,
+        "pending_cod": 1200.0
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.682668+00:00"
+  },
+  {
+    "case_id": "FR-INT-002",
+    "test_name": "test_finance_summary_requires_authentication",
+    "endpoint": "GET /api/v1/finance/summary",
+    "input": {
+      "authorization": null
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Not authenticated"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.684288+00:00"
+  },
+  {
+    "case_id": "FR-INT-003",
+    "test_name": "test_finance_payroll_run_success",
+    "endpoint": "POST /api/v1/finance/payroll/run",
+    "input": {
+      "user_payouts": [
+        {
+          "user_id": "11111111-1111-1111-1111-111111111111",
+          "amount": 3500,
+          "record_type": "staff",
+          "name": "Staff One"
+        }
+      ]
+    },
+    "expected_output": {
+      "status_code": 200,
+      "processed": 1
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "processed": 1,
+        "total_amount": 3500.0
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.686205+00:00"
+  },
+  {
+    "case_id": "FR-INT-004",
+    "test_name": "test_finance_payroll_validation_error_422",
+    "endpoint": "POST /api/v1/finance/payroll/run",
+    "input": {},
+    "expected_output": {
+      "status_code": 422,
+      "error_key": "detail"
+    },
+    "actual_output": {
+      "status_code": 422,
+      "body": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "user_payouts"
+            ],
+            "msg": "Field required",
+            "input": {}
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.688650+00:00"
+  },
+  {
+    "case_id": "FR-INT-005",
+    "test_name": "test_rates_get_public_success",
+    "endpoint": "GET /api/v1/rates",
+    "input": {},
+    "expected_output": {
+      "status_code": 200,
+      "baseBookingFee": 220
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "baseBookingFee": 220,
+        "dynamic": {
+          "peak": 1.2
+        }
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.690035+00:00"
+  },
+  {
+    "case_id": "FR-INT-006",
+    "test_name": "test_rates_update_success",
+    "endpoint": "PUT /api/v1/rates",
+    "input": {
+      "dynamic": {
+        "peak": 1.3
+      }
+    },
+    "expected_output": {
+      "status_code": 200,
+      "dynamic.peak": 1.3
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "baseBookingFee": 220,
+        "dynamic": {
+          "peak": 1.3,
+          "emergency": 2.5
+        }
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.691984+00:00"
+  },
+  {
+    "case_id": "FR-INT-007",
+    "test_name": "test_rates_update_empty_payload_returns_400",
+    "endpoint": "PUT /api/v1/rates",
+    "input": {},
+    "expected_output": {
+      "status_code": 400,
+      "detail": "Empty payload"
+    },
+    "actual_output": {
+      "status_code": 400,
+      "body": {
+        "detail": "Empty payload"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.694056+00:00"
+  },
+  {
+    "case_id": "FR-INT-008",
+    "test_name": "test_rates_update_requires_authentication",
+    "endpoint": "PUT /api/v1/rates",
+    "input": {
+      "authorization": null,
+      "json": {
+        "baseBookingFee": 300
+      }
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Not authenticated"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.696138+00:00"
+  },
+  {
+    "case_id": "LT-CON-001",
+    "test_name": "test_logistics_alerts_contract",
+    "endpoint": "GET /api/v1/logistics/alerts",
+    "input": {
+      "authorization": "Bearer <mocked>"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "response_type": "list"
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": []
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:32.737514+00:00"
+  },
+  {
+    "case_id": "LT-CON-002",
+    "test_name": "test_tracking_drivers_contract",
+    "endpoint": "GET /api/v1/tracking/drivers",
+    "input": {
+      "authorization": "Bearer <mocked>"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "required_keys": [
+        "driver_id",
+        "driver_name",
+        "latitude",
+        "longitude",
+        "status"
+      ]
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": [
+        {
+          "driver_id": "84251528-f763-49b7-88d2-d26ef2d10f11",
+          "driver_name": "Driver One",
+          "latitude": 19.076,
+          "longitude": 72.8777,
+          "vehicle_id": "e67d6fd2-19ea-4f5b-bc58-9c730653ab3c",
+          "vehicle_code": "VH-101",
+          "status": "Active",
+          "last_updated": "2026-04-17T10:00:00+00:00"
+        }
+      ]
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:32.741288+00:00"
+  },
+  {
+    "case_id": "LT-INT-001",
+    "test_name": "test_logistics_alerts_success",
+    "endpoint": "GET /api/v1/logistics/alerts",
+    "input": {
+      "authorization": "Bearer <mocked>"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "body": []
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": []
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.697938+00:00"
+  },
+  {
+    "case_id": "LT-INT-002",
+    "test_name": "test_logistics_alerts_requires_authentication",
+    "endpoint": "GET /api/v1/logistics/alerts",
+    "input": {
+      "authorization": null
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Not authenticated"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.699403+00:00"
+  },
+  {
+    "case_id": "LT-INT-003",
+    "test_name": "test_logistics_task_validation_error_422",
+    "endpoint": "POST /api/v1/logistics/tasks",
+    "input": {},
+    "expected_output": {
+      "status_code": 422,
+      "error_key": "detail"
+    },
+    "actual_output": {
+      "status_code": 422,
+      "body": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "text"
+            ],
+            "msg": "Field required",
+            "input": {}
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.701284+00:00"
+  },
+  {
+    "case_id": "LT-INT-004",
+    "test_name": "test_tracking_drivers_success_with_db_override",
+    "endpoint": "GET /api/v1/tracking/drivers",
+    "input": {
+      "authorization": "Bearer <mocked>"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "first_driver_name": "Driver One"
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": [
+        {
+          "driver_id": "f7293515-de23-4653-85c1-1c8823936752",
+          "driver_name": "Driver One",
+          "latitude": 19.076,
+          "longitude": 72.8777,
+          "vehicle_id": "8ca1e335-6ee2-4b6b-bf02-17526fb0d9de",
+          "vehicle_code": "VH-101",
+          "status": "Active",
+          "last_updated": "2026-04-17T10:00:00+00:00"
+        }
+      ]
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.703172+00:00"
+  },
+  {
+    "case_id": "LT-INT-005",
+    "test_name": "test_tracking_order_driver_requires_authentication",
+    "endpoint": "GET /api/v1/tracking/orders/{order_id}/driver",
+    "input": {
+      "authorization": null
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Not authenticated"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.705375+00:00"
+  },
+  {
+    "case_id": "ORD-CON-002",
+    "test_name": "test_order_create_contract",
+    "endpoint": "POST /api/v1/orders",
+    "input": {
+      "order_type": "MOVE",
+      "pickup_addr": "123 Pickup Road",
+      "delivery_addr": "456 Delivery Road"
+    },
+    "expected_output": {
+      "status_code": 201,
+      "required_keys": [
+        "id",
+        "tracking_code",
+        "status"
+      ]
+    },
+    "actual_output": {
+      "status_code": 201,
+      "body": {
+        "id": "f001c5a4-1234-4245-8e1d-c36155a13400",
+        "tracking_code": "TRK-1001",
+        "order_type": "MOVE",
+        "status": "CREATED",
+        "warehouse_substatus": null,
+        "picking_started_at": null,
+        "picking_completed_at": null,
+        "packing_started_at": null,
+        "packing_completed_at": null,
+        "customer_id": "3bbd984f-024a-4d49-abf3-11f32187a19f",
+        "warehouse_id": "595015ba-eaa3-40a5-9d1e-02fe1e465537",
+        "assigned_driver_id": null,
+        "assigned_vehicle_id": null,
+        "assigned_driver_name": null,
+        "assigned_vehicle_code": null,
+        "pickup_addr": "123 Pickup Road",
+        "pickup_type": null,
+        "pickup_lat": null,
+        "pickup_lng": null,
+        "delivery_addr": "456 Delivery Road",
+        "cargo_weight_kg": null,
+        "cargo_volume_m3": null,
+        "cargo_type": "HOUSEHOLD",
+        "vehicle_type": "TRUCK",
+        "labor_count": 2,
+        "base_amount": 1000.0,
+        "vehicle_amount": 300.0,
+        "labor_amount": 200.0,
+        "materials_amount": 50.0,
+        "packing_amount": 150.0,
+        "platform_fee": 20.0,
+        "tax_amount": 150.0,
+        "total_amount": 1870.0,
+        "carry_forward_charge_amount": 0.0,
+        "carry_forward_charge_paid_amount": 0.0,
+        "payment_mode": "ONLINE",
+        "payment_status": "pending",
+        "paid_amount": 0.0,
+        "declared_value": 0.0,
+        "service_otp": null,
+        "service_otp_sent_at": null,
+        "service_otp_verified_at": null,
+        "service_time_block": null,
+        "scheduled_at": null,
+        "arrived_at": null,
+        "cancel_reason": null,
+        "cancellation_fee": 0.0,
+        "wallet_refund_amount": 0.0,
+        "delivered_at": null,
+        "delivery_notes": null,
+        "pod_photos": [],
+        "pod_signature": null,
+        "poc_signature": null,
+        "job_rating": null,
+        "job_feedback": null,
+        "customer_rating": null,
+        "customer_feedback": null,
+        "packing_return_data": null,
+        "customer_name": "Jane Doe",
+        "customer_phone": "9999999999",
+        "escalated": false,
+        "escalation_id": null,
+        "escalation_status": null,
+        "created_at": "2026-04-18T07:53:36.767090Z",
+        "items": [
+          {
+            "id": "fa007e40-2c99-438a-a41a-3a8964ea295d",
+            "sku": "BOX-MEDIUM",
+            "name": null,
+            "quantity": 3,
+            "box_count": 2,
+            "estimated_volume": 1.5
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:36.767537+00:00"
+  },
+  {
+    "case_id": "ORD-CON-003",
+    "test_name": "test_order_list_contract",
+    "endpoint": "GET /api/v1/orders",
+    "input": {
+      "query": {
+        "page": 1,
+        "page_size": 20
+      }
+    },
+    "expected_output": {
+      "status_code": 200,
+      "required_keys": [
+        "items",
+        "total",
+        "page",
+        "page_size"
+      ]
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "items": [
+          {
+            "id": "6bcf28fc-a748-43ed-b232-b063d6545fdf",
+            "tracking_code": "TRK-1001",
+            "order_type": "MOVE",
+            "status": "CONFIRMED",
+            "warehouse_substatus": null,
+            "picking_started_at": null,
+            "picking_completed_at": null,
+            "packing_started_at": null,
+            "packing_completed_at": null,
+            "customer_id": "4202a79c-60e4-441b-9abb-05dd76b85be0",
+            "warehouse_id": "87a111f8-0c5a-4977-96a6-885c32177d04",
+            "assigned_driver_id": null,
+            "assigned_vehicle_id": null,
+            "assigned_driver_name": null,
+            "assigned_vehicle_code": null,
+            "pickup_addr": "123 Pickup Road",
+            "pickup_type": null,
+            "pickup_lat": null,
+            "pickup_lng": null,
+            "delivery_addr": "456 Delivery Road",
+            "cargo_weight_kg": null,
+            "cargo_volume_m3": null,
+            "cargo_type": "HOUSEHOLD",
+            "vehicle_type": "TRUCK",
+            "labor_count": 2,
+            "base_amount": 1000.0,
+            "vehicle_amount": 300.0,
+            "labor_amount": 200.0,
+            "materials_amount": 50.0,
+            "packing_amount": 150.0,
+            "platform_fee": 20.0,
+            "tax_amount": 150.0,
+            "total_amount": 1870.0,
+            "carry_forward_charge_amount": 0.0,
+            "carry_forward_charge_paid_amount": 0.0,
+            "payment_mode": "ONLINE",
+            "payment_status": "pending",
+            "paid_amount": 0.0,
+            "declared_value": 0.0,
+            "service_otp": null,
+            "service_otp_sent_at": null,
+            "service_otp_verified_at": null,
+            "service_time_block": null,
+            "scheduled_at": null,
+            "arrived_at": null,
+            "cancel_reason": null,
+            "cancellation_fee": 0.0,
+            "wallet_refund_amount": 0.0,
+            "delivered_at": null,
+            "delivery_notes": null,
+            "pod_photos": [],
+            "pod_signature": null,
+            "poc_signature": null,
+            "job_rating": null,
+            "job_feedback": null,
+            "customer_rating": null,
+            "customer_feedback": null,
+            "packing_return_data": null,
+            "customer_name": "Jane Doe",
+            "customer_phone": "9999999999",
+            "escalated": false,
+            "escalation_id": null,
+            "escalation_status": null,
+            "created_at": "2026-04-18T07:53:36.769107Z",
+            "items": [
+              {
+                "id": "dedfa82d-bc47-45fb-ab92-46300a7faa6d",
+                "sku": "BOX-MEDIUM",
+                "name": null,
+                "quantity": 3,
+                "box_count": 2,
+                "estimated_volume": 1.5
+              }
+            ]
+          }
+        ],
+        "total": 1,
+        "page": 1,
+        "page_size": 20
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:36.769423+00:00"
+  },
+  {
+    "case_id": "ORD-CON-004",
+    "test_name": "test_order_items_contract",
+    "endpoint": "GET /api/v1/orders/{order_id}/items",
+    "input": {
+      "path": {
+        "order_id": "52729db6-1a4e-4964-b0d8-4cc9580ac42b"
+      }
+    },
+    "expected_output": {
+      "status_code": 200,
+      "required_keys": [
+        "id",
+        "sku",
+        "quantity"
+      ]
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": [
+        {
+          "id": "c7ac8193-23e0-4803-9427-a8fc1687c140",
+          "sku": "BOX-MEDIUM",
+          "name": null,
+          "quantity": 3,
+          "box_count": 2,
+          "estimated_volume": 1.5
+        }
+      ]
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:36.771613+00:00"
+  },
+  {
+    "case_id": "ORD-INT-001",
+    "test_name": "test_orders_create_success",
+    "endpoint": "POST /api/v1/orders",
+    "input": {
+      "order_type": "MOVE",
+      "pickup_addr": "123 Pickup Road",
+      "delivery_addr": "456 Delivery Road"
+    },
+    "expected_output": {
+      "status_code": 201,
+      "status": "CREATED"
+    },
+    "actual_output": {
+      "status_code": 201,
+      "body": {
+        "id": "c0b99704-df71-4c47-82b7-0f5ecd253cf4",
+        "tracking_code": "TRK-1001",
+        "order_type": "MOVE",
+        "status": "CREATED",
+        "warehouse_substatus": null,
+        "picking_started_at": null,
+        "picking_completed_at": null,
+        "packing_started_at": null,
+        "packing_completed_at": null,
+        "customer_id": "b83d3fbe-55c1-40eb-a717-b32e8d0617b1",
+        "warehouse_id": "941b89d2-8bff-4bba-8241-f381e0d84f59",
+        "assigned_driver_id": null,
+        "assigned_vehicle_id": null,
+        "assigned_driver_name": null,
+        "assigned_vehicle_code": null,
+        "pickup_addr": "123 Pickup Road",
+        "pickup_type": null,
+        "pickup_lat": null,
+        "pickup_lng": null,
+        "delivery_addr": "456 Delivery Road",
+        "cargo_weight_kg": null,
+        "cargo_volume_m3": null,
+        "cargo_type": "HOUSEHOLD",
+        "vehicle_type": "TRUCK",
+        "labor_count": 2,
+        "base_amount": 1000.0,
+        "vehicle_amount": 300.0,
+        "labor_amount": 200.0,
+        "materials_amount": 50.0,
+        "packing_amount": 150.0,
+        "platform_fee": 20.0,
+        "tax_amount": 150.0,
+        "total_amount": 1870.0,
+        "carry_forward_charge_amount": 0.0,
+        "carry_forward_charge_paid_amount": 0.0,
+        "payment_mode": "ONLINE",
+        "payment_status": "pending",
+        "paid_amount": 0.0,
+        "declared_value": 0.0,
+        "service_otp": null,
+        "service_otp_sent_at": null,
+        "service_otp_verified_at": null,
+        "service_time_block": null,
+        "scheduled_at": null,
+        "arrived_at": null,
+        "cancel_reason": null,
+        "cancellation_fee": 0.0,
+        "wallet_refund_amount": 0.0,
+        "delivered_at": null,
+        "delivery_notes": null,
+        "pod_photos": [],
+        "pod_signature": null,
+        "poc_signature": null,
+        "job_rating": null,
+        "job_feedback": null,
+        "customer_rating": null,
+        "customer_feedback": null,
+        "packing_return_data": null,
+        "customer_name": "Jane Doe",
+        "customer_phone": "9999999999",
+        "escalated": false,
+        "escalation_id": null,
+        "escalation_status": null,
+        "created_at": "2026-04-18T07:53:45.706940Z",
+        "items": [
+          {
+            "id": "969c3fa7-f754-4bf5-acd8-aee8ed76841f",
+            "sku": "BOX-MEDIUM",
+            "name": null,
+            "quantity": 3,
+            "box_count": 2,
+            "estimated_volume": 1.5
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.707273+00:00"
+  },
+  {
+    "case_id": "ORD-INT-002",
+    "test_name": "test_orders_list_success",
+    "endpoint": "GET /api/v1/orders",
+    "input": {
+      "query": {
+        "page": 1,
+        "page_size": 20
+      }
+    },
+    "expected_output": {
+      "status_code": 200,
+      "total": 1
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "items": [
+          {
+            "id": "a6d8c71b-af2c-40d3-9146-ca09cf81e3c7",
+            "tracking_code": "TRK-1001",
+            "order_type": "MOVE",
+            "status": "CONFIRMED",
+            "warehouse_substatus": null,
+            "picking_started_at": null,
+            "picking_completed_at": null,
+            "packing_started_at": null,
+            "packing_completed_at": null,
+            "customer_id": "fbdd1abd-e35b-4c1f-ace6-439ff4f62d3b",
+            "warehouse_id": "b587a3bb-faf7-4616-8dea-5ccabe6d523d",
+            "assigned_driver_id": null,
+            "assigned_vehicle_id": null,
+            "assigned_driver_name": null,
+            "assigned_vehicle_code": null,
+            "pickup_addr": "123 Pickup Road",
+            "pickup_type": null,
+            "pickup_lat": null,
+            "pickup_lng": null,
+            "delivery_addr": "456 Delivery Road",
+            "cargo_weight_kg": null,
+            "cargo_volume_m3": null,
+            "cargo_type": "HOUSEHOLD",
+            "vehicle_type": "TRUCK",
+            "labor_count": 2,
+            "base_amount": 1000.0,
+            "vehicle_amount": 300.0,
+            "labor_amount": 200.0,
+            "materials_amount": 50.0,
+            "packing_amount": 150.0,
+            "platform_fee": 20.0,
+            "tax_amount": 150.0,
+            "total_amount": 1870.0,
+            "carry_forward_charge_amount": 0.0,
+            "carry_forward_charge_paid_amount": 0.0,
+            "payment_mode": "ONLINE",
+            "payment_status": "pending",
+            "paid_amount": 0.0,
+            "declared_value": 0.0,
+            "service_otp": null,
+            "service_otp_sent_at": null,
+            "service_otp_verified_at": null,
+            "service_time_block": null,
+            "scheduled_at": null,
+            "arrived_at": null,
+            "cancel_reason": null,
+            "cancellation_fee": 0.0,
+            "wallet_refund_amount": 0.0,
+            "delivered_at": null,
+            "delivery_notes": null,
+            "pod_photos": [],
+            "pod_signature": null,
+            "poc_signature": null,
+            "job_rating": null,
+            "job_feedback": null,
+            "customer_rating": null,
+            "customer_feedback": null,
+            "packing_return_data": null,
+            "customer_name": "Jane Doe",
+            "customer_phone": "9999999999",
+            "escalated": false,
+            "escalation_id": null,
+            "escalation_status": null,
+            "created_at": "2026-04-18T07:53:45.708918Z",
+            "items": [
+              {
+                "id": "43faa0f1-f69f-479a-9b8b-4dedf254e554",
+                "sku": "BOX-MEDIUM",
+                "name": null,
+                "quantity": 3,
+                "box_count": 2,
+                "estimated_volume": 1.5
+              }
+            ]
+          }
+        ],
+        "total": 1,
+        "page": 1,
+        "page_size": 20
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.709319+00:00"
+  },
+  {
+    "case_id": "ORD-INT-003",
+    "test_name": "test_orders_get_success",
+    "endpoint": "GET /api/v1/orders/{order_id}",
+    "input": {
+      "path": {
+        "order_id": "603981ba-5be0-4e50-8aa9-6026be101e50"
+      }
+    },
+    "expected_output": {
+      "status_code": 200,
+      "id": "603981ba-5be0-4e50-8aa9-6026be101e50"
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "id": "603981ba-5be0-4e50-8aa9-6026be101e50",
+        "tracking_code": "TRK-1001",
+        "order_type": "MOVE",
+        "status": "CONFIRMED",
+        "warehouse_substatus": null,
+        "picking_started_at": null,
+        "picking_completed_at": null,
+        "packing_started_at": null,
+        "packing_completed_at": null,
+        "customer_id": "0a64d5d0-e935-441c-926c-1bc853aa3941",
+        "warehouse_id": "b74a8cc3-cbf0-4224-9c49-2ac15720e6e0",
+        "assigned_driver_id": null,
+        "assigned_vehicle_id": null,
+        "assigned_driver_name": null,
+        "assigned_vehicle_code": null,
+        "pickup_addr": "123 Pickup Road",
+        "pickup_type": null,
+        "pickup_lat": null,
+        "pickup_lng": null,
+        "delivery_addr": "456 Delivery Road",
+        "cargo_weight_kg": null,
+        "cargo_volume_m3": null,
+        "cargo_type": "HOUSEHOLD",
+        "vehicle_type": "TRUCK",
+        "labor_count": 2,
+        "base_amount": 1000.0,
+        "vehicle_amount": 300.0,
+        "labor_amount": 200.0,
+        "materials_amount": 50.0,
+        "packing_amount": 150.0,
+        "platform_fee": 20.0,
+        "tax_amount": 150.0,
+        "total_amount": 1870.0,
+        "carry_forward_charge_amount": 0.0,
+        "carry_forward_charge_paid_amount": 0.0,
+        "payment_mode": "ONLINE",
+        "payment_status": "pending",
+        "paid_amount": 0.0,
+        "declared_value": 0.0,
+        "service_otp": null,
+        "service_otp_sent_at": null,
+        "service_otp_verified_at": null,
+        "service_time_block": null,
+        "scheduled_at": null,
+        "arrived_at": null,
+        "cancel_reason": null,
+        "cancellation_fee": 0.0,
+        "wallet_refund_amount": 0.0,
+        "delivered_at": null,
+        "delivery_notes": null,
+        "pod_photos": [],
+        "pod_signature": null,
+        "poc_signature": null,
+        "job_rating": null,
+        "job_feedback": null,
+        "customer_rating": null,
+        "customer_feedback": null,
+        "packing_return_data": null,
+        "customer_name": "Jane Doe",
+        "customer_phone": "9999999999",
+        "escalated": false,
+        "escalation_id": null,
+        "escalation_status": null,
+        "created_at": "2026-04-18T07:53:45.710624Z",
+        "items": [
+          {
+            "id": "1aeb038d-d34e-4722-9697-ac0b20b867a9",
+            "sku": "BOX-MEDIUM",
+            "name": null,
+            "quantity": 3,
+            "box_count": 2,
+            "estimated_volume": 1.5
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.710956+00:00"
+  },
+  {
+    "case_id": "ORD-INT-004",
+    "test_name": "test_orders_update_success",
+    "endpoint": "PUT /api/v1/orders/{order_id}",
+    "input": {
+      "path": {
+        "order_id": "27a693ae-a87c-4ad5-adcb-258607418e08"
+      },
+      "json": {
+        "pickup_addr": "999 Updated Pickup Road"
+      }
+    },
+    "expected_output": {
+      "status_code": 200,
+      "pickup_addr": "999 Updated Pickup Road"
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "id": "27a693ae-a87c-4ad5-adcb-258607418e08",
+        "tracking_code": "TRK-1001",
+        "order_type": "MOVE",
+        "status": "CONFIRMED",
+        "warehouse_substatus": null,
+        "picking_started_at": null,
+        "picking_completed_at": null,
+        "packing_started_at": null,
+        "packing_completed_at": null,
+        "customer_id": "f6eba113-8efd-4563-a1a1-e4d3cccb0c1c",
+        "warehouse_id": "f74066ec-a13f-465e-9389-f729eeb0eeaa",
+        "assigned_driver_id": null,
+        "assigned_vehicle_id": null,
+        "assigned_driver_name": null,
+        "assigned_vehicle_code": null,
+        "pickup_addr": "999 Updated Pickup Road",
+        "pickup_type": null,
+        "pickup_lat": null,
+        "pickup_lng": null,
+        "delivery_addr": "456 Delivery Road",
+        "cargo_weight_kg": null,
+        "cargo_volume_m3": null,
+        "cargo_type": "HOUSEHOLD",
+        "vehicle_type": "TRUCK",
+        "labor_count": 2,
+        "base_amount": 1000.0,
+        "vehicle_amount": 300.0,
+        "labor_amount": 200.0,
+        "materials_amount": 50.0,
+        "packing_amount": 150.0,
+        "platform_fee": 20.0,
+        "tax_amount": 150.0,
+        "total_amount": 1870.0,
+        "carry_forward_charge_amount": 0.0,
+        "carry_forward_charge_paid_amount": 0.0,
+        "payment_mode": "ONLINE",
+        "payment_status": "pending",
+        "paid_amount": 0.0,
+        "declared_value": 0.0,
+        "service_otp": null,
+        "service_otp_sent_at": null,
+        "service_otp_verified_at": null,
+        "service_time_block": null,
+        "scheduled_at": null,
+        "arrived_at": null,
+        "cancel_reason": null,
+        "cancellation_fee": 0.0,
+        "wallet_refund_amount": 0.0,
+        "delivered_at": null,
+        "delivery_notes": null,
+        "pod_photos": [],
+        "pod_signature": null,
+        "poc_signature": null,
+        "job_rating": null,
+        "job_feedback": null,
+        "customer_rating": null,
+        "customer_feedback": null,
+        "packing_return_data": null,
+        "customer_name": "Jane Doe",
+        "customer_phone": "9999999999",
+        "escalated": false,
+        "escalation_id": null,
+        "escalation_status": null,
+        "created_at": "2026-04-18T07:53:45.712819Z",
+        "items": [
+          {
+            "id": "ed583236-98b1-4687-98ce-76183cc0670d",
+            "sku": "BOX-MEDIUM",
+            "name": null,
+            "quantity": 3,
+            "box_count": 2,
+            "estimated_volume": 1.5
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.713170+00:00"
+  },
+  {
+    "case_id": "ORD-INT-005",
+    "test_name": "test_orders_create_validation_error_422",
+    "endpoint": "POST /api/v1/orders",
+    "input": {},
+    "expected_output": {
+      "status_code": 422,
+      "error_key": "detail"
+    },
+    "actual_output": {
+      "status_code": 422,
+      "body": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "order_type"
+            ],
+            "msg": "Field required",
+            "input": {}
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "pickup_addr"
+            ],
+            "msg": "Field required",
+            "input": {}
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "delivery_addr"
+            ],
+            "msg": "Field required",
+            "input": {}
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.715278+00:00"
+  },
+  {
+    "case_id": "ORD-INT-006",
+    "test_name": "test_orders_requires_authentication",
+    "endpoint": "GET /api/v1/orders",
+    "input": {
+      "authorization": null
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Not authenticated"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.716849+00:00"
+  },
+  {
+    "case_id": "ORD-INT-007",
+    "test_name": "test_orders_get_items_success",
+    "endpoint": "GET /api/v1/orders/{order_id}/items",
+    "input": {
+      "path": {
+        "order_id": "051077c1-c424-4830-90d9-e723fd416dee"
+      }
+    },
+    "expected_output": {
+      "status_code": 200,
+      "item_count": 1
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": [
+        {
+          "id": "99ea6f62-523d-448a-ac58-7d8746f4c634",
+          "sku": "BOX-MEDIUM",
+          "name": null,
+          "quantity": 3,
+          "box_count": 2,
+          "estimated_volume": 1.5
+        }
+      ]
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.718252+00:00"
+  },
+  {
+    "case_id": "ORD-INT-008",
+    "test_name": "test_orders_upsert_items_success",
+    "endpoint": "POST /api/v1/orders/{order_id}/items",
+    "input": {
+      "path": {
+        "order_id": "925f8578-1ab5-4fcd-b79e-13aefe172eae"
+      },
+      "json": [
+        {
+          "sku": "BOX-MEDIUM",
+          "quantity": 3,
+          "box_count": 1
+        }
+      ]
+    },
+    "expected_output": {
+      "status_code": 200,
+      "item_count": 1
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": [
+        {
+          "id": "bec32381-e44c-4e6f-b884-c4191b29ee14",
+          "sku": "BOX-MEDIUM",
+          "name": null,
+          "quantity": 3,
+          "box_count": 2,
+          "estimated_volume": 1.5
+        }
+      ]
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.720338+00:00"
+  },
+  {
+    "case_id": "ORD-INT-009",
+    "test_name": "test_orders_send_delivery_otp_success_for_driver",
+    "endpoint": "POST /api/v1/orders/{order_id}/delivery-otp/send",
+    "input": {
+      "path": {
+        "order_id": "43ee37c2-508f-4686-a9f4-1ee30e5e624e"
+      },
+      "json": {
+        "force_resend": false
+      }
+    },
+    "expected_output": {
+      "status_code": 200,
+      "message": "Delivery OTP sent"
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "message": "Delivery OTP sent",
+        "email": "customer@example.com",
+        "sent_at": "2026-04-03T00:00:00Z",
+        "debug_otp": "123456"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.722774+00:00"
+  },
+  {
+    "case_id": "ORD-INT-010",
+    "test_name": "test_orders_track_unknown_returns_404",
+    "endpoint": "GET /api/v1/orders/track/{tracking_code}",
+    "input": {
+      "path": {
+        "tracking_code": "UNKNOWN-TRACKING"
+      }
+    },
+    "expected_output": {
+      "status_code": 404,
+      "detail": "Tracking code not found"
+    },
+    "actual_output": {
+      "status_code": 404,
+      "body": {
+        "detail": "Tracking code not found"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.724120+00:00"
+  },
+  {
+    "case_id": "ORD-INT-011",
+    "test_name": "test_orders_customer_rating_success",
+    "endpoint": "POST /api/v1/orders/{order_id}/customer-rating",
+    "input": {
+      "path": {
+        "order_id": "3cc141f2-b681-45cc-8dc5-ab2c23238878"
+      },
+      "json": {
+        "rating": 5,
+        "feedback": "Great service"
+      }
+    },
+    "expected_output": {
+      "status_code": 200,
+      "customer_rating": 5
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "id": "3cc141f2-b681-45cc-8dc5-ab2c23238878",
+        "tracking_code": "TRK-1001",
+        "order_type": "MOVE",
+        "status": "DELIVERED",
+        "warehouse_substatus": null,
+        "picking_started_at": null,
+        "picking_completed_at": null,
+        "packing_started_at": null,
+        "packing_completed_at": null,
+        "customer_id": "337f7fb2-e43d-4767-8b4d-b74becb196bf",
+        "warehouse_id": "fc77b5c1-49e1-42f5-b4bb-9ccb5874015e",
+        "assigned_driver_id": null,
+        "assigned_vehicle_id": null,
+        "assigned_driver_name": null,
+        "assigned_vehicle_code": null,
+        "pickup_addr": "123 Pickup Road",
+        "pickup_type": null,
+        "pickup_lat": null,
+        "pickup_lng": null,
+        "delivery_addr": "456 Delivery Road",
+        "cargo_weight_kg": null,
+        "cargo_volume_m3": null,
+        "cargo_type": "HOUSEHOLD",
+        "vehicle_type": "TRUCK",
+        "labor_count": 2,
+        "base_amount": 1000.0,
+        "vehicle_amount": 300.0,
+        "labor_amount": 200.0,
+        "materials_amount": 50.0,
+        "packing_amount": 150.0,
+        "platform_fee": 20.0,
+        "tax_amount": 150.0,
+        "total_amount": 1870.0,
+        "carry_forward_charge_amount": 0.0,
+        "carry_forward_charge_paid_amount": 0.0,
+        "payment_mode": "ONLINE",
+        "payment_status": "pending",
+        "paid_amount": 0.0,
+        "declared_value": 0.0,
+        "service_otp": null,
+        "service_otp_sent_at": null,
+        "service_otp_verified_at": null,
+        "service_time_block": null,
+        "scheduled_at": null,
+        "arrived_at": null,
+        "cancel_reason": null,
+        "cancellation_fee": 0.0,
+        "wallet_refund_amount": 0.0,
+        "delivered_at": null,
+        "delivery_notes": null,
+        "pod_photos": [],
+        "pod_signature": null,
+        "poc_signature": null,
+        "job_rating": null,
+        "job_feedback": null,
+        "customer_rating": 5,
+        "customer_feedback": "Great service",
+        "packing_return_data": null,
+        "customer_name": "Jane Doe",
+        "customer_phone": "9999999999",
+        "escalated": false,
+        "escalation_id": null,
+        "escalation_status": null,
+        "created_at": "2026-04-18T07:53:45.725512Z",
+        "items": [
+          {
+            "id": "516b1fc4-208e-4944-a620-ec11bf226ce8",
+            "sku": "BOX-MEDIUM",
+            "name": null,
+            "quantity": 3,
+            "box_count": 2,
+            "estimated_volume": 1.5
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.725816+00:00"
+  },
+  {
+    "case_id": "ORD-INT-012",
+    "test_name": "test_orders_customer_rating_validation_error_422",
+    "endpoint": "POST /api/v1/orders/{order_id}/customer-rating",
+    "input": {
+      "path": {
+        "order_id": "0fd94c44-4aba-4534-b7fb-16b118e68a04"
+      },
+      "json": {
+        "rating": 6,
+        "feedback": "Invalid rating"
+      }
+    },
+    "expected_output": {
+      "status_code": 422,
+      "error_key": "detail"
+    },
+    "actual_output": {
+      "status_code": 422,
+      "body": {
+        "detail": [
+          {
+            "type": "less_than_equal",
+            "loc": [
+              "body",
+              "rating"
+            ],
+            "msg": "Input should be less than or equal to 5",
+            "input": 6,
+            "ctx": {
+              "le": 5
+            }
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.727690+00:00"
+  },
+  {
+    "case_id": "ORD-INT-013",
+    "test_name": "test_orders_customer_rating_requires_authentication",
+    "endpoint": "POST /api/v1/orders/{order_id}/customer-rating",
+    "input": {
+      "path": {
+        "order_id": "e05b0a2c-ac09-477d-abca-0048b499da5e"
+      },
+      "json": {
+        "rating": 5,
+        "feedback": "Great service"
+      },
+      "authorization": null
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Not authenticated"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.729764+00:00"
+  },
+  {
+    "case_id": "PUB-CON-002",
+    "test_name": "test_health_endpoint_contract",
+    "endpoint": "GET /health",
+    "input": {},
+    "expected_output": {
+      "status_code": 200,
+      "body": {
+        "status": "ok"
+      }
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "status": "ok"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:41.314679+00:00"
+  },
+  {
+    "case_id": "PUB-CON-003",
+    "test_name": "test_tracking_schema_contract_defined",
+    "endpoint": "GET /api/v1/tracking/drivers",
+    "input": {
+      "authorization": null
+    },
+    "expected_output": {
+      "openapi_200_item_schema_ref": "#/components/schemas/DriverLocationItem",
+      "runtime_status_code": 401
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:42.142933+00:00"
+  },
+  {
+    "case_id": "S2-CON-001",
+    "test_name": "test_support_dashboard_requires_authentication",
+    "endpoint": "GET /api/v1/ai/support/dashboard",
+    "input": {
+      "authorization": null
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Not authenticated"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:43.884282+00:00"
+  },
+  {
+    "case_id": "S2-CON-002",
+    "test_name": "test_damage_review_queue_requires_authentication",
+    "endpoint": "GET /api/v1/damage-reports",
+    "input": {
+      "authorization": null
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Not authenticated"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:43.886714+00:00"
+  },
+  {
+    "case_id": "S2-CON-003",
+    "test_name": "test_dispatcher_intelligence_requires_authentication",
+    "endpoint": "GET /api/v1/orders/ai-driver-suggestions",
+    "input": {
+      "authorization": null
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Not authenticated"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:43.888829+00:00"
+  },
+  {
+    "case_id": "S2-INT-001",
+    "test_name": "test_support_dashboard_success",
+    "endpoint": "GET /api/v1/ai/support/dashboard",
+    "input": {},
+    "expected_output": {
+      "status_code": 200,
+      "stats.active_sessions": 2
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "stats": {
+          "total_sessions": 4,
+          "active_sessions": 2,
+          "human_engaged_sessions": 1,
+          "sessions_needing_human": 1,
+          "open_escalations": 1,
+          "open_contact_forms": 3,
+          "new_contact_forms": 2,
+          "resolved_contact_forms": 1,
+          "user_messages_today": 12,
+          "assistant_messages_today": 20
+        },
+        "priority_sessions": [],
+        "recent_contact_submissions": [],
+        "activity_feed": []
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.619363+00:00"
+  },
+  {
+    "case_id": "S2-INT-002",
+    "test_name": "test_support_settings_update_success",
+    "endpoint": "PUT /api/v1/ai/support/settings",
+    "input": {
+      "tone": "Professional and empathetic",
+      "language_mode": "English",
+      "sentiment_threshold": 80,
+      "refund_limit_inr": 15000,
+      "system_prompt": "You are the support assistant. Resolve user issues clearly, politely, and with actionable steps.",
+      "autonomous_replies": true,
+      "legal_threat_detection": true,
+      "real_time_sentiment_analysis": true,
+      "proactive_human_handover": false
+    },
+    "expected_output": {
+      "status_code": 200,
+      "settings.sentiment_threshold": 80
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "settings": {
+          "tone": "Professional and empathetic",
+          "language_mode": "English",
+          "sentiment_threshold": 80,
+          "refund_limit_inr": 15000,
+          "system_prompt": "You are the support assistant. Resolve user issues clearly, politely, and with actionable steps.",
+          "autonomous_replies": true,
+          "legal_threat_detection": true,
+          "real_time_sentiment_analysis": true,
+          "proactive_human_handover": false
+        },
+        "integrations": [
+          {
+            "provider": "gmail",
+            "label": "Gmail",
+            "description": "Outbound support email",
+            "connected": true,
+            "connection_source": "env",
+            "status_note": "Connected",
+            "editable": false
+          }
+        ],
+        "updated_at": "2026-04-18T07:53:45.621809Z",
+        "autonomous_reply_guidance": "Autonomous mode is active.",
+        "rag_recommended": false
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.622146+00:00"
+  },
+  {
+    "case_id": "S2-INT-003",
+    "test_name": "test_support_analytics_and_execute_insight_success",
+    "endpoint": "GET/POST /api/v1/ai/support/analytics*",
+    "input": {
+      "range": "7D",
+      "insight_id": "escalation-spike"
+    },
+    "expected_output": {
+      "analytics_status": 200,
+      "execute_status": 200
+    },
+    "actual_output": {
+      "analytics_status": 200,
+      "analytics_body": {
+        "range": "7D",
+        "generated_at": "2026-04-18T07:53:45.623694Z",
+        "metrics": [
+          {
+            "id": "resolution_rate",
+            "label": "Resolution Rate",
+            "icon": "analytics",
+            "value": 74.2,
+            "formatted_value": "74.2%",
+            "trend": "+3.1%",
+            "trend_direction": "up"
+          }
+        ],
+        "resolution_chart": {
+          "labels": [
+            "Mon",
+            "Tue"
+          ],
+          "ai_resolved": [
+            6,
+            7
+          ],
+          "human_escalated": [
+            2,
+            3
+          ]
+        },
+        "escalation_reasons": [
+          {
+            "label": "Legal risk",
+            "count": 2,
+            "pct": 25
+          },
+          {
+            "label": "Sentiment drop",
+            "count": 6,
+            "pct": 75
+          }
+        ],
+        "sentiment_chart": {
+          "labels": [
+            "Mon",
+            "Tue"
+          ],
+          "ai_handled": [
+            82.4,
+            80.1
+          ],
+          "human_handled": [
+            60.0,
+            58.5
+          ]
+        },
+        "insights": [
+          {
+            "id": "escalation-spike",
+            "icon": "insights",
+            "title": "Escalations rising",
+            "text": "Escalations rose in the last 24h.",
+            "tone": "amber",
+            "action_label": "Create follow-up",
+            "executed": false
+          }
+        ]
+      },
+      "execute_status": 200,
+      "execute_body": {
+        "insight_id": "escalation-spike",
+        "ticket_id": "a5c9dc2c-abf2-474e-b349-efe2fb467f89",
+        "ticket_reference_code": "TCK-7788",
+        "message": "Insight escalation-spike executed for 7D"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.624759+00:00"
+  },
+  {
+    "case_id": "S2-INT-004",
+    "test_name": "test_support_settings_validation_error_422",
+    "endpoint": "PUT /api/v1/ai/support/settings",
+    "input": {
+      "tone": "Professional and empathetic",
+      "language_mode": "English",
+      "sentiment_threshold": 101,
+      "refund_limit_inr": 15000,
+      "system_prompt": "You are the support assistant. Resolve user issues clearly, politely, and with actionable steps.",
+      "autonomous_replies": true,
+      "legal_threat_detection": true,
+      "real_time_sentiment_analysis": true,
+      "proactive_human_handover": false
+    },
+    "expected_output": {
+      "status_code": 422,
+      "detail_key": "detail"
+    },
+    "actual_output": {
+      "status_code": 422,
+      "body": {
+        "detail": [
+          {
+            "type": "less_than_equal",
+            "loc": [
+              "body",
+              "sentiment_threshold"
+            ],
+            "msg": "Input should be less than or equal to 100",
+            "input": 101,
+            "ctx": {
+              "le": 100
+            }
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.626916+00:00"
+  },
+  {
+    "case_id": "S2-INT-005",
+    "test_name": "test_damage_review_queue_success",
+    "endpoint": "GET /api/v1/damage-reports",
+    "input": {
+      "query": {
+        "status": "Reported",
+        "flow_type": "pickup_inspection"
+      }
+    },
+    "expected_output": {
+      "status_code": 200,
+      "first_id": "DMG-REF-1001"
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": [
+        {
+          "id": "DMG-REF-1001",
+          "order_id": "ORD-1001",
+          "customer": "Casey Customer",
+          "description": "Box arrived damaged.",
+          "images": [
+            "photo-1.png"
+          ],
+          "flow_type": "pickup_inspection",
+          "status": "Reported"
+        }
+      ]
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.667691+00:00"
+  },
+  {
+    "case_id": "S2-INT-006",
+    "test_name": "test_damage_review_submit_success",
+    "endpoint": "POST /api/v1/damage-reports/{reference_code}/review",
+    "input": {
+      "path": {
+        "reference_code": "DMG-REF-2001"
+      },
+      "json": {
+        "damage_severity": "LOW",
+        "is_genuine": true,
+        "recommended_settlement": "Partial Refund",
+        "remarks": "Packaging dented, item usable.",
+        "new_status": "Claims Reviewed"
+      }
+    },
+    "expected_output": {
+      "status_code": 200,
+      "status": "Claims Reviewed"
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "id": "DMG-REF-2001",
+        "order_id": "ORD-2001",
+        "customer": "Vendor Ops",
+        "description": "Transit scratch report.",
+        "images": [
+          "dmg-1.png"
+        ],
+        "flow_type": "photo_review",
+        "status": "Claims Reviewed"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.669271+00:00"
+  },
+  {
+    "case_id": "S2-INT-007",
+    "test_name": "test_damage_review_validation_error_422",
+    "endpoint": "POST /api/v1/damage-reports/{reference_code}/review",
+    "input": {
+      "path": {
+        "reference_code": "DMG-REF-3001"
+      },
+      "json": {
+        "new_status": 123
+      }
+    },
+    "expected_output": {
+      "status_code": 422,
+      "detail_key": "detail"
+    },
+    "actual_output": {
+      "status_code": 422,
+      "body": {
+        "detail": [
+          {
+            "type": "string_type",
+            "loc": [
+              "body",
+              "new_status"
+            ],
+            "msg": "Input should be a valid string",
+            "input": 123
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.671644+00:00"
+  },
+  {
+    "case_id": "S2-INT-008",
+    "test_name": "test_assignment_preview_success",
+    "endpoint": "GET /api/v1/orders/assignment-preview",
+    "input": {
+      "query": {
+        "warehouse_id": "497d2787-eedf-4eb9-8666-193cd1c8e41d"
+      }
+    },
+    "expected_output": {
+      "status_code": 200,
+      "assignment_type": "selected"
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "warehouse_id": "497d2787-eedf-4eb9-8666-193cd1c8e41d",
+        "warehouse_name": "Main Hub",
+        "warehouse_address": "100 Dispatch Street",
+        "assignment_type": "selected",
+        "message": "Manual assignment ready"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.673412+00:00"
+  },
+  {
+    "case_id": "S2-INT-009",
+    "test_name": "test_ai_driver_suggestions_success",
+    "endpoint": "GET /api/v1/orders/ai-driver-suggestions",
+    "input": {},
+    "expected_output": {
+      "status_code": 200,
+      "total": 1
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "suggestions": [
+          {
+            "order_id": "14ed9a17-51e6-479d-9eec-7af5c04d78d5",
+            "order_tracking_code": "TRK-9901",
+            "pickup_addr": "A Street",
+            "delivery_addr": "B Street",
+            "priority": "HIGH",
+            "suggested_driver_id": "8c9a4660-89c9-4ac8-8b5a-f275b9af908b",
+            "suggested_driver_name": "Driver One",
+            "distance_km": 2.7,
+            "confidence": 93,
+            "reason": "Closest available driver with low workload",
+            "ai_powered": true
+          }
+        ],
+        "total": 1
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.675172+00:00"
+  },
+  {
+    "case_id": "S2-INT-010",
+    "test_name": "test_return_suggestions_success",
+    "endpoint": "GET /api/v1/orders/return-suggestions",
+    "input": {},
+    "expected_output": {
+      "status_code": 200,
+      "total": 1
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "suggestions": [
+          {
+            "driver_id": "7a56f95a-d42a-4720-a95d-e7ef2d1fce42",
+            "driver_name": "Driver Two",
+            "pending_order_id": "b57e1e1d-5c76-45ee-91b5-e565724535a2",
+            "pending_tracking_code": "TRK-RET-01",
+            "pickup_addr": "Warehouse 5",
+            "delivery_addr": "Client Avenue",
+            "distance_km": 4.2,
+            "priority": "MEDIUM",
+            "delivered_minutes_ago": 30,
+            "last_delivery_addr": "Zone C",
+            "reason": "Driver recently completed nearby drop",
+            "ai_powered": true
+          }
+        ],
+        "total": 1
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.677257+00:00"
+  },
+  {
+    "case_id": "S2-INT-011",
+    "test_name": "test_optimize_routes_and_batch_assign_success",
+    "endpoint": "POST /api/v1/orders/optimize-routes + POST /api/v1/orders/batch-assign",
+    "input": {
+      "optimize": {
+        "optimize_for": "distance",
+        "prioritize_urgent": true
+      },
+      "batch": {
+        "assignments": [
+          {
+            "order_id": "a2a81f5f-254f-47ae-812f-c476bc2adb2d",
+            "driver_id": "4c60f359-5978-4aae-928d-546dc7caafb4",
+            "vehicle_id": "62c05296-ee08-4730-9e7c-a413c76d5d4a"
+          }
+        ]
+      }
+    },
+    "expected_output": {
+      "optimize_status": 200,
+      "batch_status": 200
+    },
+    "actual_output": {
+      "optimize_status": 200,
+      "optimize_body": {
+        "optimized": true,
+        "strategy": "distance",
+        "prioritize_urgent": true
+      },
+      "batch_status": 200,
+      "batch_body": [
+        {
+          "id": "a2a81f5f-254f-47ae-812f-c476bc2adb2d",
+          "assigned_driver_id": "4c60f359-5978-4aae-928d-546dc7caafb4",
+          "assigned_vehicle_id": "62c05296-ee08-4730-9e7c-a413c76d5d4a",
+          "status": "ASSIGNED"
+        }
+      ]
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.680677+00:00"
+  },
+  {
+    "case_id": "TRK-INT-001",
+    "test_name": "test_tracking_requires_authentication",
+    "endpoint": "GET /api/v1/tracking/drivers",
+    "input": {
+      "authorization": null
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Not authenticated"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.731424+00:00"
+  },
+  {
+    "case_id": "TRK-INT-002",
+    "test_name": "test_tracking_active_drivers_success",
+    "endpoint": "GET /api/v1/tracking/drivers",
+    "input": {
+      "authorization": "Bearer <mocked>"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "driver_count": 1
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": [
+        {
+          "driver_id": "8bb180c5-a948-4794-b9e5-03000944db56",
+          "driver_name": "Driver One",
+          "latitude": 19.076,
+          "longitude": 72.8777,
+          "vehicle_id": "b5653331-e77d-4743-9840-4ebb665fc66b",
+          "vehicle_code": "VH-001",
+          "status": "On-Duty",
+          "last_updated": "2026-04-18T07:53:45.732198+00:00"
+        }
+      ]
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.732997+00:00"
+  },
+  {
+    "case_id": "TRK-INT-003",
+    "test_name": "test_tracking_order_driver_success",
+    "endpoint": "GET /api/v1/tracking/orders/{order_id}/driver",
+    "input": {
+      "path": {
+        "order_id": "d2425ef5-2b54-45af-a7f4-671410c6d899"
+      }
+    },
+    "expected_output": {
+      "status_code": 200,
+      "driver_name": "Driver Two"
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "driver_id": "bf7e7b2a-3c97-4e37-b1f0-32f4ff03dc75",
+        "driver_name": "Driver Two",
+        "latitude": 18.5204,
+        "longitude": 73.8567,
+        "vehicle_id": "42292e2e-5553-4596-a274-af871af55642",
+        "vehicle_code": "VH-002",
+        "status": "In-Transit",
+        "last_updated": "2026-04-18T07:53:45.733714+00:00"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.734818+00:00"
+  },
+  {
+    "case_id": "TRK-INT-004",
+    "test_name": "test_tracking_order_driver_returns_null_when_unassigned",
+    "endpoint": "GET /api/v1/tracking/orders/{order_id}/driver",
+    "input": {
+      "path": {
+        "order_id": "80a0a84e-d9ae-4745-a716-b7e5a6c803df"
+      }
+    },
+    "expected_output": {
+      "status_code": 200,
+      "body": null
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": null
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.736193+00:00"
+  },
+  {
+    "case_id": "WHOPS-CON-001",
+    "test_name": "test_inbound_overview_contract",
+    "endpoint": "GET /api/v1/warehouses/{warehouse_id}/operations/inbound",
+    "input": {
+      "warehouse_id": "11111111-1111-1111-1111-111111111111"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "required_keys": [
+        "stats",
+        "shipments",
+        "dock_schedule"
+      ]
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "stats": {
+          "arrived_today": 1,
+          "in_transit": 2,
+          "mismatches_found": 0,
+          "damage_reports": 0
+        },
+        "shipments": [],
+        "dock_schedule": []
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.616141+00:00"
+  },
+  {
+    "case_id": "WHOPS-CON-002",
+    "test_name": "test_loading_docks_contract",
+    "endpoint": "GET /api/v1/warehouses/{warehouse_id}/operations/loading-docks",
+    "input": {
+      "warehouse_id": "11111111-1111-1111-1111-111111111111"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "required_keys": [
+        "items",
+        "total"
+      ]
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "items": [],
+        "total": 0
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.617845+00:00"
+  },
+  {
+    "case_id": "WHOPS-INT-001",
+    "test_name": "test_inbound_overview_success",
+    "endpoint": "GET /api/v1/warehouses/{warehouse_id}/operations/inbound",
+    "input": {
+      "warehouse_id": "11111111-1111-1111-1111-111111111111"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "stats.in_transit": 3
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "stats": {
+          "arrived_today": 2,
+          "in_transit": 3,
+          "mismatches_found": 1,
+          "damage_reports": 0
+        },
+        "shipments": [],
+        "dock_schedule": []
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.738119+00:00"
+  },
+  {
+    "case_id": "WHOPS-INT-002",
+    "test_name": "test_schedule_inbound_success",
+    "endpoint": "POST /api/v1/warehouses/{warehouse_id}/operations/inbound/schedule",
+    "input": {
+      "supplier_name": "Acme Supplies",
+      "expected_qty": 120,
+      "scheduled_at": "2026-04-18T10:00:00+00:00",
+      "dock_preference": "Dock 2",
+      "notes": "Handle pallets carefully"
+    },
+    "expected_output": {
+      "status_code": 201,
+      "message_contains": "QC-8800112233"
+    },
+    "actual_output": {
+      "status_code": 201,
+      "body": {
+        "message": "Inbound delivery scheduled as QC-8800112233"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.740184+00:00"
+  },
+  {
+    "case_id": "WHOPS-INT-003",
+    "test_name": "test_inbound_overview_requires_authentication",
+    "endpoint": "GET /api/v1/warehouses/{warehouse_id}/operations/inbound",
+    "input": {
+      "authorization": null
+    },
+    "expected_output": {
+      "status_code": 401,
+      "detail": "Not authenticated"
+    },
+    "actual_output": {
+      "status_code": 401,
+      "body": {
+        "detail": "Not authenticated"
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.741914+00:00"
+  },
+  {
+    "case_id": "WHOPS-INT-004",
+    "test_name": "test_schedule_inbound_validation_error_422",
+    "endpoint": "POST /api/v1/warehouses/{warehouse_id}/operations/inbound/schedule",
+    "input": {},
+    "expected_output": {
+      "status_code": 422,
+      "error_key": "detail"
+    },
+    "actual_output": {
+      "status_code": 422,
+      "body": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "supplier_name"
+            ],
+            "msg": "Field required",
+            "input": {}
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "expected_qty"
+            ],
+            "msg": "Field required",
+            "input": {}
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "scheduled_at"
+            ],
+            "msg": "Field required",
+            "input": {}
+          }
+        ]
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.743681+00:00"
+  },
+  {
+    "case_id": "WHOPS-INT-005",
+    "test_name": "test_loading_docks_success",
+    "endpoint": "GET /api/v1/warehouses/{warehouse_id}/operations/loading-docks",
+    "input": {
+      "warehouse_id": "11111111-1111-1111-1111-111111111111"
+    },
+    "expected_output": {
+      "status_code": 200,
+      "total": 0
+    },
+    "actual_output": {
+      "status_code": 200,
+      "body": {
+        "items": [],
+        "total": 0
+      }
+    },
+    "status": "PASS",
+    "notes": null,
+    "recorded_at": "2026-04-18T07:53:45.745686+00:00"
+  }
+]

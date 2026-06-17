@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Order Coordinates</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        pre { background: #f4f4f4; padding: 10px; overflow: auto; }
+        .order { border: 1px solid #ddd; margin: 10px 0; padding: 10px; }
+        .has-coords { background: #d4edda; }
+        .no-coords { background: #f8d7da; }
+    </style>
+</head>
+<body>
+    <h1>Order Coordinates Test</h1>
+    <button onclick="testAPI()">Fetch Orders</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>Loading...</p>';
+            
+            try {
+                // Login first
+                const loginRes = await fetch('http://localhost:8000/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: 'yash@gmail.com', password: 'yash123' })
+                });
+                
+                if (!loginRes.ok) {
+                    resultDiv.innerHTML = '<p style="color:red;">Login failed: ' + loginRes.status + '</p>';
+                    return;
+                }
+                
+                const loginData = await loginRes.json();
+                const token = loginData.access_token;
+                
+                // Fetch orders
+                const ordersRes = await fetch('http://localhost:8000/api/v1/orders?page_size=20', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                
+                if (!ordersRes.ok) {
+                    resultDiv.innerHTML = '<p style="color:red;">Orders fetch failed: ' + ordersRes.status + '</p>';
+                    return;
+                }
+                
+                const ordersData = await ordersRes.json();
+                const orders = Array.isArray(ordersData) ? ordersData : (ordersData.items || []);
+                
+                let html = '<h2>Total Orders: ' + orders.length + '</h2>';
+                
+                let withCoords = 0;
+                let withoutCoords = 0;
+                
+                orders.forEach(order => {
+                    const hasCoords = order.delivery_lat != null && order.delivery_lng != null;
+                    const cssClass = hasCoords ? 'has-coords' : 'no-coords';
+                    
+                    if (hasCoords) withCoords++;
+                    else withoutCoords++;
+                    
+                    html += '<div class="order ' + cssClass + '">';
+                    html += '<strong>ID:</strong> ' + order.id + '<br>';
+                    html += '<strong>Status:</strong> ' + order.status + '<br>';
+                    html += '<strong>Delivery Address:</strong> ' + (order.delivery_addr || 'N/A') + '<br>';
+                    html += '<strong>Coordinates:</strong> ';
+                    if (hasCoords) {
+                        html += order.delivery_lat.toFixed(6) + ', ' + order.delivery_lng.toFixed(6);
+                    } else {
+                        html += '<span style="color:red;">MISSING</span>';
+                    }
+                    html += '</div>';
+                });
+                
+                html = '<p><strong>With Coords:</strong> ' + withCoords + ' | <strong>Without:</strong> ' + withoutCoords + '</p>' + html;
+                
+                resultDiv.innerHTML = html;
+                
+            } catch (error) {
+                resultDiv.innerHTML = '<p style="color:red;">Error: ' + error.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html>

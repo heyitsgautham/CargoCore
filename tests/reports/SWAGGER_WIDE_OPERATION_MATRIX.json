@@ -1,0 +1,3768 @@
+[
+  {
+    "operation": "DELETE /api/v1/ai/contact-submissions/{submission_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      204,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/ai/knowledge-articles/{article_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      204,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/ai/tickets/{ticket_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      204,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/customer/account",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/customer/notifications",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/dev/seed-gps",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/inventory/{item_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "404",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/labourers/{labourer_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      204,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/logistics/chats/{thread_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/logistics/meetings/{meeting_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/logistics/notifications",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/logistics/tasks/{task_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/logistics/zones/{zone_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/users/{user_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/vendor/notifications",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/vendor/recurring-rules/{rule_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/vendor/team-members/{member_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "DELETE /api/v1/warehouses/{warehouse_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/ai/contact-submissions",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401
+    ],
+    "observed_status": "200,401",
+    "result": "PASS",
+    "source": "AISUP-INT-002, AISUP-INT-006"
+  },
+  {
+    "operation": "GET /api/v1/ai/conversations/{session_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/ai/escalation-center",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/ai/escalations",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/ai/knowledge-articles",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/ai/knowledge-articles/{article_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/ai/recovery-tickets/count",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/ai/sessions",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/ai/support/analytics",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "-",
+    "result": "PASS",
+    "source": "S2-INT-003"
+  },
+  {
+    "operation": "GET /api/v1/ai/support/customer-history/{user_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/ai/support/damage-reports",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/ai/support/dashboard",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401
+    ],
+    "observed_status": "200,401",
+    "result": "PASS",
+    "source": "S2-CON-001, S2-INT-001"
+  },
+  {
+    "operation": "GET /api/v1/ai/support/refund-cases",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/ai/support/sessions",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/ai/support/sessions/{session_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/ai/support/settings",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/ai/tickets",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401
+    ],
+    "observed_status": "200,401",
+    "result": "PASS",
+    "source": "AISUP-CON-002, AISUP-INT-004, AISUP-INT-005"
+  },
+  {
+    "operation": "GET /api/v1/auth/me",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401
+    ],
+    "observed_status": "200,401",
+    "result": "PASS",
+    "source": "AUTH-INT-006, AUTH-INT-007"
+  },
+  {
+    "operation": "GET /api/v1/customer/damage-reports",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/customer/dashboard",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/customer/notifications",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/customer/payments",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/customer/profile",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/customer/quotes",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/customer/settings",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401
+    ],
+    "observed_status": "200,401",
+    "result": "PASS",
+    "source": "CV-CON-001, CV-INT-001, CV-INT-003"
+  },
+  {
+    "operation": "GET /api/v1/customer/tracking",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/customer/wallet",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/damage-reports",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "200,401",
+    "result": "PASS",
+    "source": "S2-CON-002, S2-INT-005"
+  },
+  {
+    "operation": "GET /api/v1/finance/summary",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "200,401",
+    "result": "PASS",
+    "source": "FR-CON-001, FR-INT-001, FR-INT-002"
+  },
+  {
+    "operation": "GET /api/v1/geocoding/reverse",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      422
+    ],
+    "observed_status": "422",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/geocoding/search",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      422
+    ],
+    "observed_status": "422",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/inventory",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/inventory/categories",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/inventory/low-stock",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/inventory/material-requests",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/inventory/movements",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/inventory/packing-catalog",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/inventory/restock-requests",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/inventory/{item_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "404",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/labourers",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/labourers/availability",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/labourers/{labourer_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/alerts",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401
+    ],
+    "observed_status": "200,401",
+    "result": "PASS",
+    "source": "LT-CON-001, LT-INT-001, LT-INT-002"
+  },
+  {
+    "operation": "GET /api/v1/logistics/bootstrap",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/chats",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/dispatch-contacts",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/drivers",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/drivers/me/audit",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/drivers/me/crew",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/drivers/me/dashboard",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/drivers/me/dispatch-thread",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/drivers/me/hos",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/drivers/me/manager-thread",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/drivers/me/notifications",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/drivers/me/shift",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/drivers/me/telemetry",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/manifests",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/meeting-participants",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/meetings",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/notifications",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/tasks",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/vehicles",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/logistics/zones",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/orders",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "200,401",
+    "result": "PASS",
+    "source": "ORD-CON-003, ORD-INT-002, ORD-INT-006"
+  },
+  {
+    "operation": "GET /api/v1/orders/ai-driver-suggestions",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401
+    ],
+    "observed_status": "200,401",
+    "result": "PASS",
+    "source": "S2-CON-003, S2-INT-009"
+  },
+  {
+    "operation": "GET /api/v1/orders/assignment-preview",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "200",
+    "result": "PASS",
+    "source": "S2-INT-008"
+  },
+  {
+    "operation": "GET /api/v1/orders/return-suggestions",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401
+    ],
+    "observed_status": "200",
+    "result": "PASS",
+    "source": "S2-INT-010"
+  },
+  {
+    "operation": "GET /api/v1/orders/track/{tracking_code}",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      404,
+      422
+    ],
+    "observed_status": "404",
+    "result": "PASS",
+    "source": "ORD-INT-010"
+  },
+  {
+    "operation": "GET /api/v1/orders/trip-intelligence",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/orders/{order_id}",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "200",
+    "result": "PASS",
+    "source": "ORD-INT-003"
+  },
+  {
+    "operation": "GET /api/v1/orders/{order_id}/items",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "200",
+    "result": "PASS",
+    "source": "ORD-CON-004, ORD-INT-007"
+  },
+  {
+    "operation": "GET /api/v1/orders/{order_id}/proof-of-delivery",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/orders/{order_id}/trip-intelligence",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/rates",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200
+    ],
+    "observed_status": "200",
+    "result": "PASS",
+    "source": "FR-CON-002, FR-INT-005"
+  },
+  {
+    "operation": "GET /api/v1/rates/inventory-seeded",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/tracking/drivers",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401
+    ],
+    "observed_status": "200,401",
+    "result": "PASS",
+    "source": "LT-CON-002, LT-INT-004, PUB-CON-003, TRK-INT-001, TRK-INT-002"
+  },
+  {
+    "operation": "GET /api/v1/tracking/orders/{order_id}/driver",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "200,401",
+    "result": "PASS",
+    "source": "LT-INT-005, TRK-INT-003, TRK-INT-004"
+  },
+  {
+    "operation": "GET /api/v1/users",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/users/{user_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/vendor/api-keys",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/vendor/bulk-uploads",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/vendor/damage-reports",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/vendor/dashboard",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/vendor/notifications",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/vendor/recurring-rules",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/vendor/settings",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401
+    ],
+    "observed_status": "200,401",
+    "result": "PASS",
+    "source": "CV-CON-002, CV-INT-004, CV-INT-006"
+  },
+  {
+    "operation": "GET /api/v1/vendor/shipments",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/vendor/support-tickets",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/vendor/team-members",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/vendor/wallet",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/warehouses",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/warehouses/{warehouse_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/warehouses/{warehouse_id}/dashboard",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/warehouses/{warehouse_id}/kpis",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/warehouses/{warehouse_id}/operations/inbound",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "200,401",
+    "result": "PASS",
+    "source": "WHOPS-CON-001, WHOPS-INT-001, WHOPS-INT-003"
+  },
+  {
+    "operation": "GET /api/v1/warehouses/{warehouse_id}/operations/loading-docks",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "200",
+    "result": "PASS",
+    "source": "WHOPS-CON-002, WHOPS-INT-005"
+  },
+  {
+    "operation": "GET /api/v1/warehouses/{warehouse_id}/operations/orders/{order_id}/ai-receive-plan",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/warehouses/{warehouse_id}/operations/orders/{order_id}/pick-progress",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/warehouses/{warehouse_id}/operations/packing-stations",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/warehouses/{warehouse_id}/operations/performance",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/warehouses/{warehouse_id}/operations/quality-checks",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/warehouses/{warehouse_id}/operations/quality-checks/{check_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/warehouses/{warehouse_id}/operations/returns",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /api/v1/warehouses/{warehouse_id}/operations/zones/{zone_id}/metrics",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "GET /health",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200
+    ],
+    "observed_status": "200",
+    "result": "PASS",
+    "source": "PUB-CON-002"
+  },
+  {
+    "operation": "POST /api/v1/ai/chat",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/ai/contact-submissions/public",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      201,
+      422
+    ],
+    "observed_status": "201,422",
+    "result": "PASS",
+    "source": "AISUP-CON-001, AISUP-INT-001, AISUP-INT-003"
+  },
+  {
+    "operation": "POST /api/v1/ai/contact-submissions/{submission_id}/reply",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/ai/escalate/{conversation_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/ai/estimate-image",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      422
+    ],
+    "observed_status": "422",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/ai/knowledge-articles",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/ai/knowledge-articles/{article_id}/like",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/ai/support/analytics/insights/{insight_id}/execute",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/ai/support/damage-reports",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/ai/support/damage-reports/{report_id}/message",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/ai/support/sessions/{session_id}/escalate",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/ai/support/sessions/{session_id}/reply",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/ai/support/sessions/{session_id}/take-over",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/ai/tickets",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/ai/tickets/{ticket_id}/reply",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/auth/change-password",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "200",
+    "result": "PASS",
+    "source": "AUTH-INT-008"
+  },
+  {
+    "operation": "POST /api/v1/auth/forgot-password",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      422
+    ],
+    "observed_status": "422",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/auth/google-login",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      422
+    ],
+    "observed_status": "422",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/auth/login",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      422
+    ],
+    "observed_status": "200",
+    "result": "PASS",
+    "source": "AUTH-CON-003, AUTH-INT-003"
+  },
+  {
+    "operation": "POST /api/v1/auth/logout",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "AUTH-INT-005"
+  },
+  {
+    "operation": "POST /api/v1/auth/refresh",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      422
+    ],
+    "observed_status": "422",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/auth/register",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      201,
+      422
+    ],
+    "observed_status": "201,422",
+    "result": "PASS",
+    "source": "AUTH-CON-002, AUTH-CON-004, AUTH-INT-001, AUTH-INT-002"
+  },
+  {
+    "operation": "POST /api/v1/auth/reset-password",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      422
+    ],
+    "observed_status": "422",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/auth/send-otp",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      422
+    ],
+    "observed_status": "200",
+    "result": "PASS",
+    "source": "AUTH-INT-009"
+  },
+  {
+    "operation": "POST /api/v1/auth/token",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      422
+    ],
+    "observed_status": "200",
+    "result": "PASS",
+    "source": "AUTH-INT-004"
+  },
+  {
+    "operation": "POST /api/v1/auth/verify-otp",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      422
+    ],
+    "observed_status": "200",
+    "result": "PASS",
+    "source": "AUTH-INT-010"
+  },
+  {
+    "operation": "POST /api/v1/customer/damage-reports",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "422",
+    "result": "PASS",
+    "source": "CV-INT-002"
+  },
+  {
+    "operation": "POST /api/v1/customer/notifications/mark-all-read",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/customer/quotes/{quote_id}/convert",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/customer/wallet/backfill-debits",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/customer/wallet/top-up",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/damage-reports/{reference_code}/review",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "200,422",
+    "result": "PASS",
+    "source": "S2-INT-006, S2-INT-007"
+  },
+  {
+    "operation": "POST /api/v1/dev/seed-gps",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/finance/payroll/run",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "200,422",
+    "result": "PASS",
+    "source": "FR-INT-003, FR-INT-004"
+  },
+  {
+    "operation": "POST /api/v1/inventory",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/inventory/material-requests",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/inventory/movements",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/inventory/pick-list/{order_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/inventory/restock-requests",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/inventory/restock-requests/{request_id}/escalate",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "404",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/labourers",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/labourers/{labourer_id}/assign/{order_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/labourers/{labourer_id}/check-in",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/labourers/{labourer_id}/check-out",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/ai/query",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/alerts",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/alerts/{alert_id}/resolve",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/capital-investment",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/chats",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/chats/{thread_id}/messages",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/documents",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/drivers",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/drivers/me/bind-vehicle",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/drivers/me/cashout",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/drivers/me/crew/{labourer_id}/check-in",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/drivers/me/crisis-alert",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/drivers/me/dispatch-thread/messages",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/drivers/me/fuel-receipt",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/drivers/me/location",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/drivers/me/manager-thread/messages",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/drivers/me/return-vehicle",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/drivers/me/shift/end",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/drivers/me/shift/start",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/manifests",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/manifests/{manifest_id}/push",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/meetings",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/notifications/broadcast",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/notifications/mark-all-read",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/returns/{case_id}/issue-refund",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/returns/{case_id}/schedule-pickup",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/tasks",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "422",
+    "result": "PASS",
+    "source": "LT-INT-003"
+  },
+  {
+    "operation": "POST /api/v1/logistics/transactions",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/vehicles",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/logistics/zones",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "201,422",
+    "result": "PASS",
+    "source": "ORD-CON-002, ORD-INT-001, ORD-INT-005"
+  },
+  {
+    "operation": "POST /api/v1/orders/auto-balance",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/batch-assign",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "-",
+    "result": "PASS",
+    "source": "S2-INT-011"
+  },
+  {
+    "operation": "POST /api/v1/orders/cluster",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/optimize-routes",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "-",
+    "result": "PASS",
+    "source": "S2-INT-011"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/asset-log",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/assign",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/cancel",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/complete-return",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/confirm",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/customer-rating",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "200,401,422",
+    "result": "PASS",
+    "source": "ORD-INT-011, ORD-INT-012, ORD-INT-013"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/delivery-otp/send",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "200",
+    "result": "PASS",
+    "source": "ORD-INT-009"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/escalate",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/house-shift-signoff",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/items",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "200",
+    "result": "PASS",
+    "source": "ORD-INT-008"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/job-rating",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/packing-return",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/pay",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/proof-of-delivery",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/simulate-arrival",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/transition",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/trip-intelligence/deviation",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/trip-intelligence/push",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/orders/{order_id}/wallet-pay",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/rates/seed-inventory",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/users",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/users/{user_id}/assign-role",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/users/{user_id}/assign-warehouse",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/vendor/api-keys",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/vendor/api-keys/{key_id}/revoke",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/vendor/bulk-uploads",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/vendor/damage-reports",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/vendor/invoices/{order_id}/pay",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/vendor/notifications/mark-all-read",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/vendor/recurring-rules",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/vendor/recurring-rules/{rule_id}/toggle",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/vendor/support-tickets",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "422",
+    "result": "PASS",
+    "source": "CV-INT-005"
+  },
+  {
+    "operation": "POST /api/v1/vendor/support-tickets/{ticket_id}/reply",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/vendor/support-tickets/{ticket_id}/resolve",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/vendor/team-members",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/vendor/wallet/top-up",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/inbound/schedule",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      201,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "201,422",
+    "result": "PASS",
+    "source": "WHOPS-INT-002, WHOPS-INT-004"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/loading-docks",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/loading-docks/{dock_id}/assign",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/loading-docks/{dock_id}/maintenance",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/loading-docks/{dock_id}/release",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/orders/{order_id}/accept",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/orders/{order_id}/complete-packing",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/orders/{order_id}/complete-picking",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/orders/{order_id}/generate-take-back",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/orders/{order_id}/mark-arrived",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/orders/{order_id}/pick-item",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/orders/{order_id}/quality-check",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/orders/{order_id}/receive-inbound",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/orders/{order_id}/report-damage",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/orders/{order_id}/report-mismatch",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/orders/{order_id}/revert-picking",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/orders/{order_id}/start-packing",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/orders/{order_id}/start-picking",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/packing-stations",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/quality-checks/{check_id}/pass",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/returns",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/returns/{grading_id}/complete",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/returns/{grading_id}/photo",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/operations/zones/metrics",
+    "mode": "PROBE",
+    "documented_statuses": [
+      201,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/orders/{order_id}/complete",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/orders/{order_id}/reassign",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "POST /api/v1/warehouses/{warehouse_id}/restock",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/ai/contact-submissions/{submission_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/ai/escalation-center/{escalation_id}/resolve",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/ai/escalations/{escalation_id}/resolve",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/ai/knowledge-articles/{article_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/ai/support/damage-reports/{report_id}/notes",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/ai/support/refund-cases/{case_id}/urgent",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/ai/support/settings",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "200,422",
+    "result": "PASS",
+    "source": "S2-INT-002, S2-INT-004"
+  },
+  {
+    "operation": "PUT /api/v1/ai/tickets/{ticket_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/auth/me",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/customer/notifications/{notification_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/customer/settings",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/inventory/material-requests/{request_id}/approve",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "404",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/inventory/material-requests/{request_id}/reject",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "404",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/inventory/restock-requests/{request_id}/status",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "404",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/inventory/{item_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "404",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/labourers/{labourer_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/logistics/chats/{thread_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/logistics/documents/{doc_id}/status",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/logistics/drivers/{driver_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/logistics/escalations/{escalation_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/logistics/meetings/{meeting_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/logistics/notifications/{notification_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/logistics/returns/{case_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/logistics/tasks/{task_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/logistics/vehicles/{vehicle_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/logistics/zones/{zone_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/orders/{order_id}",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "200",
+    "result": "PASS",
+    "source": "ORD-INT-004"
+  },
+  {
+    "operation": "PUT /api/v1/rates",
+    "mode": "DIRECT",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "200,400,401",
+    "result": "PASS",
+    "source": "FR-INT-006, FR-INT-007, FR-INT-008"
+  },
+  {
+    "operation": "PUT /api/v1/users/{user_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/vendor/bulk-uploads/{upload_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/vendor/notifications/{notification_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/vendor/recurring-rules/{rule_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/vendor/settings",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/warehouses/{warehouse_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/warehouses/{warehouse_id}/floor-plan",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/warehouses/{warehouse_id}/operations/packing-stations/{station_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/warehouses/{warehouse_id}/operations/quality-checks/{check_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  },
+  {
+    "operation": "PUT /api/v1/warehouses/{warehouse_id}/operations/returns/{grading_id}",
+    "mode": "PROBE",
+    "documented_statuses": [
+      200,
+      401,
+      404,
+      422
+    ],
+    "observed_status": "401",
+    "result": "PASS",
+    "source": "Swagger probe scan"
+  }
+]
