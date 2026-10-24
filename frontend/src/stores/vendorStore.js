@@ -3,6 +3,15 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useRates } from '@/composables/useRates'
 import { buildPodData } from '@/utils/pod'
+import {
+    parseStatusKey,
+    formatStatusLabel,
+    statusProgress,
+    safeDateLabel,
+    safeDateTimeLabel,
+    routeSummary,
+    isRecurringShipment,
+} from './vendor/shipmentFormat'
 
 const API_BASE = `${API_BASE_URL}/api/v1`
 const VENDOR_WALLET_TOPUP_OFFSET_KEY = 'vendor_wallet_topup_offset'
@@ -18,66 +27,6 @@ function getAuthHeaders(json = false) {
         ...(json ? { 'Content-Type': 'application/json' } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
     }
-}
-
-function parseStatusKey(status) {
-    const value = String(status || '').toLowerCase()
-    if (['warehouse', 'awaiting_pick', 'picking', 'picked', 'packing', 'packed', 'qc_passed'].includes(value)) return 'warehouse'
-    if (value.includes('transit') || value === 'assigned') return 'transit'
-    if (value === 'delivered' || value === 'closed') return 'delivered'
-    if (value === 'cancelled') return 'cancelled'
-    if (value === 'out_for_delivery') return 'delivery'
-    return 'pending'
-}
-
-function formatStatusLabel(statusKey) {
-    return {
-        pending: 'Pending',
-        warehouse: 'In Warehouse',
-        transit: 'In Transit',
-        delivery: 'Out for Delivery',
-        delivered: 'Delivered',
-        cancelled: 'Cancelled',
-    }[statusKey] || 'Pending'
-}
-
-function statusProgress(statusKey) {
-    return { pending: 15, warehouse: 35, transit: 65, delivery: 85, delivered: 100, cancelled: 0 }[statusKey] || 0
-}
-
-function safeDateLabel(value, fallback = 'TBD') {
-    if (!value) return fallback
-    const parsed = new Date(value)
-    return Number.isNaN(parsed.getTime())
-        ? String(value)
-        : parsed.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
-}
-
-function safeDateTimeLabel(value, fallback = 'TBD') {
-    if (!value) return fallback
-    const parsed = new Date(value)
-    return Number.isNaN(parsed.getTime())
-        ? String(value)
-        : parsed.toLocaleString('en-US', {
-            month: 'short',
-            day: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        })
-}
-
-function routeSummary(pickup, delivery) {
-    return `${pickup || 'Origin'} → ${delivery || 'Destination'}`
-}
-
-function isRecurringShipment(raw) {
-    const notes = String(raw.delivery_notes || '')
-    return Boolean(
-        raw.recurring_rule_id ||
-        raw.is_recurring ||
-        (notes.includes('RECURRING_RULE:') && notes.includes('|RUN:'))
-    )
 }
 
 export const useVendorStore = defineStore('vendor', () => {
