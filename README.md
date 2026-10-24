@@ -1,279 +1,180 @@
-# Logistics & Personal Move Management System
+# CargoCore
 
-## Project Overview
-This project is a **Centralized Cloud Platform** where all roles interact with one shared database. It is designed to manage the full lifecycle of logistics, specifically optimized for the "Personal Move" (House Shift) scenario—the system's most complex use case. By integrating real-time GPS, inventory, and labor management, it provides a seamless flow from initial booking to final delivery.
+CargoCore is a logistics and house-move management system built by Team QuadCore-Devs for the IIT Madras Software Engineering course.
+One FastAPI backend and one Postgres database serve three clients.
 
----
+| Part | Folder | Stack |
+|---|---|---|
+| API | `backend/` | FastAPI, SQLAlchemy 2 async, Alembic, Pydantic v2, Redis, Loguru |
+| Web app for every office role | `frontend/` | Vue 3, Vite, Pinia, Vue Router, Tailwind CSS 4 |
+| Driver app | `driver-app/` | Vue 3, Capacitor 6 for Android |
 
-## Tech Stack
+The web app has dashboards for six roles: individual customer, vendor, logistics manager, warehouse manager, dispatcher and AI support agent.
+Drivers use the Android app for manifests, GPS tracking and proof of delivery.
 
-| Layer | Technology |
-| :--- | :--- |
-| **Frontend** | Vue 3, Vite, Pinia |
-| **Backend** | FastAPI (Python), Uvicorn |
-| **Database** | PostgreSQL 16 (async via asyncpg + SQLAlchemy) |
-| **Cache / Realtime** | Redis 7 |
-| **Migrations** | Alembic |
-| **Auth** | JWT (access + refresh tokens) |
-| **AI / GenAI** | Google Gemini API + RAG |
-| **Maps** | Google Maps Platform |
-| **Video** | Daily.co |
-| **Background Tasks** | Celery |
-| **Containerization** | Docker + Docker Compose |
+## Architecture
 
----
-
-## System Architecture
-The platform is built on three core pillars:
-- **The Backend (The Engine):** Houses the primary logic for routing, inventory, and GenAI.
-- **The Frontend (The Dashboards):** Six different "Views" tailored specifically to each role.
-- **The Database (The Heart):** Stores all live data, including GPS, Stock, Labor, and Payments.
-
----
-
-## Running the Project
-
-### Prerequisites
-- Docker & Docker Compose installed
-- Node.js 18+ and npm/yarn (for frontend dev)
-- Python 3.11+ (for backend dev without Docker)
-
----
-
-### Option 1 — Docker (Recommended)
-
-```bash
-# From the backend folder
-cd backend
-docker-compose up --build
+```
+ frontend/ (Vue SPA)        driver-app/ (Capacitor APK)
+        │  REST + JWT                │  REST + JWT, WebSocket
+        └──────────────┬─────────────┘
+                       ▼
+              backend/app/main.py  (FastAPI app factory)
+                       │
+        routers/   one module per domain: auth, orders, logistics,
+                   warehouses, warehouse_operations, inventory, vendor,
+                   customer, finance, rates, tracking, ai, ws_fleet ...
+                       │  request bodies validated by schemas/ (Pydantic)
+        services/  business rules, one module per domain
+                       │
+        models/    SQLAlchemy ORM ──► PostgreSQL 16 (Alembic migrations)
+        utils/     JWT, hashing, Redis client, Gemini client, geocoding
 ```
 
-This starts three containers:
-| Container | Service | Port |
-| :--- | :--- | :--- |
-| `logistics_app` | FastAPI backend | `http://localhost:8000` |
-| `logistics_dbw` | PostgreSQL database | `localhost:5432` |
-| `logistics_redis` | Redis cache | `localhost:6379` |
+- `middleware/logging_middleware.py` logs method, path, status and duration for every request with Loguru.
+- `GET /health` returns `{"status": "ok"}` and backs the container health check.
+- Auth issues HS256 access and refresh tokens, and Redis holds the logout blacklist and password-reset OTPs.
+- The AI assistant calls Google Gemini when `GEMINI_API_KEY` is set and answers from rules and database lookups when it is not.
 
-Alembic migrations run automatically on startup.
+## Quick start with Docker
 
----
+Docker Compose brings up the API, the web app, Postgres 16 and Redis 7 from the repo root.
 
-### Option 2 — Manual (Dev Mode)
+```bash
+cp .env.example .env        # optional, every value has a default
+docker compose up --build
+```
 
-#### Backend
+| Service | URL |
+|---|---|
+| Web app | http://localhost:8080 |
+| API | http://localhost:8000 |
+| Swagger UI | http://localhost:8000/docs |
+| ReDoc | http://localhost:8000/redoc |
+| Postgres | localhost:5432, database `logistics_db` |
+| Redis | localhost:6379 |
+
+The `app` container runs `alembic upgrade head` before it starts Uvicorn.
+
+## Running without Docker
+
+You need Python 3.12, Node.js 20 or newer, PostgreSQL 16 and Redis 7.
+
+### Backend
 
 ```bash
 cd backend
-
-# Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Copy and configure environment variables
-cp .env.example .env            # then fill in your values
-
-# Run database migrations
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+cp .env.example .env                 # set DATABASE_URL, REDIS_URL and SECRET_KEY
+createdb logistics_db
 alembic upgrade head
-
-# Start the backend server
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+uvicorn app.main:app --reload --port 8000
 ```
 
-Backend runs at: `http://127.0.0.1:8000`
-API docs (Swagger UI): `http://127.0.0.1:8000/docs`
-API docs (ReDoc): `http://127.0.0.1:8000/redoc`
-
-#### Frontend
+### Web app
 
 ```bash
 cd frontend
-
-# Install dependencies
-npm install
-
-# Start the dev server
-npm run dev
+npm ci
+cp .env.example .env                 # VITE_API_BASE_URL defaults to http://127.0.0.1:8000
+npm run dev                          # http://localhost:5173
 ```
 
-Frontend runs at: `http://localhost:5173`
-
----
-
-## Environment Variables
-
-**Quickest way — just copy the example files:**
+### Driver app
 
 ```bash
-# Backend
-cd backend
+cd driver-app
+npm ci --legacy-peer-deps
 cp .env.example .env
-cd ..
-
-# Frontend
-cd frontend
-cp .env.example .env
-cd ..
+npm run dev                          # browser preview
+npm run cap:android                  # build, sync and open in Android Studio
 ```
 
-> **Windows users:** use `copy` instead of `cp`
-> ```
-> cd backend && copy .env.example .env && cd ..
-> cd frontend && copy .env.example .env && cd ..
-> ```
+CI builds a debug APK on every push to `main` that touches `driver-app/`.
 
-Then open `backend/.env` and fill in your API keys. That's it — no manual typing needed.
+## Tests and checks
 
----
+These are the commands CI runs in `.github/workflows/ci.yml`.
 
-The full list of variables for reference — create a `.env` file inside `backend/` with:
+| Where | Command | What it does |
+|---|---|---|
+| `backend/` | `pytest --cov` | 689 unit, contract and integration tests, fails under 35% coverage |
+| `backend/` | `ruff check .` | lint |
+| `backend/` | `pip-audit -r requirements.txt --no-deps --disable-pip` | dependency audit |
+| `frontend/` | `npm test` | 79 Vitest tests for the API client, utils, composables and stores |
+| `frontend/` | `npm run test:coverage` | the same tests with coverage thresholds |
+| `frontend/` | `npm run lint` | ESLint with the Vue plugin |
+| `frontend/` | `npm run format:check` | Prettier |
+| `frontend/` | `npm run build` | production bundle in `frontend/dist` |
+| `frontend/` | `npm audit --audit-level=high` | dependency audit |
+| repo root | `gitleaks git --config .gitleaks.toml .` | secret scan over the full history |
 
-```env
-# Application
-APP_ENV=development
-SECRET_KEY=your-secret-key-here
+The backend tests need a reachable Postgres database named `logistics_db_test`.
+`tests/conftest.py` derives its URL from `DATABASE_URL`, creates the tables and drops them afterwards.
+Redis and Gemini are mocked.
 
-# Database
-DATABASE_URL=postgresql+asyncpg://logistics_user:logistics_pass@localhost:5432/logistics_db
+## Environment variables
 
-# Redis
-REDIS_URL=redis://localhost:6379/0
+`.env.example` at the root lists every variable for the Docker setup.
+`backend/.env.example`, `frontend/.env.example` and `driver-app/.env.example` cover running each part on its own.
 
-# Google APIs
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_MAPS_API_KEY=your-google-maps-api-key
-GEMINI_API_KEY=your-gemini-api-key
+| Variable | Read by | Default | Purpose |
+|---|---|---|---|
+| `APP_ENV` | backend | `development` | `production` turns off SQL echo and dev-only shortcuts |
+| `SECRET_KEY` | backend | `change-me` | signs JWTs, set 32 or more random characters |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | backend | `1440` | access token lifetime |
+| `REFRESH_TOKEN_EXPIRE_DAYS` | backend | `7` | refresh token lifetime |
+| `DATABASE_URL` | backend | local `logistics_db` | async SQLAlchemy URL, `postgresql+asyncpg://...` |
+| `REDIS_URL` | backend | `redis://localhost:6379/0` | token blacklist and OTP storage |
+| `ALLOWED_ORIGINS` | backend | `http://localhost:5173,http://localhost:3000` | CORS allow list, comma separated |
+| `GOOGLE_CLIENT_ID` | backend | empty | Google sign-in token audience |
+| `GOOGLE_MAPS_API_KEY` | backend | empty | geocoding and distance lookups |
+| `GEMINI_API_KEY` | backend | empty | AI assistant and room photo estimates |
+| `DAILY_API_KEY` | backend | empty | Daily.co video rooms for meetings |
+| `UPLOAD_DIR`, `MAX_UPLOAD_SIZE_MB` | backend | `./uploads`, `10` | file uploads |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` | backend | empty, `587` | outgoing email |
+| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | docker compose | `logistics_user`, `logistics_pass`, `logistics_db` | database container |
+| `VITE_API_BASE_URL` | frontend, driver app | `http://127.0.0.1:8000` | API origin, baked in at build time |
+| `VITE_GOOGLE_CLIENT_ID` | frontend | empty | Google sign-in button |
+| `VITE_API_BASE_URL_ANDROID` | driver app | unset | API origin override on a phone or emulator |
 
-# Daily.co (Video Conferencing)
-DAILY_API_KEY=your-daily-api-key
-
-# PostgreSQL (used by Docker Compose)
-POSTGRES_USER=logistics_user
-POSTGRES_PASSWORD=logistics_pass
-POSTGRES_DB=logistics_db
-```
-
-For the frontend, create a `.env` file inside `frontend/`:
-
-```env
-VITE_API_BASE_URL=http://127.0.0.1:8000
-```
-
----
-
-## Server / Port Reference
-
-| Service | URL | Notes |
-| :--- | :--- | :--- |
-| Frontend (Vite dev) | `http://localhost:5173` | Run `npm run dev` in `frontend/` |
-| Backend API | `http://127.0.0.1:8000` | Run uvicorn or Docker |
-| Swagger UI | `http://127.0.0.1:8000/docs` | Auto-generated API docs |
-| ReDoc | `http://127.0.0.1:8000/redoc` | Alternative API docs |
-| PostgreSQL | `localhost:5432` | DB: `logistics_db` |
-| Redis | `localhost:6379` | Cache & pub/sub |
-
----
-
-## Running Tests
-
-```bash
-cd backend
-
-# Run all tests
-pytest
-
-# Run specific suites
-pytest tests/unit/
-pytest tests/integration/
-pytest tests/contract/
-pytest tests/test_ai/
-
-# With verbose output
-pytest -v
-```
-
----
-
-## Key Roles & Workflow
-The system follows a sequential six-step process to ensure operational efficiency:
-
-| Sequence | Role | Primary Tool | Output to Next Role |
-| :--- | :--- | :--- | :--- |
-| 1 | Individual/Vendor | Booking UI | Order Data (ORDER_ID) |
-| 2 | Logistics Manager | Admin Dashboard | Approved Workflow Resource |
-| 3 | Warehouse Manager | Inventory/Staff Map | Packed Box + Crew Logic |
-| 4 | Dispatcher | Route Map | Assigned Route Execution |
-| 5 | Driver | Mobile App | Proof of Delivery |
-| 6 | AI Bot | Chat Interface | Customer Rating Support |
-
----
-
-## Detailed Module Specifications
-
-### 1. Logistics Manager (System Owner)
-- **Organizational Architecture:** Multi-warehouse provisioning and Role-Based Access Control (RBAC) to link managers to specific hubs.
-- **Global Control Tower:** Integrated fleet map using Google Maps to monitor active vehicles and real-time KPI visualization.
-- **Geofencing:** Digital boundaries that trigger "Auto-Arrival/Departure" timestamps and security alerts for unauthorized movement.
-- **Financial Ledger:** Monitors Cash on Delivery (COD) and automates payroll based on distance and performance.
-
-### 2. Warehouse Manager (Regional Administrator)
-- **Inventory & Stock:** Real-time SKU tracking (Aisle/Shelf/Bin) and automated safety stock alerts.
-- **Resource Management:** Manages the labor roster and assigns "Helpers" to moves.
-- **Internal Mapping:** Digitized floor plans (2D grids) and dynamic slotting to maximize picking speed.
-
-### 3. Dispatcher (Operational Coordinator)
-- **Dynamic Route Optimization:** Solves the "Traveling Salesman Problem" using automated batching and real-time traffic data.
-- **Constraint-Based Routing:** Accounts for vehicle size (e.g., avoiding narrow streets) and seat capacity for laborers.
-- **Crisis Management:** Real-time re-optimization of routes if a truck breaks down.
-
-### 4. Driver (Field Execution - Mobile App)
-- **Interactive Manifest:** Digital checklists for vehicle check-in and sequential stop lists with special instructions.
-- **Geofence Integration:** Automatic "Driver is outside" notifications sent to customers when within 50m of the address.
-- **Proof of Delivery (PoD):** Captures photos, e-signatures, and QR scans to close orders.
-
-### 5. AI Customer Support (The "Amazon-Style" Bot)
-- **Intelligent Tracking:** Pulls live GPS and ETA data to answer "Where is my stuff?".
-- **Autonomous Problem Solving:** Handles address corrections, rescheduling, and refund initiation.
-- **Escalation:** Uses sentiment analysis to "hot-swap" conversations to a human manager if a customer is angry.
-
----
-
-## Generative AI Integration
-The system leverages Google Gemini and Retrieval-Augmented Generation (RAG) to prevent hallucinations:
-
-- **Predictive Labor Scaling:** Suggests shifting staff between hubs based on predicted volume.
-- **AI Visual Volume Estimator:** Requesters can upload photos of their room; the AI estimates the number of boxes and laborers required.
-- **Smart Parking Assistant:** Analyzes historical data to suggest parking spots to drivers.
-- **Natural Language Analytics:** Managers can ask questions like *"Who was my most efficient driver last week?"* to get instant summaries and charts.
-
----
-
-## Project Structure
+## Repository layout
 
 ```
-QuadCore-Devs/
-├── backend/
-│   ├── app/
-│   │   ├── models/        # SQLAlchemy ORM models
-│   │   ├── routers/       # FastAPI route handlers
-│   │   ├── schemas/       # Pydantic request/response schemas
-│   │   ├── services/      # Business logic layer
-│   │   └── main.py        # App entry point
-│   ├── alembic/           # Database migrations
-│   ├── tests/             # Test suites (unit, integration, contract, ai)
-│   ├── docker-compose.yml
-│   ├── Dockerfile
-│   └── requirements.txt
-├── frontend/
-│   └── src/
-│       ├── LWD-views/     # Role-specific dashboard views
-│       ├── stores/        # Pinia state management
-│       ├── composables/   # Vue composables
-│       ├── config/        # API config
-│       └── main.js
-├── driver-app/            # Mobile app for drivers
-└── docs/                  # Project documentation
+backend/
+  app/           FastAPI app: routers, schemas, services, models, utils, middleware
+  alembic/       database migrations
+  tests/         unit, contract and integration suites, plus API test reports
+  requirements.in, requirements.txt          runtime dependencies, pinned
+  requirements-dev.in, requirements-dev.txt  test and lint tools, pinned
+frontend/
+  src/           role views (IV, LWD, LWDDVI, Ai), Pinia stores, composables, API client
+  tests/unit/    Vitest suites
+  html-slips/    printable slip templates served at /html-slips
+driver-app/      Capacitor Android app and its Gradle project
+docs/            plans, meeting minutes, frontend and backend notes
+docker-compose.yml, .env.example   full stack for local use
 ```
+
+## Role workflow
+
+| Step | Role | Tool | Hands over |
+|---|---|---|---|
+| 1 | Individual or vendor | booking UI | an order |
+| 2 | Logistics manager | admin dashboard | an approved order and resources |
+| 3 | Warehouse manager | inventory and floor map | a packed shipment and crew |
+| 4 | Dispatcher | route map | an assigned route |
+| 5 | Driver | Android app | proof of delivery |
+| 6 | AI support | chat | answers, escalations and tickets |
+
+`ROLE_FEATURES.md` describes each role's screens in detail.
+
+## Contributing
+
+`CONTRIBUTING.md` has the setup, branch, commit and review rules.
+
+## License
+
+This is an academic project, see `LICENSE` for the terms.

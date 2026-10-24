@@ -6,21 +6,15 @@ FastAPI · PostgreSQL 16 · SQLAlchemy 2.0 (async) · Alembic · Redis · Docker
 
 ## Quickstart (Docker Compose)
 
+The compose file lives at the repo root and starts this API with Postgres, Redis and the web app.
+
 ```bash
-# 1. Copy environment variables
-cp .env.example .env
-# Edit .env — at minimum set a strong SECRET_KEY
-
-# 2. Build and start all services (app + db + redis)
+cd ..
 docker compose up --build
-
-# 3. API is available at:
-#    http://localhost:8000
-#    http://localhost:8000/docs   ← Swagger UI
-#    http://localhost:8000/redoc  ← ReDoc
 ```
 
-Alembic migrations run automatically on container start.
+The API listens on http://localhost:8000, with Swagger UI at `/docs` and ReDoc at `/redoc`.
+Alembic migrations run when the `app` container starts.
 
 ---
 
@@ -33,8 +27,8 @@ Alembic migrations run automatically on container start.
 cd backend
 python -m venv venv && source venv/bin/activate
 
-# 2. Install dependencies
-pip install -r requirements.txt
+# 2. Install pinned dependencies (runtime plus test and lint tools)
+pip install -r requirements-dev.txt
 
 # 3. Copy and configure environment variables
 cp .env.example .env
@@ -57,8 +51,26 @@ uvicorn app.main:app --reload --port 8000
 
 ## Running Tests
 
+The suites need a Postgres database named `logistics_db_test` that `DATABASE_URL` can reach.
+Redis is mocked.
+
 ```bash
-pytest tests/ -v 
+createdb logistics_db_test
+pytest --cov          # unit, contract and integration suites, fails under 35% coverage
+ruff check .          # lint
+pip-audit -r requirements.txt --no-deps --disable-pip
+```
+
+`pytest` collects `tests/unit`, `tests/contract` and `tests/integration` by default.
+The older suites under `tests/test_*` and the loose `tests/test_*.py` scripts expect live services and are not part of the default run.
+
+## Updating dependencies
+
+Edit `requirements.in` or `requirements-dev.in`, then regenerate the pinned files.
+
+```bash
+uv pip compile requirements.in --universal --python-version 3.12 -o requirements.txt
+uv pip compile requirements-dev.in --universal --python-version 3.12 -o requirements-dev.txt
 ```
 
 ---
