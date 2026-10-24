@@ -3,7 +3,6 @@ from pydantic import ValidationError
 
 from app.routers.orders import CustomerRatingRequest
 
-
 VALID_CASES = [
     {"rating": 1, "feedback": "Minimum accepted"},
     {"rating": 5, "feedback": "Maximum accepted"},

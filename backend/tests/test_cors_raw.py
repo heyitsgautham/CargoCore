@@ -1,8 +1,7 @@
 import asyncio
+
 from app.main import app
-from starlette.middleware.cors import CORSMiddleware
-from starlette.requests import Request
-from starlette.responses import JSONResponse
+
 
 class DummyReceive:
     async def __call__(self):

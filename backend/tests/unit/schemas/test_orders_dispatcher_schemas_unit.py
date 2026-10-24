@@ -1,7 +1,11 @@
 import pytest
 from pydantic import ValidationError
 
-from app.schemas.orders import BatchConfirmRequest, DriverSuggestionResponse, ReturnTripResponse
+from app.schemas.orders import (
+    BatchConfirmRequest,
+    DriverSuggestionResponse,
+    ReturnTripResponse,
+)
 
 
 def test_driver_suggestion_response_accepts_valid_payload() -> None:

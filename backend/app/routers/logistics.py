@@ -9,6 +9,7 @@ from app.dependencies import require_role
 from app.models.user import User
 from app.schemas.auth import MessageResponse
 from app.schemas.logistics import (
+    CapitalInvestmentCreate,
     DispatchContactItem,
     DriverAuditEventItem,
     DriverCashoutRequest,
@@ -23,16 +24,25 @@ from app.schemas.logistics import (
     DriverVehicleBindRequest,
     LogisticsAiQueryRequest,
     LogisticsAiQueryResponse,
+    LogisticsAlertItem,
     LogisticsBootstrapResponse,
     LogisticsChatMessageCreate,
     LogisticsChatThreadCreate,
-    LogisticsChatThreadUpdate,
     LogisticsChatThreadItem,
-    LogisticsDriverCreate,
+    LogisticsChatThreadUpdate,
+    LogisticsDocumentCreate,
+    LogisticsDocumentItem,
+    LogisticsDocumentUpdateStatus,
     LogisticsDriverItem,
     LogisticsDriverUpdate,
     LogisticsEscalationItem,
     LogisticsEscalationStatusUpdate,
+    LogisticsManifestCreate,
+    LogisticsManifestItem,
+    LogisticsMeetingCreate,
+    LogisticsMeetingItem,
+    LogisticsMeetingParticipantItem,
+    LogisticsMeetingUpdate,
     LogisticsNotificationItem,
     LogisticsNotificationUpdate,
     LogisticsReturnCaseItem,
@@ -42,24 +52,12 @@ from app.schemas.logistics import (
     LogisticsTaskUpdate,
     LogisticsTransactionCreate,
     LogisticsTransactionItem,
-    CapitalInvestmentCreate,
     LogisticsVehicleCreate,
     LogisticsVehicleItem,
     LogisticsVehicleUpdate,
     LogisticsZoneCreate,
     LogisticsZoneItem,
     LogisticsZoneUpdate,
-    LogisticsDocumentItem,
-    LogisticsDocumentCreate,
-    LogisticsDocumentUpdateStatus,
-    LogisticsAlertItem,
-    LogisticsManifestCreate,
-    LogisticsManifestItem,
-    LogisticsManifestStatusUpdate,
-    LogisticsMeetingCreate,
-    LogisticsMeetingItem,
-    LogisticsMeetingParticipantItem,
-    LogisticsMeetingUpdate,
 )
 from app.services import logistics_service
 
@@ -117,7 +115,6 @@ async def list_drivers(
     db: Annotated[AsyncSession, Depends(get_db)],
     user: Annotated[object, Depends(require_role("LOGISTIC_MANAGER", "DISPATCHER"))],
 ):
-    from uuid import UUID as _UUID
     warehouse_id = getattr(user, "warehouse_id", None)
     if getattr(user, "role", None) and user.role.name == "DISPATCHER" and warehouse_id:
         return await logistics_service.list_drivers(db, warehouse_id=warehouse_id)

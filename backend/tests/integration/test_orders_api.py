@@ -8,8 +8,12 @@ from httpx import AsyncClient
 
 from app.dependencies import get_current_user
 from app.services import orders_service
-
-from tests.utils.sample_data import make_fake_user, make_order_item, make_order_list_response, make_order_response
+from tests.utils.sample_data import (
+    make_fake_user,
+    make_order_item,
+    make_order_list_response,
+    make_order_response,
+)
 
 pytestmark = pytest.mark.asyncio
 

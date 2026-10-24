@@ -6,7 +6,6 @@ import pytest
 
 from app.services.sql_validator import SQLValidationError, validate_sql
 
-
 # ── Valid SELECT queries ──────────────────────────────────────────────────────
 
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from types import SimpleNamespace
 
 import pytest
@@ -88,7 +88,7 @@ def test_clamp_respects_min_and_max() -> None:
 
 
 def test_eta_label_from_minutes_uses_reference_time() -> None:
-    reference = datetime(2026, 1, 1, 10, 0, tzinfo=timezone.utc)
+    reference = datetime(2026, 1, 1, 10, 0, tzinfo=UTC)
 
     label = orders_service._eta_label_from_minutes(75, reference_time=reference)
 

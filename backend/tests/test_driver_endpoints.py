@@ -1,6 +1,6 @@
-import requests
-import json
 import sys
+
+import requests
 
 sys.stdout.reconfigure(encoding='utf-8')
 base_url = "http://127.0.0.1:8000/api/v1"

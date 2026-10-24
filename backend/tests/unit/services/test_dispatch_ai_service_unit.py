@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 from uuid import uuid4
 
@@ -154,7 +154,7 @@ def test_haversine_suggestions_prefers_recent_non_packing_type_match() -> None:
 
 @pytest.mark.asyncio
 async def test_return_trip_suggestions_only_include_on_shift_non_busy_driver() -> None:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     free_driver_id = uuid4()
     busy_driver_id = uuid4()
 
@@ -249,7 +249,7 @@ async def test_return_trip_suggestions_only_include_on_shift_non_busy_driver() -
 
 @pytest.mark.asyncio
 async def test_return_trip_suggestions_allow_profile_location_when_delivery_coords_missing() -> None:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     free_driver_id = uuid4()
 
     pending_order = SimpleNamespace(
@@ -328,7 +328,7 @@ async def test_return_trip_suggestions_allow_profile_location_when_delivery_coor
 
 @pytest.mark.asyncio
 async def test_return_trip_suggestions_exclude_driver_if_latest_completed_job_used_packing() -> None:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     driver_id = uuid4()
 
     pending_order = SimpleNamespace(

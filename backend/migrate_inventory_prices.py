@@ -3,7 +3,9 @@ One-off migration: add cost_price and selling_price columns to inventory_items.
 Safe to run multiple times (uses IF NOT EXISTS / ignores duplicate column errors).
 """
 import asyncio
+
 from sqlalchemy import text
+
 from app.database import engine
 
 

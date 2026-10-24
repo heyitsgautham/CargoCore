@@ -6,12 +6,12 @@ quality checks, loading dock management, returns grading, and zone metrics.
 import json
 import re
 import uuid
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from uuid import UUID
 
 from fastapi import HTTPException, UploadFile, status
 from google.genai import types
-from sqlalchemy import and_, func, or_, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -30,9 +30,11 @@ from app.models.warehouse import (
     WarehouseZoneMetrics,
 )
 from app.schemas.warehouse_operations import (
+    WAREHOUSE_SUBSTATUS_TRANSITIONS,
+    WAREHOUSE_SUBSTATUSES,
     AssignTruckRequest,
-    DockVerificationData,
     DockSlot,
+    DockVerificationData,
     InboundDamageReport,
     InboundMismatchReport,
     InboundReceivePlanResponse,
@@ -50,7 +52,6 @@ from app.schemas.warehouse_operations import (
     PerformanceMetrics,
     PerformanceResponse,
     PickingResponse,
-    QualityCheckCreate,
     QualityCheckListResponse,
     QualityCheckResponse,
     QualityCheckUpdate,
@@ -61,14 +62,11 @@ from app.schemas.warehouse_operations import (
     ScheduleInboundRequest,
     StartPackingRequest,
     StartPickingRequest,
-    WAREHOUSE_SUBSTATUSES,
-    WAREHOUSE_SUBSTATUS_TRANSITIONS,
     ZoneMetricsCreate,
     ZoneMetricsListResponse,
     ZoneMetricsResponse,
 )
 from app.utils.gemini import GEMINI_MODEL, GeminiConfigError, get_gemini_client
-
 
 # ======================
 # Helper Functions
@@ -251,7 +249,7 @@ def _inbound_status(order: Order) -> str | None:
     if order.arrived_at:
         return "Arrived"
     scheduled_at = order.scheduled_at
-    if scheduled_at and scheduled_at > datetime.now(timezone.utc):
+    if scheduled_at and scheduled_at > datetime.now(UTC):
         return "InTransit"
     return "Scheduled"
 
@@ -499,7 +497,7 @@ async def get_inbound_overview(
             latest_issue_ticket_by_order.setdefault(linked_order_id, ticket)
 
     shipments: list[InboundShipmentItem] = []
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     today = now.date()
     inbound_cutoff = today + timedelta(days=1)  # show recurring orders 1 day before their run date
     arrived_today = 0
@@ -545,7 +543,7 @@ async def get_inbound_overview(
                 "Warehouse cannot move this inbound until support confirms the vendor decision.",
             )
 
-        if order.arrived_at and order.arrived_at.astimezone(timezone.utc).date() == now.date():
+        if order.arrived_at and order.arrived_at.astimezone(UTC).date() == now.date():
             arrived_today += 1
         if status_name == "InTransit":
             in_transit += 1
@@ -590,7 +588,7 @@ async def get_inbound_overview(
     dock_schedule = [
         DockSlot(
             id=index + 1,
-            time=(shipment.scheduled_at or shipment.created_at).astimezone(timezone.utc).strftime("%H:%M"),
+            time=(shipment.scheduled_at or shipment.created_at).astimezone(UTC).strftime("%H:%M"),
             supplier=shipment.supplier_name,
             dock=f"Dock {(index % 4) + 1}",
             pallets=max(1, (shipment.expected_qty + 9) // 10),
@@ -1272,7 +1270,7 @@ async def mark_inbound_arrived(
         )
 
     if order.arrived_at is None:
-        order.arrived_at = datetime.now(timezone.utc)
+        order.arrived_at = datetime.now(UTC)
         db.add(order)
         await db.flush()
 
@@ -1405,7 +1403,7 @@ async def start_picking(
                 assigned_labourer_id = labourer.id
 
     order.warehouse_substatus = "PICKING"
-    order.picking_started_at = datetime.now(timezone.utc)
+    order.picking_started_at = datetime.now(UTC)
 
     await db.commit()
 
@@ -1542,7 +1540,7 @@ async def complete_picking(
                         db.add(movement)
 
     order.warehouse_substatus = "PICKED"
-    order.picking_completed_at = datetime.now(timezone.utc)
+    order.picking_completed_at = datetime.now(UTC)
     await db.commit()
 
     return PickingResponse(
@@ -2001,7 +1999,7 @@ async def start_packing(
     station.current_order_id = order_id
     station.status = "ACTIVE"
     order.warehouse_substatus = "PACKING"
-    order.packing_started_at = datetime.now(timezone.utc)
+    order.packing_started_at = datetime.now(UTC)
 
     await db.commit()
 
@@ -2154,7 +2152,7 @@ async def complete_packing(
                         ))
 
     order.warehouse_substatus = "PACKED"
-    order.packing_completed_at = datetime.now(timezone.utc)
+    order.packing_completed_at = datetime.now(UTC)
     await db.commit()
 
     return PickingResponse(
@@ -2334,7 +2332,7 @@ async def pass_quality_check(
     _validate_substatus_transition(order.warehouse_substatus, "QC_PASSED")
 
     qc.is_passed = True
-    qc.checked_at = datetime.now(timezone.utc)
+    qc.checked_at = datetime.now(UTC)
     if performed_by:
         qc.performed_by = performed_by
 
@@ -2383,7 +2381,7 @@ async def get_loading_docks(
         docks = result.scalars().all()
 
     items = []
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     for dock in docks:
         dwell_minutes = 0
         if dock.arrived_at and dock.status == "OCCUPIED":
@@ -2506,7 +2504,7 @@ async def assign_truck_to_dock(
     dock.assigned_vehicle_id = data.vehicle_id
     dock.assigned_carrier = "Internal Fleet"
     dock.assigned_order_id = data.order_id
-    dock.arrived_at = datetime.now(timezone.utc)
+    dock.arrived_at = datetime.now(UTC)
     dock.status = "OCCUPIED"
 
     await db.commit()
@@ -2601,7 +2599,7 @@ async def release_dock(
         _validate_substatus_transition(order.warehouse_substatus, "DISPATCHED")
         order.warehouse_substatus = "DISPATCHED"
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     dwell_minutes = 0
     if dock.arrived_at:
         dwell_minutes = int((now - dock.arrived_at).total_seconds() / 60)
@@ -2873,7 +2871,7 @@ async def create_return_grading(
         recommended_outcome=data.recommended_outcome,
         inspection_remarks=data.inspection_remarks,
         graded_by=graded_by,
-        graded_at=datetime.now(timezone.utc) if graded_by else None,
+        graded_at=datetime.now(UTC) if graded_by else None,
         status="pending",
     )
     db.add(grading)
@@ -3005,7 +3003,7 @@ async def complete_return_grading(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Return grading not found")
 
     grading.status = "completed"
-    grading.graded_at = datetime.now(timezone.utc)
+    grading.graded_at = datetime.now(UTC)
     if graded_by:
         grading.graded_by = graded_by
 
@@ -3167,7 +3165,7 @@ async def get_performance_metrics(
     await _get_warehouse(db, warehouse_id)
 
     # Define date range
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     if time_range == "today":
         start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
     elif time_range == "week":

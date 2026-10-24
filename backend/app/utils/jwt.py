@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -19,7 +19,7 @@ def _create_token(
 ) -> str:
     """Base token factory used by both access and refresh token helpers."""
     payload = data.copy()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     payload.update(
         {
             "iat": now,

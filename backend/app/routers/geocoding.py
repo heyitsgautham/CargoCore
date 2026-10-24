@@ -1,15 +1,16 @@
 """
 Geocoding endpoints for address search and map integration.
 """
-from fastapi import APIRouter, Query
-from typing import List, Dict, Any
-from app.services import geocoding_service
+from typing import Any
 
+from fastapi import APIRouter, Query
+
+from app.services import geocoding_service
 
 router = APIRouter(prefix="/api/v1/geocoding", tags=["Geocoding"])
 
 
-@router.get("/search", response_model=List[Dict[str, Any]])
+@router.get("/search", response_model=list[dict[str, Any]])
 async def search_addresses(
     q: str = Query(..., min_length=3, description="Search query for address"),
     limit: int = Query(5, ge=1, le=10, description="Maximum number of results"),
@@ -22,7 +23,7 @@ async def search_addresses(
     return results
 
 
-@router.get("/reverse", response_model=Dict[str, Any])
+@router.get("/reverse", response_model=dict[str, Any])
 async def reverse_geocode(
     lat: float = Query(..., ge=-90, le=90, description="Latitude"),
     lon: float = Query(..., ge=-180, le=180, description="Longitude"),

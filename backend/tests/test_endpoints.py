@@ -1,6 +1,7 @@
-import requests
 import json
 import sys
+
+import requests
 
 # Ensure stdout encodes properly
 sys.stdout.reconfigure(encoding='utf-8')

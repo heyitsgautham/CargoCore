@@ -1,13 +1,13 @@
-from datetime import datetime, timedelta, timezone
-from zoneinfo import ZoneInfo
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
+from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException, status
-from sqlalchemy import and_, desc, func, select
+from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.inventory import InventoryItem, InventoryMovement
-from app.models.labour import Labourer, LabourAttendance
+from app.models.labour import Labourer
 from app.models.order import DamageReport, Order, OrderItem
 from app.models.user import User
 from app.models.warehouse import LoadingDock, Warehouse
@@ -181,7 +181,7 @@ async def get_warehouse_dashboard(db: AsyncSession, warehouse_id: UUID) -> Wareh
     total_inventory_value = sum(item.quantity_on_hand for item in inventory_items) * 100.0
 
     # Get inventory value from a week ago for comparison
-    week_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    week_ago = datetime.now(UTC) - timedelta(days=7)
     inventory_movements_week = (
         await db.execute(
             select(InventoryMovement)
@@ -324,7 +324,7 @@ async def get_warehouse_dashboard(db: AsyncSession, warehouse_id: UUID) -> Wareh
     recent_damage_reports = (
         await db.execute(
             select(DamageReport)
-            .where(DamageReport.created_at >= datetime.now(timezone.utc) - timedelta(days=1))
+            .where(DamageReport.created_at >= datetime.now(UTC) - timedelta(days=1))
             .order_by(desc(DamageReport.created_at))
             .limit(5)
         )
@@ -404,7 +404,7 @@ async def get_warehouse_dashboard(db: AsyncSession, warehouse_id: UUID) -> Wareh
 
     for i in range(7):
         day = today_ist - timedelta(days=6 - i)
-        day_start = datetime.combine(day, datetime.min.time()).replace(tzinfo=timezone.utc)
+        day_start = datetime.combine(day, datetime.min.time()).replace(tzinfo=UTC)
         day_end = day_start + timedelta(days=1)
 
         day_labels.append(day.strftime('%a'))

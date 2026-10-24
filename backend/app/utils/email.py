@@ -2,10 +2,10 @@
 email.py
 Async email sender using Gmail SMTP (TLS on port 587).
 """
-from html import escape
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from html import escape
 
 from loguru import logger
 

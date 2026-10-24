@@ -18,16 +18,16 @@ from app.schemas.inventory import (
     InventoryMovementResponse,
     InventoryResponse,
     InventoryUpdate,
-    PickingListResponse,
-    RestockRequestCreate,
-    RestockRequestStatusUpdate,
-    RestockRequestResponse,
-    RestockRequestListResponse,
-    MaterialRequestCreate,
     MaterialRequestApprove,
+    MaterialRequestCreate,
+    MaterialRequestListResponse,
     MaterialRequestReject,
     MaterialRequestResponse,
-    MaterialRequestListResponse,
+    PickingListResponse,
+    RestockRequestCreate,
+    RestockRequestListResponse,
+    RestockRequestResponse,
+    RestockRequestStatusUpdate,
 )
 from app.services import inventory_service
 

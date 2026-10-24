@@ -4,7 +4,7 @@ import asyncio
 import importlib.util
 import json
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -337,7 +337,7 @@ def _write_markdown(
     file_inventory: list[dict[str, Any]],
 ) -> None:
     lines: list[str] = []
-    generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    generated_at = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
 
     lines.append("# Swagger-Wide API Test Report")
     lines.append("")

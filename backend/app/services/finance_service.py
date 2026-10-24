@@ -3,26 +3,25 @@ Finance Service
 Live-computes revenue and expense aggregations from the database.
 All numbers come from real DB rows — zero when tables are empty.
 """
-from collections import defaultdict
-import uuid
 import random
 import string
-from datetime import datetime, timezone, date, timedelta
+import uuid
+from collections import defaultdict
+from datetime import UTC, date, datetime, timedelta
 from uuid import UUID
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.logistics import LogisticsTransaction, LogisticsDailyStats
+from app.models.logistics import LogisticsDailyStats, LogisticsTransaction
 from app.models.order import Order
 from app.models.payment import OrderPayment
 from app.models.user import User
 
-
 # ── helpers ────────────────────────────────────────────────────────────────
 
 def _today() -> date:
-    return datetime.now(timezone.utc).date()
+    return datetime.now(UTC).date()
 
 
 def _gen_ref(prefix: str = "PAY") -> str:
@@ -129,7 +128,8 @@ async def record_order_payment(
 
     order = (await db.execute(select(Order).where(Order.id == order_id))).scalar_one_or_none()
     if order is None:
-        from fastapi import HTTPException, status as http_status
+        from fastapi import HTTPException
+        from fastapi import status as http_status
         raise HTTPException(status_code=http_status.HTTP_404_NOT_FOUND, detail="Order not found")
 
     ref = payment_ref or _gen_ref("PAY")
@@ -155,7 +155,9 @@ async def record_order_payment(
         order.payment_status = "partial"
     db.add(order)
 
-    from app.services.return_charge_service import settle_transport_charges_from_order_payment
+    from app.services.return_charge_service import (
+        settle_transport_charges_from_order_payment,
+    )
     await settle_transport_charges_from_order_payment(
         db,
         order=order,
@@ -481,7 +483,7 @@ async def run_payroll(db: AsyncSession, user_payouts: list[dict]) -> dict:
 
     user_payouts: list of {user_id, amount, record_type, name}
     """
-    period = datetime.now(timezone.utc).strftime("%Y-%m")
+    period = datetime.now(UTC).strftime("%Y-%m")
     created = 0
     total_paid = 0.0
     user_ids = [uuid.UUID(str(payout["user_id"])) for payout in user_payouts if payout.get("user_id")]

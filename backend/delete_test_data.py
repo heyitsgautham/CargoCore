@@ -7,7 +7,8 @@ Usage:
 
 import asyncio
 import sys
-from sqlalchemy import select, delete
+
+from sqlalchemy import delete, select
 
 # Add backend to path
 sys.path.insert(0, ".")
@@ -56,7 +57,7 @@ async def delete_test_driver():
 
         await db.delete(driver)
         await db.commit()
-        print(f"✅ Deleted test driver: driver.test@cargocore.com")
+        print("✅ Deleted test driver: driver.test@cargocore.com")
 
 
 async def main():

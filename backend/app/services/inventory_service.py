@@ -9,7 +9,6 @@ from app.models.logistics import LogisticsEscalation
 from app.models.order import Order, OrderItem
 from app.models.user import User
 from app.models.warehouse import Warehouse
-from app.services import finance_service
 from app.schemas.inventory import (
     InventoryCreate,
     InventoryListResponse,
@@ -20,10 +19,11 @@ from app.schemas.inventory import (
     PickingListItem,
     PickingListResponse,
     RestockRequestCreate,
-    RestockRequestStatusUpdate,
-    RestockRequestResponse,
     RestockRequestListResponse,
+    RestockRequestResponse,
+    RestockRequestStatusUpdate,
 )
+from app.services import finance_service
 
 MOVEMENT_TYPES = {"INBOUND", "OUTBOUND", "ADJUSTMENT", "ISSUE", "RESTOCK", "RESERVED", "PICK"}
 
@@ -586,16 +586,17 @@ async def escalate_restock_request(
 # Material Request Functions (WM requests new packing material -> LM approves)
 # ─────────────────────────────────────────────────────────────────────────────
 
-from app.models.inventory import MaterialRequest
-from app.schemas.inventory import (
-    MaterialRequestCreate,
-    MaterialRequestApprove,
-    MaterialRequestReject,
-    MaterialRequestResponse,
-    MaterialRequestListResponse,
-)
 import json
 from pathlib import Path
+
+from app.models.inventory import MaterialRequest
+from app.schemas.inventory import (
+    MaterialRequestApprove,
+    MaterialRequestCreate,
+    MaterialRequestListResponse,
+    MaterialRequestReject,
+    MaterialRequestResponse,
+)
 
 _RATES_CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "rates_config.json"
 
@@ -751,7 +752,7 @@ def _add_material_to_rates(material_name: str, rate: float, unit: str) -> None:
     
     # Load current rates
     if _RATES_CONFIG_PATH.exists():
-        with open(_RATES_CONFIG_PATH, "r", encoding="utf-8") as f:
+        with open(_RATES_CONFIG_PATH, encoding="utf-8") as f:
             rates = json.load(f)
     else:
         rates = {}

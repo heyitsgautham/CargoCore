@@ -5,10 +5,11 @@ Usage: python generate_markdown_docs.py
 import json
 from pathlib import Path
 
+
 def generate_markdown():
     # Load OpenAPI spec
     docs_dir = Path(__file__).parent
-    with open(docs_dir / 'openapi.json', 'r', encoding='utf-8') as f:
+    with open(docs_dir / 'openapi.json', encoding='utf-8') as f:
         spec = json.load(f)
 
     md_lines = []

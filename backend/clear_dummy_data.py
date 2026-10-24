@@ -10,10 +10,12 @@ This script removes:
 - And all other logistics seed data
 """
 import asyncio
+
 from sqlalchemy import delete, select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import AsyncSessionLocal
+from app.models.document import LogisticsDocument
+from app.models.inventory import InventoryItem, InventoryMovement, RestockRequest
 from app.models.labour import LabourAttendance, Labourer
 from app.models.logistics import (
     LogisticsAlert,
@@ -31,19 +33,17 @@ from app.models.logistics import (
     LogisticsVehicle,
     LogisticsZone,
 )
-from app.models.document import LogisticsDocument
-from app.models.inventory import InventoryItem, InventoryMovement, RestockRequest
-from app.models.order import Order, OrderItem, PickedItem, DamageReport, CustomerQuote
+from app.models.order import CustomerQuote, DamageReport, Order, OrderItem, PickedItem
+from app.models.user import User
+from app.models.vendor import VendorSupportReply, VendorSupportTicket
 from app.models.warehouse import (
-    Warehouse,
     LoadingDock,
     PackingStation,
     QualityCheck,
     ReturnGrading,
+    Warehouse,
     WarehouseZoneMetrics,
 )
-from app.models.vendor import VendorSupportTicket, VendorSupportReply
-from app.models.user import User
 
 
 async def clear_dummy_data():

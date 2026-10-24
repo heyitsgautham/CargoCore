@@ -1,9 +1,10 @@
 import asyncio
 import os
+
 os.environ["DATABASE_URL"] = "postgresql+asyncpg://logistics_user:logistics_pass@localhost:5432/logistics_db"
 
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 engine = create_async_engine(os.environ["DATABASE_URL"])
 

@@ -7,12 +7,13 @@ Once seeded, confirm_order will check and deduct these from inventory.
 If a warehouse already has these SKUs, they are skipped.
 """
 import asyncio
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 
 from sqlalchemy import select
+
 from app.database import AsyncSessionLocal
 from app.models.inventory import InventoryItem
 from app.models.warehouse import Warehouse

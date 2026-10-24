@@ -2,12 +2,12 @@
 ai.py
 AI chatbot endpoints — thin router, all logic in ai_service.
 """
-import base64
 import json
 from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from google.genai import types as genai_types
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db, get_ro_db
@@ -29,22 +29,22 @@ from app.schemas.ai import (
     EscalationListResponse,
     EscalationResponse,
     SessionListResponse,
-    SupportDamageReportCreate,
-    SupportDamageReportListResponse,
-    SupportDamageReportItem,
-    SupportDamageReportNotesUpdate,
     SupportAnalyticsInsightExecutionResponse,
     SupportAnalyticsResponse,
-    SupportMessageCreate,
+    SupportDamageReportCreate,
+    SupportDamageReportItem,
+    SupportDamageReportListResponse,
+    SupportDamageReportNotesUpdate,
     SupportDashboardResponse,
-    SupportSettings,
-    SupportSettingsResponse,
+    SupportMessageCreate,
     SupportRefundCaseItem,
     SupportRefundCaseListResponse,
     SupportRefundCaseUrgentUpdate,
     SupportSessionDetail,
     SupportSessionEscalateRequest,
     SupportSessionListResponse,
+    SupportSettings,
+    SupportSettingsResponse,
     TicketCreate,
     TicketListResponse,
     TicketResponse,
@@ -57,8 +57,7 @@ from app.schemas.ai_config import (
     KnowledgeArticleUpdate,
 )
 from app.services import ai_service, ai_support_service
-from app.utils.gemini import GeminiConfigError, get_gemini_client, generate_with_fallback
-from google.genai import types as genai_types
+from app.utils.gemini import generate_with_fallback
 
 router = APIRouter(prefix="/api/v1/ai", tags=["AI"])
 SUPPORT_ROLES = ("LOGISTIC_MANAGER", "AI_AGENT", "AI_SUPPORT", "CUSTOMER_SUPPORT")
@@ -185,7 +184,7 @@ async def chat(
             chat_context=data.context,
             order_id=data.order_id,
         )
-    except Exception as e:
+    except Exception:
         # Safety net — never let an unhandled exception reach the client as 500
         import traceback
         traceback.print_exc()

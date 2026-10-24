@@ -4,8 +4,8 @@ This script converts vehicle codes to vehicle UUIDs in the logistics_documents t
 Run this after updating the codebase to use vehicle UUIDs instead of codes.
 """
 import asyncio
-from sqlalchemy import select, update
-from sqlalchemy.ext.asyncio import AsyncSession
+
+from sqlalchemy import select
 
 from app.database import AsyncSessionLocal
 from app.models.document import LogisticsDocument

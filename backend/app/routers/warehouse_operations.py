@@ -11,7 +11,7 @@ from fastapi import APIRouter, Depends, File, Query, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import get_current_user, require_role
+from app.dependencies import require_role
 from app.models.user import User
 from app.schemas.auth import MessageResponse
 from app.schemas.warehouse_operations import (

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from types import SimpleNamespace
 from uuid import uuid4
 
@@ -9,7 +9,6 @@ from httpx import AsyncClient
 
 from app.database import get_db
 from app.dependencies import get_current_user
-
 from tests.utils.sample_data import make_fake_user
 
 pytestmark = pytest.mark.asyncio
@@ -74,7 +73,7 @@ async def test_tracking_active_drivers_success(
     dependency_override_manager,
     record_evidence,
 ) -> None:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     fake_profile = SimpleNamespace(
         current_location="19.0760,72.8777",
         status="On-Duty",
@@ -118,7 +117,7 @@ async def test_tracking_order_driver_success(
 ) -> None:
     order_id = str(uuid4())
     driver_id = uuid4()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     fake_order = SimpleNamespace(assigned_driver_id=driver_id)
     fake_profile = SimpleNamespace(

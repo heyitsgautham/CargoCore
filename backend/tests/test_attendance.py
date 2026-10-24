@@ -8,10 +8,10 @@ This script will:
 """
 import asyncio
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
-from datetime import datetime, timezone
+
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 # Add backend directory to path
 backend_path = Path(__file__).parent / "backend"
@@ -30,7 +30,7 @@ async def check_attendance():
         users = result.scalars().all()
         
         # Get today's date in YYYY-MM-DD format
-        today_str = datetime.now(timezone.utc).date().isoformat()
+        today_str = datetime.now(UTC).date().isoformat()
         
         print(f"\n{'='*80}")
         print(f"ATTENDANCE REPORT - {today_str}")

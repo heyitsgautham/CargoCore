@@ -7,17 +7,18 @@ Usage:
 
 import asyncio
 import sys
-from uuid import uuid4
 from datetime import datetime, timedelta
+from uuid import uuid4
+
 from sqlalchemy import select
 
 # Add backend to path
 sys.path.insert(0, ".")
 
 from app.database import AsyncSessionLocal as SessionLocal
+from app.models.logistics import LogisticsVehicle
 from app.models.order import Order, OrderItem
 from app.models.user import User
-from app.models.logistics import LogisticsVehicle
 
 
 async def get_or_create_test_driver():
@@ -137,7 +138,7 @@ async def create_test_order(driver, vehicle):
         await db.commit()
         await db.refresh(order)
 
-        print(f"\n✅ Test order created successfully!")
+        print("\n✅ Test order created successfully!")
         print(f"   Tracking Code: {tracking_code}")
         print(f"   Order ID: {order.id}")
         print(f"   Status: {order.status}")
@@ -166,8 +167,8 @@ async def main():
     order = await create_test_order(driver, vehicle)
 
     print("\n📱 Driver App Login Credentials:")
-    print(f"   Email: driver.test@cargocore.com")
-    print(f"   Password: Test@123")
+    print("   Email: driver.test@cargocore.com")
+    print("   Password: Test@123")
     print("\n🔍 Now test the complete flow:")
     print("   1. Login with driver credentials")
     print("   2. Complete pre-shift safety checks")

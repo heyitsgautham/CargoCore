@@ -1,8 +1,9 @@
+from uuid import UUID
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from uuid import UUID
 
 from app.models.logistics import LogisticsEscalation
 from app.models.order import Order
@@ -403,7 +404,7 @@ async def test_dispatcher_can_escalate_order_into_logistics_queue(
     assert f"[order:{created['id']}]" in (stored.action_details or "")
 
     list_response = await client.get(
-        f"/api/v1/orders?status_filter=ASSIGNED&page_size=20",
+        "/api/v1/orders?status_filter=ASSIGNED&page_size=20",
         headers=_auth_headers(dispatcher_tokens),
     )
     assert list_response.status_code == 200

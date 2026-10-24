@@ -4,7 +4,7 @@ All authentication business logic.  Routers should only call these functions —
 no direct DB or Redis access in routers.
 """
 import secrets
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import HTTPException, status
 from loguru import logger
@@ -12,20 +12,21 @@ from redis.asyncio import Redis
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import get_settings
 from app.models.logistics import LogisticsNotification
 from app.models.user import Role, User
 from app.schemas.auth import (
-    GoogleLoginRequest,
     SELF_SERVICE_ROLES,
     ChangePasswordRequest,
     ForgotPasswordRequest,
+    GoogleLoginRequest,
     LoginResponse,
     OTPVerifiedResponse,
-    RegistrationResponse,
     RefreshTokenRequest,
+    RegistrationResponse,
     ResetPasswordRequest,
-    SignupOtpSendResponse,
     SendOTPRequest,
+    SignupOtpSendResponse,
     TokenResponse,
     UserLogin,
     UserProfile,
@@ -33,8 +34,6 @@ from app.schemas.auth import (
     UserRegister,
     VerifyOTPRequest,
 )
-
-from app.config import get_settings
 from app.utils.hashing import hash_password, verify_password
 from app.utils.jwt import create_access_token, create_refresh_token, decode_token
 from app.utils.username import generate_unique_username, normalize_username
@@ -340,7 +339,7 @@ async def login_user(db: AsyncSession, data: UserLogin) -> LoginResponse:
             detail="Account is deactivated",
         )
 
-    user.last_login = datetime.now(timezone.utc)
+    user.last_login = datetime.now(UTC)
     db.add(user)
     await db.flush()
     await db.refresh(user, attribute_names=["role", "warehouse"])
@@ -390,7 +389,7 @@ async def logout_user(redis: Redis | None, access_token: str) -> None:
         return  # malformed token — nothing to blacklist
 
     if redis:
-        ttl = int(exp - datetime.now(timezone.utc).timestamp())
+        ttl = int(exp - datetime.now(UTC).timestamp())
         if ttl > 0:
             await redis.setex(f"{_BLACKLIST_PREFIX}{jti}", ttl, "1")
         logger.info(f"Token blacklisted: jti={jti} ttl={max(ttl, 0)}s")
@@ -473,7 +472,8 @@ async def forgot_password(db: AsyncSession, redis: Redis | None, data: ForgotPas
     The OTP is stored in Redis with a 10-minute TTL.
     """
     import random
-    from app.utils.email import send_email, password_reset_email_html
+
+    from app.utils.email import password_reset_email_html, send_email
 
     user = await _get_user_by_email(db, data.email.lower())
     # Always return 200 to prevent email enumeration
@@ -547,7 +547,8 @@ async def reset_password(
 async def send_signup_otp(db: AsyncSession, redis: Redis | None, data: SendOTPRequest) -> SignupOtpSendResponse:
     """Generate a 6-digit OTP, store it, and send via email."""
     import random
-    from app.utils.email import send_email, otp_email_html
+
+    from app.utils.email import otp_email_html, send_email
 
     # Check if email already exists to provide early feedback
     email = data.email.lower()
@@ -560,7 +561,7 @@ async def send_signup_otp(db: AsyncSession, redis: Redis | None, data: SendOTPRe
 
     otp = f"{random.randint(0, 999999):06d}"
     key = f"{_OTP_PREFIX}{email}"
-    sent_at = datetime.now(timezone.utc)
+    sent_at = datetime.now(UTC)
     if redis is not None:
         await redis.setex(key, _OTP_TTL_SECONDS, otp)
     else:
@@ -633,7 +634,8 @@ _OTP_LOGIN_ALLOWED_ROLES = frozenset({"INDIVIDUAL", "VENDOR"})
 async def send_login_otp(db: AsyncSession, redis: Redis | None, data: SendOTPRequest) -> SignupOtpSendResponse:
     """Send a login OTP to an existing INDIVIDUAL or VENDOR user's email."""
     import random
-    from app.utils.email import send_email, otp_email_html
+
+    from app.utils.email import otp_email_html, send_email
 
     email = data.email.lower()
     user = await _get_user_by_email(db, email)
@@ -656,7 +658,7 @@ async def send_login_otp(db: AsyncSession, redis: Redis | None, data: SendOTPReq
 
     otp = f"{random.randint(0, 999999):06d}"
     key = f"{_LOGIN_OTP_PREFIX}{email}"
-    sent_at = datetime.now(timezone.utc)
+    sent_at = datetime.now(UTC)
     if redis is not None:
         await redis.setex(key, _OTP_TTL_SECONDS, otp)
     else:
@@ -717,8 +719,9 @@ async def verify_login_otp(db: AsyncSession, redis: Redis | None, data: VerifyOT
     return _build_login_response(user)
 
 
-from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
+
 
 async def google_login_or_register(db: AsyncSession, redis: Redis, data: GoogleLoginRequest) -> LoginResponse:
     try:
@@ -791,7 +794,7 @@ async def google_login_or_register(db: AsyncSession, redis: Redis, data: GoogleL
                     detail="Vendor registration submitted successfully. A Logistics Manager must approve it before login.",
                 )
 
-        user.last_login = datetime.now(timezone.utc)
+        user.last_login = datetime.now(UTC)
         db.add(user)
         await db.flush()
         return _build_login_response(user)

@@ -1,9 +1,11 @@
 import asyncio
 import sys
+
 sys.path.insert(0, '.')
 from app.database import AsyncSessionLocal
-from app.routers.tracking import get_active_driver_locations
 from app.models.user import User
+from app.routers.tracking import get_active_driver_locations
+
 
 async def main():
     async with AsyncSessionLocal() as db:
@@ -11,7 +13,7 @@ async def main():
         try:
             res = await get_active_driver_locations(db, user)
             print("locations:", res)
-        except Exception as e:
+        except Exception:
             import traceback
             traceback.print_exc()
 

@@ -3,7 +3,6 @@ from pydantic import ValidationError
 
 from app.schemas.orders import CancelOrderRequest
 
-
 VALID_CASES = [{'reason': 'Cancel due to delay'}, {'reason': 'Client requested change'}, {'reason': 'Wrong address provided'}, {'reason': 'Need to reschedule'}, {'reason': 'Duplicate order created'}, {'reason': 'Service unavailable today'}, {'reason': 'Customer unavailable now'}, {'reason': 'Payment issue encountered'}]
 INVALID_CASES = [{'reason': ''}, {'reason': 'a'}, {'reason': 'ab'}, {'reason': '  '}, {'reason': 'x '}, {'reason': ' y'}, {'reason': '\n'}, {'reason': '\t'}]
 

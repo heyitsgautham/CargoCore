@@ -7,7 +7,7 @@ For CI, a separate test database is used: logistics_db_test.
 """
 pytest_plugins = ("tests.api_suite_fixtures",)
 
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 from unittest.mock import AsyncMock
 
 import pytest_asyncio
@@ -19,9 +19,9 @@ from sqlalchemy.pool import NullPool
 from app.config import get_settings
 from app.database import Base, get_db, get_ro_db
 from app.main import app
-from app.models import user as _  # noqa: F401 — registers models with Base
 from app.models import ai_conversation as _ai_conversation  # noqa: F401
 from app.models import escalation as _escalation  # noqa: F401
+from app.models import user as _  # noqa: F401 — registers models with Base
 from app.utils.redis import get_redis
 
 settings = get_settings()

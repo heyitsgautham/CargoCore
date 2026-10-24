@@ -13,11 +13,11 @@ Driver Alert Flow:
   2. When dispatcher sends broadcast alert, driver_alert_manager.broadcast() pushes to all drivers.
   3. Driver app receives alert and shows notification.
 """
-import json
 import asyncio
+import json
 from typing import Any
 
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Query, status
+from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect, status
 from jose import JWTError
 
 router = APIRouter(tags=["Fleet WebSocket"])
@@ -134,8 +134,9 @@ async def _authenticate_ws_token(token: str | None) -> bool:
     if not token:
         return False
     try:
-        from app.config import get_settings
         from jose import jwt as jose_jwt
+
+        from app.config import get_settings
         settings = get_settings()
         jose_jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
         return True
@@ -148,8 +149,9 @@ async def _decode_ws_token(token: str | None) -> dict | None:
     if not token:
         return None
     try:
-        from app.config import get_settings
         from jose import jwt as jose_jwt
+
+        from app.config import get_settings
         settings = get_settings()
         payload = jose_jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
         return payload
@@ -190,7 +192,7 @@ async def fleet_websocket(
             # Keep connection open; client may send pong frames
             try:
                 await asyncio.wait_for(ws.receive_text(), timeout=30.0)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # Send a ping every 30 s to keep the connection alive through proxies
                 try:
                     await ws.send_text(json.dumps({"type": "ping"}))
@@ -245,7 +247,7 @@ async def driver_alerts_websocket(
                         pass  # Keepalive response, no action needed
                 except Exception:
                     pass
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # Send a ping every 30 s to keep the connection alive through proxies
                 try:
                     await ws.send_text(json.dumps({"type": "ping"}))

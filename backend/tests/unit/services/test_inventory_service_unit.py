@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from types import SimpleNamespace
 from uuid import uuid4
 
@@ -84,7 +84,7 @@ def test_to_movement_response_maps_related_models() -> None:
         quantity=15,
         reference_order_id=uuid4(),
         performed_by=uuid4(),
-        created_at=datetime(2026, 4, 17, 12, 0, tzinfo=timezone.utc),
+        created_at=datetime(2026, 4, 17, 12, 0, tzinfo=UTC),
     )
     item = SimpleNamespace(
         warehouse_id=uuid4(),
@@ -114,8 +114,8 @@ def test_to_restock_response_maps_requester_and_item() -> None:
         status="PENDING",
         requested_by=uuid4(),
         manager_notes=None,
-        created_at=datetime(2026, 4, 17, 9, 0, tzinfo=timezone.utc),
-        updated_at=datetime(2026, 4, 17, 9, 30, tzinfo=timezone.utc),
+        created_at=datetime(2026, 4, 17, 9, 0, tzinfo=UTC),
+        updated_at=datetime(2026, 4, 17, 9, 30, tzinfo=UTC),
     )
     item = SimpleNamespace(sku="PKG-BUBBLE-WRAP", name="Bubble Wrap")
     requester = SimpleNamespace(name="WM User")

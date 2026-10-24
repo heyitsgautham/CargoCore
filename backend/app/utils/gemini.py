@@ -9,11 +9,9 @@ from functools import lru_cache
 
 from google import genai
 from google.genai import types
-
 from loguru import logger
 
 from app.config import get_settings
-
 
 # ── Gemini client factory & error ─────────────────────────────────────────────
 

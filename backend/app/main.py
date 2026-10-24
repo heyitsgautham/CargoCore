@@ -5,12 +5,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
-from app.database import AsyncSessionLocal, engine, ro_engine, Base
+from app.database import AsyncSessionLocal, engine, ro_engine
 from app.middleware.logging_middleware import LoggingMiddleware
-from app.routers import auth as auth_router
 from app.routers import ai as ai_router
+from app.routers import auth as auth_router
 from app.routers import customer as customer_router
 from app.routers import damage_reports as damage_reports_router
+from app.routers import dev_seed as dev_seed_router
+from app.routers import finance as finance_router
 from app.routers import geocoding as geocoding_router
 from app.routers import inventory as inventory_router
 from app.routers import labourers as labourers_router
@@ -22,9 +24,7 @@ from app.routers import users as users_router
 from app.routers import vendor as vendor_router
 from app.routers import warehouse_operations as warehouse_operations_router
 from app.routers import warehouses as warehouses_router
-from app.routers import finance as finance_router
 from app.routers import ws_fleet as ws_fleet_router
-from app.routers import dev_seed as dev_seed_router
 
 settings = get_settings()
 
@@ -33,8 +33,9 @@ settings = get_settings()
 async def lifespan(app: FastAPI):
     # Startup
     from loguru import logger
-    from app.services.auth_service import ensure_logistic_manager_account
+
     from app.services import vendor_service
+    from app.services.auth_service import ensure_logistic_manager_account
 
     if not settings.gemini_api_key:
         logger.warning(

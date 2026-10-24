@@ -7,7 +7,6 @@ from httpx import AsyncClient
 
 from app.database import get_db
 from app.services import auth_service
-
 from tests.utils.sample_data import make_login_response, make_registration_response
 
 pytestmark = pytest.mark.asyncio

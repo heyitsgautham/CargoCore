@@ -1,9 +1,9 @@
-from collections import OrderedDict
-from datetime import date, datetime, time, timedelta, timezone
-import httpx
 import json
 import uuid
+from collections import OrderedDict
+from datetime import UTC, date, datetime, time, timedelta
 
+import httpx
 from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -46,8 +46,8 @@ from app.schemas.vendor import (
     VendorSettingsResponse,
     VendorShipmentCost,
     VendorShipmentHistoryItem,
-    VendorShipmentSummary,
     VendorShipmentsResponse,
+    VendorShipmentSummary,
     VendorStats,
     VendorSupportReplyCreate,
     VendorSupportReplyResponse,
@@ -412,7 +412,7 @@ def _invoice_record(order: Order, now: datetime) -> VendorInvoiceRecord:
 
 
 async def _orders_for_vendor(db: AsyncSession, user: User) -> list[Order]:
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(UTC).date()
     cutoff = today + timedelta(days=1)  # show recurring orders 1 day before their run date
 
     all_orders = (
@@ -570,7 +570,7 @@ def _append_auto_debit_event(
     event_type: str,
     message: str,
 ) -> None:
-    now_iso = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    now_iso = datetime.now(UTC).isoformat(timespec="seconds")
     event_line = f"AUTODEBIT_EVENT|RUN:{run_iso}|TYPE:{event_type}|TS:{now_iso}|MSG:{message}"
     existing = str(order.delivery_notes or "")
     marker = f"|RUN:{run_iso}|TYPE:{event_type}|"
@@ -641,7 +641,7 @@ async def _auto_debit_order_if_eligible(
 
     # Scheduled auto-debit must happen only on the exact scheduled day.
     if trigger == "scheduled":
-        today = datetime.now(timezone.utc).date()
+        today = datetime.now(UTC).date()
         scheduled_day = order.scheduled_at.date() if order.scheduled_at else None
         if scheduled_day is None:
             try:
@@ -1004,7 +1004,7 @@ def _scheduled_datetime(next_run: str, drop_off_time: str | None) -> datetime | 
             mm = int(parts[1])
         except Exception:
             pass
-    return datetime.combine(run_day, time(hour=hh, minute=mm, tzinfo=timezone.utc))
+    return datetime.combine(run_day, time(hour=hh, minute=mm, tzinfo=UTC))
 
 
 async def run_due_recurring_rules(
@@ -1012,7 +1012,7 @@ async def run_due_recurring_rules(
     *,
     vendor_id: uuid.UUID | None = None,
 ) -> int:
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(UTC).date()
     stmt = select(VendorRecurringRule).where(VendorRecurringRule.active.is_(True))
     if vendor_id:
         stmt = stmt.where(VendorRecurringRule.vendor_id == vendor_id)
@@ -1102,7 +1102,7 @@ async def ensure_upcoming_recurring_orders(
     ).scalars().all()
     user_by_id = {user.id: user for user in users}
 
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(UTC).date()
     cutoff = today + timedelta(days=1)  # only materialize 1 day before the scheduled run
 
     created = 0

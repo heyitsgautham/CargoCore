@@ -3,14 +3,14 @@ Test the real-time tracking API endpoints
 """
 import asyncio
 import sys
-from uuid import uuid4
+
 from sqlalchemy import select
 
 sys.path.insert(0, ".")
 
 from app.database import AsyncSessionLocal as SessionLocal
-from app.models.user import User
 from app.models.logistics import LogisticsDriverProfile
+from app.models.user import User
 
 
 async def test_tracking():
@@ -60,7 +60,7 @@ async def test_tracking():
                     db.add(profile)
 
                 await db.commit()
-                print(f"✅ Set test driver location: 19.1136, 72.8697")
+                print("✅ Set test driver location: 19.1136, 72.8697")
             else:
                 print("❌ Test driver not found. Run create_test_order.py first.")
                 return

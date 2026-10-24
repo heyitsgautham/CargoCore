@@ -3,10 +3,10 @@ Geocoding utility using OpenStreetMap Nominatim API (free, no API key required).
 Converts addresses to lat/lng coordinates.
 """
 
-import httpx
 import asyncio
-from typing import Tuple, Optional
 import logging
+
+import httpx
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ async def _rate_limit():
         _last_request_time = time.time()
 
 
-async def geocode_address(address: str) -> Optional[Tuple[float, float]]:
+async def geocode_address(address: str) -> tuple[float, float] | None:
     """
     Convert an address string to (latitude, longitude) coordinates.
     
@@ -89,7 +89,7 @@ async def geocode_address_with_fallback(
     address: str,
     city: str = None,
     country: str = "India"
-) -> Optional[Tuple[float, float]]:
+) -> tuple[float, float] | None:
     """
     Try geocoding with full address, fall back to city-level if it fails.
     
@@ -116,12 +116,13 @@ async def geocode_address_with_fallback(
     return None
 
 
-def geocode_address_sync(address: str) -> Optional[Tuple[float, float]]:
+def geocode_address_sync(address: str) -> tuple[float, float] | None:
     """
     Synchronous version of geocode_address for use in non-async contexts.
     """
-    import requests
     import time
+
+    import requests
     
     if not address or len(address.strip()) < 5:
         return None

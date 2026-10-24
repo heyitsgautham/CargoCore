@@ -1,6 +1,6 @@
-import asyncio
-from app.main import app
 from starlette.middleware.cors import CORSMiddleware
+
+from app.main import app
 
 # Find CORS middleware
 for middleware in app.user_middleware:

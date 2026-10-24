@@ -1,5 +1,5 @@
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import HTTPException, status
@@ -269,7 +269,7 @@ async def update_user(db: AsyncSession, user_id: UUID, data: UserAdminUpdate) ->
         if user.role.name != "VENDOR":
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Approval status can only be updated for vendor users")
         user.approval_status = approval_status
-        user.approval_reviewed_at = datetime.now(timezone.utc)
+        user.approval_reviewed_at = datetime.now(UTC)
         if data.is_active is None:
             user.is_active = approval_status != "REJECTED"
 

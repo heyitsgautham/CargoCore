@@ -1,7 +1,7 @@
 import re
 import uuid
 from collections import defaultdict
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, select
@@ -29,17 +29,9 @@ from app.schemas.ai import (
     ContactSubmissionUpdate,
     CustomerHistoryResponse,
     EscalationDetailItem,
-    SupportMessageCreate,
-    SupportMessageItem,
     EscalationDetailListResponse,
     EscalationResponse,
     SupportAgentSummary,
-    SupportConversationMessage,
-    SupportDamageReportCreate,
-    SupportDamageReportItem,
-    SupportDamageReportListResponse,
-    SupportDamageReportNotesUpdate,
-    SupportDamageReportStats,
     SupportAnalyticsEscalationReason,
     SupportAnalyticsInsight,
     SupportAnalyticsInsightExecutionResponse,
@@ -47,21 +39,29 @@ from app.schemas.ai import (
     SupportAnalyticsResolutionChart,
     SupportAnalyticsResponse,
     SupportAnalyticsSentimentChart,
+    SupportConversationMessage,
+    SupportDamageReportCreate,
+    SupportDamageReportItem,
+    SupportDamageReportListResponse,
+    SupportDamageReportNotesUpdate,
+    SupportDamageReportStats,
     SupportDashboardFeedItem,
     SupportDashboardResponse,
     SupportDashboardStats,
     SupportIntegrationStatus,
+    SupportMessageCreate,
+    SupportMessageItem,
     SupportRefundCaseItem,
     SupportRefundCaseListResponse,
     SupportRefundCaseStats,
     SupportRefundCaseUrgentUpdate,
-    SupportSettings,
-    SupportSettingsResponse,
     SupportSessionDetail,
     SupportSessionEscalateRequest,
     SupportSessionEscalationSummary,
     SupportSessionListItem,
     SupportSessionListResponse,
+    SupportSettings,
+    SupportSettingsResponse,
     TicketCreate,
     TicketListResponse,
     TicketReplyItem,
@@ -116,7 +116,7 @@ APP_SETTINGS = get_settings()
 
 
 def _utc_now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 DEFAULT_SUPPORT_SYSTEM_PROMPT = """You are the primary autonomous support agent for Cargo-Core Logistics.
@@ -189,7 +189,7 @@ def _normalize_analytics_range(value: str | None) -> str:
 
 
 def _analytics_bucket_starts(range_name: str, now: datetime) -> list[datetime]:
-    current = now.astimezone(timezone.utc)
+    current = now.astimezone(UTC)
     if range_name == "24H":
         end = current.replace(minute=0, second=0, microsecond=0)
         return [end - timedelta(hours=index) for index in range(23, -1, -1)]
@@ -226,7 +226,7 @@ def _analytics_label(range_name: str, bucket_start: datetime) -> str:
 
 
 def _bucket_for_datetime(value: datetime, range_name: str) -> datetime:
-    current = value.astimezone(timezone.utc)
+    current = value.astimezone(UTC)
     if range_name == "24H":
         return current.replace(minute=0, second=0, microsecond=0)
     if range_name in {"7D", "30D"}:
@@ -3339,7 +3339,7 @@ async def update_knowledge_article(
         row.is_active = data.is_active
 
     row.updated_by_user_id = actor.id
-    row.updated_at = datetime.now(timezone.utc)
+    row.updated_at = datetime.now(UTC)
     await db.flush()
     return _article_to_schema(row)
 

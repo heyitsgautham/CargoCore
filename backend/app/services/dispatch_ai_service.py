@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import json
 import math
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
-from datetime import datetime, timedelta, timezone
 
 from loguru import logger
 from sqlalchemy import func, or_, select
@@ -19,7 +19,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.logistics import LogisticsDriverProfile
 from app.models.order import Order
 from app.models.user import User
-from app.utils.gemini import GeminiConfigError, generate_with_fallback, get_gemini_client
+from app.utils.gemini import (
+    GeminiConfigError,
+    generate_with_fallback,
+    get_gemini_client,
+)
 
 try:
     from google.genai import types as _gtypes
@@ -477,7 +481,7 @@ async def get_return_trip_suggestions(db: AsyncSession) -> list[dict]:
          within 8 km — these are return-trip opportunities.
       4. Gemini 2.5 Pro writes a plain-English dispatch reason and ranks results.
     """
-    two_hours_ago = datetime.now(timezone.utc) - timedelta(hours=2)
+    two_hours_ago = datetime.now(UTC) - timedelta(hours=2)
 
     busy_driver_ids = await _fetch_busy_driver_ids(db)
 
@@ -555,7 +559,7 @@ async def get_return_trip_suggestions(db: AsyncSession) -> list[dict]:
             seen.add(key)
             minutes_ago = int(
                 (
-                    datetime.now(timezone.utc) - delivery_order.delivered_at
+                    datetime.now(UTC) - delivery_order.delivered_at
                 ).total_seconds()
                 / 60
             )

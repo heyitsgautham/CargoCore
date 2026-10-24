@@ -6,11 +6,10 @@ All Gemini API calls are mocked — no real LLM calls in tests.
 Uses the new google-genai SDK patterns (client.aio.models.generate_content).
 """
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-import pytest_asyncio
 from httpx import AsyncClient
 from sqlalchemy import select
 
@@ -20,7 +19,6 @@ from app.models.order import Order
 from app.models.support_ticket import SupportTicket
 from app.models.user import Role, User
 from tests.conftest import REGISTER_PAYLOAD
-
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -703,7 +701,7 @@ class TestSupportAnalytics:
         ).scalar_one()
         user.role_id = ai_agent_role.id
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         ai_resolved_session_id = uuid.uuid4()
         escalated_session_id = uuid.uuid4()
@@ -795,7 +793,7 @@ class TestSupportAnalytics:
         ).scalar_one()
         user.role_id = ai_agent_role.id
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         session_id = uuid.uuid4()
 
         user_message = AIConversation(

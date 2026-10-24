@@ -2,14 +2,16 @@
 Real-time location tracking endpoint for dispatchers/customers
 """
 from typing import Annotated
-from fastapi import APIRouter, Depends, Query
+
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.database import get_db
 from app.dependencies import get_current_user
-from app.models.user import User
 from app.models.logistics import LogisticsDriverProfile, LogisticsVehicle
-from pydantic import BaseModel
+from app.models.user import User
 
 
 class DriverLocationItem(BaseModel):
@@ -95,8 +97,9 @@ async def get_order_driver_location(
     Get real-time location of the driver assigned to a specific order.
     Used by customers to track their delivery.
     """
-    from app.models.order import Order
     from uuid import UUID
+
+    from app.models.order import Order
 
     # Get order
     order = await db.get(Order, UUID(order_id))

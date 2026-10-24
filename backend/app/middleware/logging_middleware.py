@@ -17,7 +17,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 
         try:
             response = await call_next(request)
-        except Exception as exc:
+        except Exception:
             import traceback
             logger.error(
                 f"UNHANDLED EXCEPTION {request.method} {request.url.path}\n"

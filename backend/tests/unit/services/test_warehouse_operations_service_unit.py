@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 from uuid import uuid4
 
@@ -18,7 +18,7 @@ def _order(**overrides) -> SimpleNamespace:
         "delivery_notes": "",
         "warehouse_substatus": "AWAITING_INBOUND",
         "arrived_at": None,
-        "scheduled_at": datetime.now(timezone.utc) + timedelta(hours=3),
+        "scheduled_at": datetime.now(UTC) + timedelta(hours=3),
     }
     base.update(overrides)
     return SimpleNamespace(**base)
@@ -85,8 +85,8 @@ def test_to_quality_check_response_maps_performer_name() -> None:
         notes="Checked",
         performed_by=uuid4(),
         performer=SimpleNamespace(name="QC User"),
-        checked_at=datetime(2026, 4, 17, 9, 0, tzinfo=timezone.utc),
-        created_at=datetime(2026, 4, 17, 8, 0, tzinfo=timezone.utc),
+        checked_at=datetime(2026, 4, 17, 9, 0, tzinfo=UTC),
+        created_at=datetime(2026, 4, 17, 8, 0, tzinfo=UTC),
     )
 
     response = warehouse_ops._to_quality_check_response(qc)
@@ -185,16 +185,16 @@ def test_is_inbound_issue_ticket_requires_source_order_and_issue_type() -> None:
 def test_inbound_status_variants() -> None:
     completed = _order(warehouse_substatus="PICKING")
     on_hold = _order(warehouse_substatus="ON_HOLD")
-    arrived = _order(warehouse_substatus="AWAITING_INBOUND", arrived_at=datetime.now(timezone.utc))
+    arrived = _order(warehouse_substatus="AWAITING_INBOUND", arrived_at=datetime.now(UTC))
     in_transit = _order(
         warehouse_substatus="AWAITING_INBOUND",
         arrived_at=None,
-        scheduled_at=datetime.now(timezone.utc) + timedelta(hours=2),
+        scheduled_at=datetime.now(UTC) + timedelta(hours=2),
     )
     scheduled = _order(
         warehouse_substatus="AWAITING_INBOUND",
         arrived_at=None,
-        scheduled_at=datetime.now(timezone.utc) - timedelta(hours=2),
+        scheduled_at=datetime.now(UTC) - timedelta(hours=2),
     )
     delivered = _order(status="DELIVERED", warehouse_substatus="AWAITING_INBOUND")
     none_case = _order(warehouse_substatus=None)

@@ -4,9 +4,10 @@ Comprehensive Driver App Workflow Test Script
 Tests all major driver app endpoints against the backend
 """
 
-import requests
 import json
 from datetime import datetime
+
+import requests
 
 BASE_URL = "http://localhost:8000/api/v1"
 

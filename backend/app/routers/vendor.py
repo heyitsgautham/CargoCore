@@ -7,6 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
+from app.schemas.auth import MessageResponse
+from app.schemas.logistics import LogisticsNotificationItem, LogisticsNotificationUpdate
 from app.schemas.vendor import (
     VendorApiKeyCreate,
     VendorApiKeyResponse,
@@ -32,8 +34,6 @@ from app.schemas.vendor import (
     VendorTeamMemberCreate,
     VendorTeamMemberResponse,
 )
-from app.schemas.logistics import LogisticsNotificationItem, LogisticsNotificationUpdate
-from app.schemas.auth import MessageResponse
 from app.schemas.wallet import WalletSummary, WalletTopUpRequest, WalletTopUpResponse
 from app.services import logistics_service, vendor_service, wallet_service
 

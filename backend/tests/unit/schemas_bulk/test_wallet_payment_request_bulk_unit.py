@@ -3,7 +3,6 @@ from pydantic import ValidationError
 
 from app.schemas.wallet import WalletPaymentRequest
 
-
 VALID_CASES = [{'amount': 0.01}, {'amount': 0.1}, {'amount': 1.0}, {'amount': 5.5}, {'amount': 10.0}, {'amount': 100.0}, {'amount': 500.0}, {'amount': 1000.0}]
 INVALID_CASES = [{'amount': 0.0}, {'amount': -0.01}, {'amount': -1.0}, {'amount': -5.0}, {'amount': -10.0}, {'amount': -50.0}, {'amount': -100.0}, {'amount': -999.0}]
 

@@ -3,7 +3,6 @@ from pydantic import ValidationError
 
 from app.schemas.logistics import LogisticsAiQueryRequest
 
-
 VALID_CASES = [{'query': 'qq'}, {'query': 'qqq'}, {'query': 'qqqqq'}, {'query': 'qqqqqqqqqq'}, {'query': 'qqqqqqqqqqqqqqqqqqqq'}, {'query': 'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq'}, {'query': 'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq'}, {'query': 'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq'}]
 INVALID_CASES = [{'query': ''}, {'query': 'a'}, {'query': ' '}, {'query': '\t'}, {'query': '\n'}, {'query': 'x'}, {'query': '?'}, {'query': '1'}]
 

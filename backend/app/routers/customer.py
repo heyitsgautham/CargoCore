@@ -8,20 +8,18 @@ from app.database import get_db
 from app.dependencies import get_current_user
 from app.models.user import User
 from app.schemas.auth import MessageResponse
-from app.schemas.logistics import LogisticsNotificationItem, LogisticsNotificationUpdate
 from app.schemas.customer import (
     CustomerDamageReport,
     CustomerDamageReportCreate,
     CustomerDamageReportsResponse,
-    CustomerDashboardResponse,
     CustomerPaymentsSummary,
     CustomerProfileResponse,
-    CustomerQuote,
     CustomerQuotesResponse,
     CustomerSettings,
     CustomerSettingsResponse,
     CustomerTrackingResponse,
 )
+from app.schemas.logistics import LogisticsNotificationItem, LogisticsNotificationUpdate
 from app.schemas.wallet import WalletSummary, WalletTopUpRequest, WalletTopUpResponse
 from app.services import customer_service, logistics_service, wallet_service
 

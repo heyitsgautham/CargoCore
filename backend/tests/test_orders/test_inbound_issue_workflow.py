@@ -17,7 +17,6 @@ from app.services.warehouse_operations_service import (
     report_inbound_damage,
 )
 
-
 pytestmark = pytest.mark.asyncio
 
 

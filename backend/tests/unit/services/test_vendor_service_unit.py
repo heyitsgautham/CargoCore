@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from types import SimpleNamespace
 from uuid import uuid4
 
@@ -27,7 +27,7 @@ def _make_user(*, role_name: str = "VENDOR") -> SimpleNamespace:
         contact_person="Vendor Contact",
         business_email="ops@vendor.example.com",
         business_phone="8888877777",
-        created_at=datetime(2026, 4, 17, 9, 0, tzinfo=timezone.utc),
+        created_at=datetime(2026, 4, 17, 9, 0, tzinfo=UTC),
     )
 
 
@@ -48,8 +48,8 @@ def _make_order(**overrides) -> SimpleNamespace:
         "payment_status": "pending",
         "labor_count": 2,
         "total_amount": 1200.0,
-        "scheduled_at": datetime(2026, 4, 20, 9, 0, tzinfo=timezone.utc),
-        "created_at": datetime.now(timezone.utc) - timedelta(days=3),
+        "scheduled_at": datetime(2026, 4, 20, 9, 0, tzinfo=UTC),
+        "created_at": datetime.now(UTC) - timedelta(days=3),
         "delivered_at": None,
         "pod_photos": None,
         "pod_signature": None,
@@ -98,7 +98,7 @@ def test_status_label_and_progress_values() -> None:
 def test_eta_label_variants() -> None:
     delivered = _make_order(status="DELIVERED")
     cancelled = _make_order(status="CANCELLED")
-    scheduled = _make_order(status="ASSIGNED", scheduled_at=datetime(2026, 4, 30, 11, 0, tzinfo=timezone.utc))
+    scheduled = _make_order(status="ASSIGNED", scheduled_at=datetime(2026, 4, 30, 11, 0, tzinfo=UTC))
 
     assert vendor_service._eta_label(delivered) == "Delivered"
     assert vendor_service._eta_label(cancelled) == "Cancelled"
@@ -111,7 +111,7 @@ def test_history_includes_cancelled_reason() -> None:
     history = vendor_service._history(order)
 
     assert history[0].status == "Created"
-    assert any("Cancelled: Customer stopped shipment" == item.status for item in history)
+    assert any(item.status == "Cancelled: Customer stopped shipment" for item in history)
 
 
 def test_parse_rule_details_handles_invalid_json() -> None:
@@ -298,7 +298,7 @@ def test_compact_route_truncates_long_values() -> None:
 
 
 def test_invoice_status_and_record_variants() -> None:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     overdue = _make_order(created_at=now - timedelta(days=40), payment_status="pending", paid_amount=0.0)
     partial = _make_order(created_at=now - timedelta(days=5), payment_status="pending", paid_amount=100.0)
     paid = _make_order(created_at=now - timedelta(days=5), payment_status="paid", paid_amount=0.0, total_amount=900.0)
@@ -313,7 +313,7 @@ def test_invoice_status_and_record_variants() -> None:
 
 
 def test_invoice_summary_computes_totals() -> None:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     overdue = _make_order(created_at=now - timedelta(days=40), payment_status="pending", paid_amount=0.0, total_amount=1000.0)
     paid = _make_order(created_at=now - timedelta(days=2), payment_status="paid", paid_amount=0.0, total_amount=800.0)
 
@@ -343,7 +343,7 @@ def test_shipment_includes_driver_cost_and_auto_debit_note() -> None:
 
 
 def test_analytics_returns_success_and_on_time_metrics() -> None:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     orders = [
         _make_order(status="DELIVERED", created_at=now - timedelta(days=10), scheduled_at=now - timedelta(days=8), total_amount=1000.0),
         _make_order(status="CANCELLED", created_at=now - timedelta(days=6), scheduled_at=now - timedelta(days=5), total_amount=600.0),

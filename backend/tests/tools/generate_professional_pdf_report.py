@@ -1,19 +1,28 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+import yaml
 from PIL import Image as PilImage
 from PIL import ImageDraw, ImageFont
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
+from reportlab.platypus import (
+    CondPageBreak,
+    LongTable,
+    PageBreak,
+    Paragraph,
+    SimpleDocTemplate,
+    Spacer,
+    Table,
+    TableStyle,
+)
 from reportlab.platypus import Image as RLImage
-from reportlab.platypus import CondPageBreak, LongTable, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
-import yaml
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
 REPORTS_DIR = ROOT_DIR / "tests" / "reports"
@@ -534,7 +543,7 @@ def build_report() -> None:
             }
         )
 
-    generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+    generated_at = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
     summary_metrics = {
         "generated_at": generated_at,
         "openapi_total": len(openapi_operations),

@@ -9,7 +9,7 @@ Uses the new unified `google-genai` SDK with async client (`client.aio`).
 import json
 import re
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 from fastapi import HTTPException
@@ -28,12 +28,12 @@ from app.models.logistics import (
     LogisticsDailyStats,
     LogisticsDriverProfile,
     LogisticsReturnCase,
-    LogisticsTransaction,
     LogisticsVehicle,
 )
-from app.models.order import CustomerQuote, DamageReport, Order
+from app.models.order import DamageReport, Order
 from app.models.user import User
 from app.models.vendor import VendorRecurringRule, VendorSupportTicket
+from app.models.wallet import WalletTransaction
 from app.models.warehouse import (
     LoadingDock,
     PackingStation,
@@ -41,13 +41,10 @@ from app.models.warehouse import (
     Warehouse,
     WarehouseZoneMetrics,
 )
-from app.models.wallet import WalletTransaction
 from app.schemas.ai import (
     ChatResponse,
     ConversationHistory,
     ConversationMessage,
-    EscalationListResponse,
-    EscalationResponse,
     SessionListItem,
     SessionListResponse,
 )
@@ -58,7 +55,6 @@ from app.services.wallet_service import get_wallet_balance
 from app.utils.gemini import (
     EXECUTE_SQL_TOOL,
     GEMINI_FLASH_MODEL,
-    GEMINI_MODEL,
     SYSTEM_INSTRUCTION,
     GeminiConfigError,
     generate_with_fallback,
@@ -1163,7 +1159,7 @@ async def _vendor_analytics_message(ro_db: AsyncSession, user: User) -> str:
     successful = max(total - cancelled, 0)
     success_rate = round((successful / total) * 100, 1) if total else 0.0
     avg_order_value = round(sum(float(order.total_amount or 0.0) for order in orders) / total, 2) if total else 0.0
-    current_month = datetime.now(timezone.utc).strftime("%Y-%m")
+    current_month = datetime.now(UTC).strftime("%Y-%m")
     monthly_spend = round(
         sum(float(order.total_amount or 0.0) for order in orders if order.created_at.strftime("%Y-%m") == current_month),
         2,
@@ -1192,7 +1188,7 @@ async def _self_service_spend_message(ro_db: AsyncSession, user: User, role: str
         if _normalize_text(order.payment_status) == "paid" or _normalize_text(order.status) == "delivered"
     ]
     total_spent = round(sum(float(order.total_amount or 0.0) for order in completed_orders), 2)
-    current_month = datetime.now(timezone.utc).strftime("%Y-%m")
+    current_month = datetime.now(UTC).strftime("%Y-%m")
     month_spent = round(
         sum(
             float(order.total_amount or 0.0)
@@ -1506,7 +1502,7 @@ async def _build_warehouse_snapshot(ro_db: AsyncSession, user: User) -> dict | N
     pending_returns = sum(1 for row in recent_returns if _normalize_text(row.status) != "completed")
     completed_returns = sum(1 for row in recent_returns if _normalize_text(row.status) == "completed")
 
-    seven_days_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    seven_days_ago = datetime.now(UTC) - timedelta(days=7)
     orders_last_week = (
         await ro_db.execute(
             select(func.count(Order.id))
@@ -2068,7 +2064,7 @@ async def _build_dispatcher_snapshot(ro_db: AsyncSession) -> dict:
     active_vehicles = list(vehicle_result.scalars().all())
 
     # SLA at risk (orders past scheduled time, not yet delivered)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     sla_risk_result = await ro_db.execute(
         select(Order)
         .where(
@@ -2389,8 +2385,11 @@ async def chat(
     msg = (user_message or "").strip().lower()
     if chat_context == SUPPORT_CHAT_CONTEXT and _role_name(user) in SELF_SERVICE_ROLES:
         if _is_human_handoff_request(msg) or _has_legal_threat(msg) or _has_severe_negative_sentiment(msg):
-            from app.models.ai_support_settings import AISupportSettings as _AISupportSettingsEarly
             from sqlalchemy import select as _selectEarly
+
+            from app.models.ai_support_settings import (
+                AISupportSettings as _AISupportSettingsEarly,
+            )
             _early_settings = (
                 await db.execute(_selectEarly(_AISupportSettingsEarly).limit(1))
             ).scalar_one_or_none()
@@ -2515,8 +2514,9 @@ async def chat(
     _conversation_turns = sum(1 for m in history if m.role == "user")
 
     # ── Step 2: Load admin-configured settings (tone, system prompt, etc.) ─
-    from app.models.ai_support_settings import AISupportSettings as _AISupportSettings
     from sqlalchemy import select as _select
+
+    from app.models.ai_support_settings import AISupportSettings as _AISupportSettings
     _db_settings = (
         await db.execute(_select(_AISupportSettings).limit(1))
     ).scalar_one_or_none()
@@ -4411,7 +4411,6 @@ async def resolve_escalation(
     escalation_id: uuid.UUID,
 ) -> Escalation:
     """Mark an escalation as RESOLVED and set resolved_at to now."""
-    from datetime import timezone
 
     result = await db.execute(
         select(Escalation)
@@ -4424,7 +4423,7 @@ async def resolve_escalation(
 
     was_resolved = escalation.status == "RESOLVED"
     escalation.status = "RESOLVED"
-    escalation.resolved_at = datetime.now(timezone.utc)
+    escalation.resolved_at = datetime.now(UTC)
 
     conversation = escalation.conversation
     if conversation and not was_resolved:

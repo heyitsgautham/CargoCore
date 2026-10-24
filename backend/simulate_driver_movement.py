@@ -3,15 +3,16 @@ Simulate a driver moving around Mumbai
 Creates realistic GPS trail for testing real-time tracking
 """
 import asyncio
-import sys
 import random
+import sys
+
 from sqlalchemy import select
 
 sys.path.insert(0, ".")
 
 from app.database import AsyncSessionLocal as SessionLocal
-from app.models.user import User
 from app.models.logistics import LogisticsDriverProfile
+from app.models.user import User
 
 
 async def simulate_driver_movement():

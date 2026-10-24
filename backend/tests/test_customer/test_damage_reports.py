@@ -7,16 +7,22 @@ from app.models.user import Role, User
 from app.models.wallet import WalletTransaction
 from app.models.warehouse import ReturnGrading, Warehouse
 from app.schemas.customer import CustomerDamageReportCreate
-from app.schemas.orders import CancelOrderRequest, OrderCreate
 from app.schemas.logistics import LogisticsReturnCaseUpdate
+from app.schemas.orders import CancelOrderRequest, OrderCreate
 from app.schemas.warehouse_operations import ReturnGradingCreate
 from app.services.customer_service import create_customer_damage_report
 from app.services.finance_service import get_finance_summary, record_order_payment
 from app.services.logistics_service import build_bootstrap, update_return_case
 from app.services.orders_service import cancel_order, create_order
-from app.services.return_charge_service import apply_rejected_claim_transport_charge, get_unattached_pending_transport_charge_total
-from app.services.warehouse_operations_service import create_return_grading, get_return_gradings
+from app.services.return_charge_service import (
+    apply_rejected_claim_transport_charge,
+    get_unattached_pending_transport_charge_total,
+)
 from app.services.wallet_service import get_wallet_balance
+from app.services.warehouse_operations_service import (
+    create_return_grading,
+    get_return_gradings,
+)
 
 
 @pytest.mark.asyncio

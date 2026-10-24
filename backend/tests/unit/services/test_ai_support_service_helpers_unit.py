@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 from uuid import uuid4
 
@@ -25,7 +25,7 @@ def test_normalize_analytics_range_rejects_invalid_value() -> None:
 
 
 def test_analytics_bucket_starts_lengths_and_ordering() -> None:
-    now = datetime(2026, 4, 17, 14, 42, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 17, 14, 42, tzinfo=UTC)
 
     h24 = ai_support_service._analytics_bucket_starts("24H", now)
     d7 = ai_support_service._analytics_bucket_starts("7D", now)
@@ -41,7 +41,7 @@ def test_analytics_bucket_starts_lengths_and_ordering() -> None:
 
 
 def test_next_analytics_window_start_by_range() -> None:
-    start = datetime(2026, 4, 17, 10, 0, tzinfo=timezone.utc)
+    start = datetime(2026, 4, 17, 10, 0, tzinfo=UTC)
 
     assert ai_support_service._next_analytics_window_start("24H", start) == start + timedelta(hours=1)
     assert ai_support_service._next_analytics_window_start("7D", start) == start + timedelta(days=1)
@@ -50,7 +50,7 @@ def test_next_analytics_window_start_by_range() -> None:
 
 
 def test_analytics_label_by_range() -> None:
-    bucket = datetime(2026, 4, 17, 9, 0, tzinfo=timezone.utc)
+    bucket = datetime(2026, 4, 17, 9, 0, tzinfo=UTC)
 
     assert ai_support_service._analytics_label("24H", bucket) == "09:00"
     assert len(ai_support_service._analytics_label("7D", bucket)) == 3
@@ -58,12 +58,12 @@ def test_analytics_label_by_range() -> None:
 
 
 def test_bucket_for_datetime_normalization() -> None:
-    value = datetime(2026, 4, 17, 15, 37, 22, tzinfo=timezone.utc)
+    value = datetime(2026, 4, 17, 15, 37, 22, tzinfo=UTC)
 
-    assert ai_support_service._bucket_for_datetime(value, "24H") == datetime(2026, 4, 17, 15, 0, tzinfo=timezone.utc)
-    assert ai_support_service._bucket_for_datetime(value, "7D") == datetime(2026, 4, 17, 0, 0, tzinfo=timezone.utc)
-    assert ai_support_service._bucket_for_datetime(value, "30D") == datetime(2026, 4, 17, 0, 0, tzinfo=timezone.utc)
-    assert ai_support_service._bucket_for_datetime(value, "90D") == datetime(2026, 4, 13, 0, 0, tzinfo=timezone.utc)
+    assert ai_support_service._bucket_for_datetime(value, "24H") == datetime(2026, 4, 17, 15, 0, tzinfo=UTC)
+    assert ai_support_service._bucket_for_datetime(value, "7D") == datetime(2026, 4, 17, 0, 0, tzinfo=UTC)
+    assert ai_support_service._bucket_for_datetime(value, "30D") == datetime(2026, 4, 17, 0, 0, tzinfo=UTC)
+    assert ai_support_service._bucket_for_datetime(value, "90D") == datetime(2026, 4, 13, 0, 0, tzinfo=UTC)
 
 
 def test_percent_delta_and_format_helpers() -> None:

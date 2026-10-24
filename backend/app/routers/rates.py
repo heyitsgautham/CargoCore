@@ -6,9 +6,8 @@ GET  /api/v1/rates/inventory-seeded — LM only, checks if packing materials exi
 POST /api/v1/rates/seed-inventory   — LM only, one-time seed packing materials to all warehouses
 """
 import json
-import os
 from pathlib import Path
-from typing import Annotated, Any, Dict
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select
@@ -24,7 +23,7 @@ router = APIRouter(prefix="/api/v1/rates", tags=["Rates"])
 # Stored beside the backend package (project root)
 _CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "rates_config.json"
 
-_DEFAULTS: Dict[str, Any] = {
+_DEFAULTS: dict[str, Any] = {
     # ── Customer charges (used by CreateShipment, BookMove, etc.) ──────────
     "baseBookingFee": 220,          # flat base fee for vendor shipments
     "perKmRate": 12,                # ₹/km for vendor shipments
@@ -93,10 +92,10 @@ _DEFAULTS: Dict[str, Any] = {
 }
 
 
-def _load() -> Dict[str, Any]:
+def _load() -> dict[str, Any]:
     if _CONFIG_PATH.exists():
         try:
-            with open(_CONFIG_PATH, "r", encoding="utf-8") as f:
+            with open(_CONFIG_PATH, encoding="utf-8") as f:
                 stored = json.load(f)
             # Deep-merge stored over defaults so new keys always appear
             merged = {**_DEFAULTS}
@@ -111,14 +110,14 @@ def _load() -> Dict[str, Any]:
     return dict(_DEFAULTS)
 
 
-def _save(data: Dict[str, Any]) -> None:
+def _save(data: dict[str, Any]) -> None:
     _CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(_CONFIG_PATH, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
 
 
 @router.get("", summary="Get current rate configuration")
-async def get_rates() -> Dict[str, Any]:
+async def get_rates() -> dict[str, Any]:
     return _load()
 
 
@@ -127,7 +126,7 @@ async def get_rates() -> Dict[str, Any]:
     summary="Update rate configuration (LOGISTIC_MANAGER only)",
     dependencies=[Depends(require_role("LOGISTIC_MANAGER"))],
 )
-async def update_rates(payload: Dict[str, Any]) -> Dict[str, Any]:
+async def update_rates(payload: dict[str, Any]) -> dict[str, Any]:
     if not payload:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Empty payload")
     current = _load()
@@ -148,7 +147,7 @@ async def update_rates(payload: Dict[str, Any]) -> Dict[str, Any]:
 )
 async def check_inventory_seeded(
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     result = await db.execute(
         select(func.count(InventoryItem.id)).where(
             InventoryItem.category == "Packing Materials",
@@ -166,7 +165,7 @@ async def check_inventory_seeded(
 )
 async def seed_inventory(
     db: Annotated[AsyncSession, Depends(get_db)],
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     # Guard: if already seeded, do nothing
     count_result = await db.execute(
         select(func.count(InventoryItem.id)).where(

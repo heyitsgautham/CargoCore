@@ -7,7 +7,6 @@ import yaml
 from httpx import AsyncClient
 
 from app.services import auth_service
-
 from tests.utils.sample_data import make_login_response, make_registration_response
 
 OPENAPI_YAML = Path(__file__).resolve().parents[1] / "api-docs" / "openapi.swagger.yaml"

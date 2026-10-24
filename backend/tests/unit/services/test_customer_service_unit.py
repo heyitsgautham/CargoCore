@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from types import SimpleNamespace
 from uuid import uuid4
 
@@ -16,9 +16,9 @@ def _make_order(**overrides):
         "warehouse_substatus": "AWAITING_PICK",
         "pickup_addr": "Pickup A",
         "delivery_addr": "Drop B",
-        "scheduled_at": datetime(2026, 4, 18, 9, 30, tzinfo=timezone.utc),
-        "created_at": datetime(2026, 4, 17, 8, 0, tzinfo=timezone.utc),
-        "updated_at": datetime(2026, 4, 17, 10, 0, tzinfo=timezone.utc),
+        "scheduled_at": datetime(2026, 4, 18, 9, 30, tzinfo=UTC),
+        "created_at": datetime(2026, 4, 17, 8, 0, tzinfo=UTC),
+        "updated_at": datetime(2026, 4, 17, 10, 0, tzinfo=UTC),
         "delivered_at": None,
         "vehicle_type": "mini-truck",
         "cargo_type": None,
@@ -36,10 +36,10 @@ def _make_order(**overrides):
         "assigned_driver_id": uuid4(),
         "payment_status": "pending",
         "cancel_reason": None,
-        "picking_started_at": datetime(2026, 4, 17, 9, 0, tzinfo=timezone.utc),
-        "picking_completed_at": datetime(2026, 4, 17, 9, 20, tzinfo=timezone.utc),
-        "packing_started_at": datetime(2026, 4, 17, 9, 30, tzinfo=timezone.utc),
-        "packing_completed_at": datetime(2026, 4, 17, 9, 45, tzinfo=timezone.utc),
+        "picking_started_at": datetime(2026, 4, 17, 9, 0, tzinfo=UTC),
+        "picking_completed_at": datetime(2026, 4, 17, 9, 20, tzinfo=UTC),
+        "packing_started_at": datetime(2026, 4, 17, 9, 30, tzinfo=UTC),
+        "packing_completed_at": datetime(2026, 4, 17, 9, 45, tzinfo=UTC),
     }
     base.update(overrides)
     return SimpleNamespace(**base)
@@ -75,7 +75,7 @@ def test_service_otp_derives_from_tracking_code_digits() -> None:
 
 def test_service_time_block_uses_fallbacks() -> None:
     explicit = _make_order(service_time_block="09:00 AM - 11:00 AM")
-    scheduled = _make_order(service_time_block=None, scheduled_at=datetime(2026, 4, 18, 14, 15, tzinfo=timezone.utc))
+    scheduled = _make_order(service_time_block=None, scheduled_at=datetime(2026, 4, 18, 14, 15, tzinfo=UTC))
     missing = _make_order(service_time_block=None, scheduled_at=None)
 
     assert customer_service._service_time_block(explicit) == "09:00 AM - 11:00 AM"
@@ -92,7 +92,7 @@ def test_progress_for_status_uses_ui_mapping() -> None:
 def test_eta_label_for_delivered_and_cancelled_orders() -> None:
     delivered = _make_order(
         status="DELIVERED",
-        delivered_at=datetime(2026, 4, 18, 12, 0, tzinfo=timezone.utc),
+        delivered_at=datetime(2026, 4, 18, 12, 0, tzinfo=UTC),
     )
     cancelled = _make_order(status="CANCELLED")
 
@@ -102,7 +102,7 @@ def test_eta_label_for_delivered_and_cancelled_orders() -> None:
 
 def test_fmt_handles_none_and_datetime() -> None:
     assert customer_service._fmt(None) == ""
-    rendered = customer_service._fmt(datetime(2026, 4, 17, 8, 45, tzinfo=timezone.utc))
+    rendered = customer_service._fmt(datetime(2026, 4, 17, 8, 45, tzinfo=UTC))
     assert "17 Apr 2026" in rendered
 
 
@@ -155,7 +155,7 @@ def test_to_user_profile_maps_role_and_status() -> None:
         address="Address",
         role=SimpleNamespace(name="INDIVIDUAL"),
         is_active=True,
-        created_at=datetime(2026, 4, 17, 7, 0, tzinfo=timezone.utc),
+        created_at=datetime(2026, 4, 17, 7, 0, tzinfo=UTC),
     )
 
     profile = customer_service._to_user_profile(user)

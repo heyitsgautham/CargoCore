@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
 
@@ -8,7 +8,12 @@ import pytest
 import yaml
 from httpx import AsyncClient
 
-from app.schemas.ai import ContactSubmissionResponse, TicketListResponse, TicketResponse, TicketStats
+from app.schemas.ai import (
+    ContactSubmissionResponse,
+    TicketListResponse,
+    TicketResponse,
+    TicketStats,
+)
 from app.services import ai_support_service
 
 OPENAPI_YAML = Path(__file__).resolve().parents[1] / "api-docs" / "openapi.swagger.yaml"
@@ -23,7 +28,7 @@ def _load_openapi() -> dict:
 
 
 def _contact_submission_response() -> ContactSubmissionResponse:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     return ContactSubmissionResponse(
         id=uuid4(),
         reference_code="CS-1001",
@@ -44,7 +49,7 @@ def _contact_submission_response() -> ContactSubmissionResponse:
 
 
 def _ticket_response() -> TicketResponse:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     return TicketResponse(
         id=uuid4(),
         reference_code="TCK-1001",

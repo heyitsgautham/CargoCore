@@ -39,7 +39,9 @@ async def get_wallet_balance(db: AsyncSession, user_id: UUID) -> float:
 
 async def get_wallet_summary(db: AsyncSession, user: User):
     balance = await get_wallet_balance(db, user.id)
-    from app.services.return_charge_service import get_unattached_pending_transport_charge_total
+    from app.services.return_charge_service import (
+        get_unattached_pending_transport_charge_total,
+    )
     pending_transport_charge = await get_unattached_pending_transport_charge_total(db, user.id)
 
     totals = await db.execute(
@@ -194,7 +196,9 @@ async def apply_wallet_payment(
     order.payment_status = "paid" if order.paid_amount >= order.total_amount else "partial"
     db.add(order)
 
-    from app.services.return_charge_service import settle_transport_charges_from_order_payment
+    from app.services.return_charge_service import (
+        settle_transport_charges_from_order_payment,
+    )
     await settle_transport_charges_from_order_payment(
         db,
         order=order,
@@ -205,7 +209,7 @@ async def apply_wallet_payment(
     # ── Record in Finance: create a REVENUE_WALLET LogisticsTransaction so
     #    wallet bookings appear in the Finance overview table and MTD revenue. ──
     from app.models.logistics import LogisticsTransaction
-    from app.services.finance_service import _upsert_daily_stats, _gen_ref
+    from app.services.finance_service import _gen_ref, _upsert_daily_stats
 
     db.add(
         LogisticsTransaction(
@@ -249,6 +253,7 @@ async def backfill_wallet_debits(db: AsyncSession, user: User) -> int:
     Returns the number of rows created.
     """
     from sqlalchemy import func as _func
+
     from app.models.order import Order
     from app.models.payment import OrderPayment
 
@@ -363,7 +368,7 @@ async def credit_cancellation_refund(
             # Create a LogisticsTransaction reversal so the Logistics Manager
             # transaction history reflects the revenue being returned to the customer.
             from app.models.logistics import LogisticsTransaction
-            from app.services.finance_service import _upsert_daily_stats, _gen_ref
+            from app.services.finance_service import _gen_ref, _upsert_daily_stats
 
             db.add(
                 LogisticsTransaction(
@@ -387,7 +392,7 @@ async def credit_cancellation_refund(
         # No recorded payment rows — the refund was inferred from payment_status='paid'.
         # Still record a logistics transaction reversal for accounting accuracy.
         from app.models.logistics import LogisticsTransaction
-        from app.services.finance_service import _upsert_daily_stats, _gen_ref
+        from app.services.finance_service import _gen_ref, _upsert_daily_stats
 
         db.add(
             LogisticsTransaction(
@@ -454,7 +459,7 @@ async def credit_return_refund(
 
     # 2. LogisticsTransaction — negative amount = revenue reversal visible in Finance & Payroll
     from app.models.logistics import LogisticsTransaction
-    from app.services.finance_service import _upsert_daily_stats, _gen_ref
+    from app.services.finance_service import _gen_ref, _upsert_daily_stats
 
     db.add(
         LogisticsTransaction(

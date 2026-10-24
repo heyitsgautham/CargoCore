@@ -1,6 +1,8 @@
 import asyncio
+
 import asyncpg
 import bcrypt
+
 
 async def main():
     conn = await asyncpg.connect('postgresql://logistics_user:logistics_pass@localhost:5432/logistics_db')

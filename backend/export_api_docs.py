@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from collections import Counter, defaultdict
-from datetime import datetime, timezone
-from pathlib import Path
 import json
+from collections import Counter, defaultdict
+from datetime import UTC, datetime
+from pathlib import Path
 
 from app.main import app
-
 
 ROOT = Path(__file__).resolve().parent
 DOCS_DIR = ROOT / "docs"
@@ -115,7 +114,7 @@ def auth_summary(operation: dict) -> str:
 
 
 def build_catalog(schema: dict) -> str:
-    generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")
+    generated_at = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%SZ")
     paths: dict = schema.get("paths", {})
     operations: list[dict] = []
 
@@ -151,8 +150,8 @@ def build_catalog(schema: dict) -> str:
     lines.append(f"- Tags: `{len(tag_counts)}`")
     lines.append(f"- Paths: `{len(paths)}`")
     lines.append(f"- Operations: `{len(operations)}`")
-    lines.append(f"- Swagger UI: `http://localhost:8000/docs`")
-    lines.append(f"- ReDoc: `http://localhost:8000/redoc`")
+    lines.append("- Swagger UI: `http://localhost:8000/docs`")
+    lines.append("- ReDoc: `http://localhost:8000/redoc`")
     lines.append("")
     lines.append("## Swagger Testing Flow")
     lines.append("")

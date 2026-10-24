@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
 
@@ -81,7 +81,7 @@ async def test_tracking_drivers_contract(
                 {
                     "status": "Active",
                     "current_location": "19.0760,72.8777",
-                    "updated_at": datetime(2026, 4, 17, 10, 0, tzinfo=timezone.utc),
+                    "updated_at": datetime(2026, 4, 17, 10, 0, tzinfo=UTC),
                 },
             )()
             driver_user = type(
@@ -98,7 +98,7 @@ async def test_tracking_drivers_contract(
                 {
                     "id": uuid4(),
                     "code": "VH-101",
-                    "updated_at": datetime(2026, 4, 17, 10, 5, tzinfo=timezone.utc),
+                    "updated_at": datetime(2026, 4, 17, 10, 5, tzinfo=UTC),
                 },
             )()
             return _FakeResult([(driver_profile, driver_user, vehicle)])

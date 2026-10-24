@@ -8,9 +8,6 @@ and PostgreSQL transaction-level enforcement).
 import re
 
 import sqlparse
-from sqlparse.sql import IdentifierList, Identifier, Where, Parenthesis
-from sqlparse.tokens import Keyword, DML
-
 from loguru import logger
 
 # ── Configuration ─────────────────────────────────────────────────────────────

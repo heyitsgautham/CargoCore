@@ -13,10 +13,10 @@ DELETE /api/v1/dev/seed-gps — wipes the seeded coords (reset to null)
 from __future__ import annotations
 
 import random
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -129,7 +129,7 @@ async def seed_gps_coordinates(
         )
     ).scalars().all()
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     for i, order in enumerate(delivered_orders):
         d_lat, d_lng, d_name = _DELIVERY_SPOTS[(i + 3) % len(_DELIVERY_SPOTS)]
         order.delivery_lat, order.delivery_lng = _rand_offset(d_lat, d_lng, 0.5)
@@ -169,8 +169,9 @@ async def seed_gps_coordinates(
 
         # Broadcast to live dispatcher map via WebSocket
         try:
-            from app.routers.ws_fleet import fleet_manager
             import asyncio
+
+            from app.routers.ws_fleet import fleet_manager
             asyncio.ensure_future(
                 fleet_manager.broadcast({
                     "type": "location_update",

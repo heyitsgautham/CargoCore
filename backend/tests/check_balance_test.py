@@ -1,7 +1,10 @@
 """Quick check of drivers and orders for Auto-Balance testing"""
 import asyncio
-from app.database import engine
+
 from sqlalchemy import text
+
+from app.database import engine
+
 
 async def check():
     async with engine.connect() as conn:

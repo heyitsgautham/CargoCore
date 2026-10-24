@@ -1,10 +1,10 @@
 """
 Geocoding service using Nominatim (OpenStreetMap) - Free and no API key required.
 """
-import httpx
 import time
-from typing import List, Dict, Any
+from typing import Any
 
+import httpx
 
 NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org"
 PHOTON_BASE_URL = "https://photon.komoot.io"
@@ -15,11 +15,11 @@ DEFAULT_HEADERS = {
     "Accept-Language": "en",
 }
 _CACHE_TTL_SECONDS = 180
-_search_cache: Dict[str, tuple[float, List[Dict[str, Any]]]] = {}
-_reverse_cache: Dict[str, tuple[float, Dict[str, Any]]] = {}
+_search_cache: dict[str, tuple[float, list[dict[str, Any]]]] = {}
+_reverse_cache: dict[str, tuple[float, dict[str, Any]]] = {}
 
 
-def _cache_get(cache: Dict[str, tuple[float, Any]], key: str):
+def _cache_get(cache: dict[str, tuple[float, Any]], key: str):
     entry = cache.get(key)
     if not entry:
         return None
@@ -30,11 +30,11 @@ def _cache_get(cache: Dict[str, tuple[float, Any]], key: str):
     return value
 
 
-def _cache_set(cache: Dict[str, tuple[float, Any]], key: str, value: Any):
+def _cache_set(cache: dict[str, tuple[float, Any]], key: str, value: Any):
     cache[key] = (time.time(), value)
 
 
-def _format_photon_results(results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+def _format_photon_results(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
     formatted_results = []
     for item in results:
         geometry = item.get("geometry", {})
@@ -63,7 +63,7 @@ def _format_photon_results(results: List[Dict[str, Any]]) -> List[Dict[str, Any]
     return formatted_results
 
 
-async def search_address(query: str, limit: int = 5) -> List[Dict[str, Any]]:
+async def search_address(query: str, limit: int = 5) -> list[dict[str, Any]]:
     """
     Search for addresses using Nominatim geocoding.
     Returns list of address suggestions with coordinates.
@@ -125,7 +125,7 @@ async def search_address(query: str, limit: int = 5) -> List[Dict[str, Any]]:
             return []
 
 
-async def reverse_geocode(lat: float, lon: float) -> Dict[str, Any]:
+async def reverse_geocode(lat: float, lon: float) -> dict[str, Any]:
     """
     Reverse geocode coordinates to address using Nominatim.
     Returns address details for the given coordinates.
@@ -165,7 +165,7 @@ async def reverse_geocode(lat: float, lon: float) -> Dict[str, Any]:
             except httpx.HTTPStatusError as e:
                 if e.response.status_code != 429:
                     raise
-                print(f"Nominatim rate limited, falling back to Photon")
+                print("Nominatim rate limited, falling back to Photon")
 
             photon_response = await client.get(
                 f"{PHOTON_BASE_URL}/reverse",
@@ -187,7 +187,7 @@ async def reverse_geocode(lat: float, lon: float) -> Dict[str, Any]:
                 _cache_set(_reverse_cache, cache_key, payload)
                 return payload
 
-            print(f"No results from Photon, returning coordinates")
+            print("No results from Photon, returning coordinates")
             payload = {
                 "display_name": f"{lat:.6f}, {lon:.6f}",
                 "address": {},

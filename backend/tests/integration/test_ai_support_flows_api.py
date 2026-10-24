@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
@@ -21,7 +21,7 @@ pytestmark = pytest.mark.asyncio
 
 
 def _contact_submission_response() -> ContactSubmissionResponse:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     return ContactSubmissionResponse(
         id=uuid4(),
         reference_code="CS-1001",
@@ -42,7 +42,7 @@ def _contact_submission_response() -> ContactSubmissionResponse:
 
 
 def _ticket_response() -> TicketResponse:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     return TicketResponse(
         id=uuid4(),
         reference_code="TCK-1001",

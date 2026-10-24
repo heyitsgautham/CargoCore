@@ -1,11 +1,16 @@
 [tool.ruff]
 line-length = 88
 target-version = "py312"
-exclude = ["alembic"]
+extend-exclude = ["alembic", ".venv"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
-ignore = ["E501"]
+ignore = [
+    "E501",  # long lines are left to the formatter
+    "B008",  # FastAPI declares dependencies as Depends() defaults
+    "E711",  # SQLAlchemy filters need `== None` to build IS NULL
+    "E712",  # SQLAlchemy filters need `== True` to build the SQL comparison
+]
 
 [tool.black]
 line-length = 88

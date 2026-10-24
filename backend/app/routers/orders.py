@@ -8,31 +8,29 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.dependencies import get_current_user, require_role
 from app.models.user import User
+from app.schemas.logistics import LogisticsEscalationItem
 from app.schemas.orders import (
     BatchConfirmRequest,
     CancelOrderRequest,
     ClusterResponse,
     DeliveryOtpSendResponse,
     DriverSuggestionResponse,
-    OrderTripIntelligenceItem,
-    OrderEscalateRequest,
     OrderAssignmentPreview,
     OrderAssignRequest,
     OrderCreate,
+    OrderEscalateRequest,
     OrderItemResponse,
     OrderItemUpsert,
     OrderListResponse,
     OrderResponse,
+    OrderTripIntelligenceItem,
     OrderUpdate,
     ReturnTripResponse,
     TripCommandPushRequest,
     TripDeviationReportRequest,
 )
-from app.schemas.logistics import LogisticsEscalationItem
 from app.schemas.wallet import WalletPaymentRequest, WalletPaymentResponse
-from app.services import orders_service
-from app.services import clustering_service
-from app.services import wallet_service
+from app.services import clustering_service, orders_service, wallet_service
 
 router = APIRouter(prefix="/api/v1/orders", tags=["Orders"])
 
@@ -109,8 +107,9 @@ async def cluster_orders(
     _: Annotated[object, Depends(require_role("LOGISTIC_MANAGER", "DISPATCHER"))],
     radius_km: float = Query(default=5.0, ge=1.0, le=50.0),
 ):
-    from app.models.order import Order
     from sqlalchemy import select
+
+    from app.models.order import Order
     from app.schemas.orders import ClusterOrderItem, OrderCluster
 
     orders = (
@@ -335,8 +334,9 @@ async def pay_order_with_wallet(
     db: Annotated[AsyncSession, Depends(get_db)],
     user: Annotated[User, Depends(get_current_user)],
 ):
-    from app.models.order import Order as _Order
     from sqlalchemy import select as _select
+
+    from app.models.order import Order as _Order
 
     order = (await db.execute(_select(_Order).where(_Order.id == order_id))).scalar_one_or_none()
     if order is None:
@@ -429,8 +429,8 @@ async def get_proof_of_delivery_html(
     user: Annotated[User, Depends(get_current_user)],
 ):
     """Generate and return Proof of Delivery HTML document with real data."""
-    from pathlib import Path
     from datetime import datetime
+    from pathlib import Path
 
     # Fetch order with POD data
     order = await orders_service.get_order_detail(db, order_id, user)
@@ -445,7 +445,7 @@ async def get_proof_of_delivery_html(
 
     # Read HTML template
     template_path = Path(__file__).parent.parent.parent.parent / "html-slips" / "ProofOfDelivery.html"
-    with open(template_path, "r", encoding="utf-8") as f:
+    with open(template_path, encoding="utf-8") as f:
         html_content = f.read()
 
     # Get driver details
@@ -543,9 +543,10 @@ async def pay_order(
     user: Annotated[User, Depends(get_current_user)],
 ):
     """Record a payment for an order. Online (Razorpay) or COD by driver."""
-    from app.services import finance_service
-    from app.models.order import Order as _Order
     from sqlalchemy import select as _select
+
+    from app.models.order import Order as _Order
+    from app.services import finance_service
 
     order = (await db.execute(_select(_Order).where(_Order.id == order_id))).scalar_one_or_none()
     if order is None:
@@ -666,8 +667,9 @@ async def submit_packing_return(
     user: Annotated[User, Depends(require_role("DRIVER"))],
 ):
     """Driver submits how many packing assets they are returning to warehouse."""
-    from app.models.order import Order as _Order
     from sqlalchemy import select as _select
+
+    from app.models.order import Order as _Order
 
     order = (await db.execute(_select(_Order).where(_Order.id == order_id))).scalar_one_or_none()
     if order is None:
@@ -710,10 +712,11 @@ async def save_asset_log(
     For each item with returned > 0, creates an RETURN inventory movement
     to add the items back into warehouse stock.
     """
-    from app.models.order import Order as _Order
-    from app.models.inventory import InventoryItem, InventoryMovement
-    from sqlalchemy import select as _select, or_
     from fastapi import HTTPException
+    from sqlalchemy import select as _select
+
+    from app.models.inventory import InventoryItem, InventoryMovement
+    from app.models.order import Order as _Order
 
     order = (await db.execute(_select(_Order).where(_Order.id == order_id))).scalar_one_or_none()
     if order is None:
@@ -798,12 +801,13 @@ async def simulate_driver_arrival(
     map shows the truck near the pickup pin and the geofence alert fires on the
     customer's screen.
     """
-    import math
     import random
+
     from fastapi import HTTPException
     from sqlalchemy import select as _select
-    from app.models.order import Order as _Order
+
     from app.models.logistics import LogisticsDriverProfile
+    from app.models.order import Order as _Order
 
     order = (await db.execute(_select(_Order).where(_Order.id == order_id))).scalar_one_or_none()
     if order is None:

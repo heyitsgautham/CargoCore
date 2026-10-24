@@ -21,7 +21,6 @@ from app.schemas.labour import (
 
 
 async def _get_labourer(db: AsyncSession, labourer_id: UUID) -> Labourer:
-    from sqlalchemy.orm import selectinload as sil
     result = await db.execute(
         select(Labourer)
         .options(

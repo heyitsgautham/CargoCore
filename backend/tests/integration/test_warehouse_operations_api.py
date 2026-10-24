@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from types import SimpleNamespace
 
 import pytest
@@ -58,7 +58,7 @@ async def test_schedule_inbound_success(
     payload = {
         "supplier_name": "Acme Supplies",
         "expected_qty": 120,
-        "scheduled_at": datetime(2026, 4, 18, 10, 0, tzinfo=timezone.utc).isoformat(),
+        "scheduled_at": datetime(2026, 4, 18, 10, 0, tzinfo=UTC).isoformat(),
         "dock_preference": "Dock 2",
         "notes": "Handle pallets carefully",
     }

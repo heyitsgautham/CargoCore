@@ -272,7 +272,7 @@ def _tokenize(text: str) -> set[str]:
 
 
 async def retrieve_knowledge_from_db(
-    query: str, audience: str, db: "AsyncSession", limit: int = 3
+    query: str, audience: str, db: AsyncSession, limit: int = 3
 ) -> list[KnowledgeEntry]:
     """
     Retrieve relevant knowledge entries from the DB.
@@ -281,6 +281,7 @@ async def retrieve_knowledge_from_db(
     """
     try:
         from sqlalchemy import select
+
         from app.models.ai_config import AIKnowledgeArticle
 
         rows = (

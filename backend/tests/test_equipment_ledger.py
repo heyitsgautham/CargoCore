@@ -1,8 +1,8 @@
 """
 Test script to verify equipment_ledger is being returned from the backend
 """
+
 import requests
-import json
 
 # Configuration
 BASE_URL = "http://127.0.0.1:8000"  # Adjust if your backend runs on a different port
@@ -26,7 +26,7 @@ def test_equipment_ledger():
         login_response.raise_for_status()
         token_data = login_response.json()
         access_token = token_data.get("access_token")
-        print(f"✓ Login successful! Got access token")
+        print("✓ Login successful! Got access token")
     except Exception as e:
         print(f"✗ Login failed: {e}")
         print("\nPlease update the login credentials in test_equipment_ledger.py")
@@ -48,13 +48,13 @@ def test_equipment_ledger():
         # Check if equipment_ledger exists in the response
         equipment_ledger = data.get("equipment_ledger", [])
         
-        print(f"✓ Bootstrap data received!")
-        print(f"\n3. Equipment Ledger Status:")
+        print("✓ Bootstrap data received!")
+        print("\n3. Equipment Ledger Status:")
         print(f"   - equipment_ledger key exists: {('equipment_ledger' in data)}")
         print(f"   - Number of records: {len(equipment_ledger)}")
         
         if equipment_ledger:
-            print(f"\n4. Sample Equipment Ledger Records:")
+            print("\n4. Sample Equipment Ledger Records:")
             for idx, eq in enumerate(equipment_ledger[:5], 1):  # Show first 5
                 print(f"\n   Record {idx}:")
                 print(f"   - ID: {eq.get('id')}")
@@ -64,12 +64,12 @@ def test_equipment_ledger():
                 print(f"   - Reference Code: {eq.get('reference_code')}")
                 print(f"   - Status: {eq.get('status')}")
         else:
-            print(f"\n   ⚠ WARNING: equipment_ledger is EMPTY!")
-            print(f"   This means the backend is not returning any equipment ledger data.")
-            print(f"\n   Possible causes:")
-            print(f"   1. Database has no equipment ledger records")
-            print(f"   2. Data seeding hasn't run")
-            print(f"   3. Query filter excluding all records")
+            print("\n   ⚠ WARNING: equipment_ledger is EMPTY!")
+            print("   This means the backend is not returning any equipment ledger data.")
+            print("\n   Possible causes:")
+            print("   1. Database has no equipment ledger records")
+            print("   2. Data seeding hasn't run")
+            print("   3. Query filter excluding all records")
             
     except requests.exceptions.HTTPError as e:
         print(f"✗ HTTP Error: {e}")

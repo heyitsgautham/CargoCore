@@ -4,16 +4,16 @@ Create a test order assigned to driver1@gmail.com for testing.
 
 import asyncio
 import sys
-from uuid import uuid4
 from datetime import datetime, timedelta
+
 from sqlalchemy import select
 
 sys.path.insert(0, ".")
 
 from app.database import AsyncSessionLocal as SessionLocal
+from app.models.logistics import LogisticsVehicle
 from app.models.order import Order, OrderItem
 from app.models.user import User
-from app.models.logistics import LogisticsVehicle
 
 
 async def create_order_for_driver1():
@@ -97,11 +97,11 @@ async def create_order_for_driver1():
         await db.commit()
         await db.refresh(order)
 
-        print(f"\n[SUCCESS] Test order created!")
+        print("\n[SUCCESS] Test order created!")
         print(f"  Tracking Code: {tracking_code}")
         print(f"  Order ID: {order.id}")
         print(f"  Status: {order.status}")
-        print(f"  Assigned Driver: driver1@gmail.com")
+        print("  Assigned Driver: driver1@gmail.com")
         print(f"  Assigned Vehicle: {vehicle.code}")
         print(f"  Total Amount: Rs.{order.total_amount}")
         print(f"  Payment Mode: {order.payment_mode}")

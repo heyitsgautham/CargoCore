@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import json
 import warnings
-from datetime import datetime, timezone
+from collections.abc import Callable
+from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any, Callable
+from typing import Any
 
 import pytest
 import pytest_asyncio
@@ -60,7 +61,7 @@ def _json_safe(value: Any) -> Any:
 
 
 def _build_fake_user(role_name: str = "LOGISTIC_MANAGER") -> SimpleNamespace:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     return SimpleNamespace(
         id="11111111-1111-1111-1111-111111111111",
         name="Test User",
@@ -140,7 +141,7 @@ def record_evidence(request: pytest.FixtureRequest) -> Callable[..., None]:
                 "actual_output": _json_safe(actual_output),
                 "status": status,
                 "notes": notes,
-                "recorded_at": datetime.now(timezone.utc).isoformat(),
+                "recorded_at": datetime.now(UTC).isoformat(),
             }
         )
 
@@ -166,7 +167,7 @@ def record_mismatch(request: pytest.FixtureRequest) -> Callable[..., None]:
                 "expected_output": _json_safe(expected_output),
                 "actual_output": _json_safe(actual_output),
                 "difference_summary": difference_summary,
-                "recorded_at": datetime.now(timezone.utc).isoformat(),
+                "recorded_at": datetime.now(UTC).isoformat(),
             }
         )
 

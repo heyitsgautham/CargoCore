@@ -1,6 +1,6 @@
+import uuid
 from collections import OrderedDict
 from datetime import datetime
-import uuid
 
 from fastapi import HTTPException, status
 from sqlalchemy import select
@@ -14,8 +14,9 @@ from app.models.user import User
 from app.models.warehouse import Warehouse
 from app.schemas.auth import UserProfile
 from app.schemas.customer import (
-    DamageReviewQueueItem,
-    DamageReviewUpdate,
+    CustomerDamageReport,
+    CustomerDamageReportCreate,
+    CustomerDamageReportsResponse,
     CustomerDashboardActiveMove,
     CustomerDashboardCostSummary,
     CustomerDashboardDriver,
@@ -23,9 +24,6 @@ from app.schemas.customer import (
     CustomerDashboardOrder,
     CustomerDashboardResponse,
     CustomerDashboardStats,
-    CustomerDamageReport,
-    CustomerDamageReportCreate,
-    CustomerDamageReportsResponse,
     CustomerPaymentRecord,
     CustomerPaymentsSummary,
     CustomerProfileResponse,
@@ -35,6 +33,8 @@ from app.schemas.customer import (
     CustomerSettingsResponse,
     CustomerTrackingOrder,
     CustomerTrackingResponse,
+    DamageReviewQueueItem,
+    DamageReviewUpdate,
 )
 
 
@@ -234,7 +234,7 @@ def _tracking_log(order: Order, qc_checked_at=None) -> list[dict]:
     # Cancelled
     if order.status == "CANCELLED":
         entries.append({
-            "event": f"Order cancelled",
+            "event": "Order cancelled",
             "description": order.cancel_reason or "No reason provided",
             "time": _fmt(order.updated_at),
             "icon": "cancel",

@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import re
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,10 +16,8 @@ from app.models.ai_config import AIKnowledgeArticle
 from app.models.ai_support_settings import AISupportSettings
 from app.models.user import User
 from app.schemas.ai_config import (
-    AISettingsResponse,
     AISettingsUpdate,
     KnowledgeArticleCreate,
-    KnowledgeArticleResponse,
     KnowledgeArticleUpdate,
 )
 
@@ -76,7 +74,7 @@ async def update_ai_settings(
         row.proactive_human_handover = data.proactive_human_handover
 
     row.updated_by_user_id = actor.id
-    row.updated_at = datetime.now(timezone.utc)
+    row.updated_at = datetime.now(UTC)
     await db.flush()
     return row
 
@@ -164,7 +162,7 @@ async def update_knowledge_article(
         article.is_active = data.is_active
 
     article.updated_by_user_id = actor.id
-    article.updated_at = datetime.now(timezone.utc)
+    article.updated_at = datetime.now(UTC)
     await db.flush()
     return article
 

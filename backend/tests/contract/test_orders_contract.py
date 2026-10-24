@@ -8,8 +8,11 @@ import yaml
 from httpx import AsyncClient
 
 from app.services import orders_service
-
-from tests.utils.sample_data import make_order_item, make_order_list_response, make_order_response
+from tests.utils.sample_data import (
+    make_order_item,
+    make_order_list_response,
+    make_order_response,
+)
 
 OPENAPI_YAML = Path(__file__).resolve().parents[1] / "api-docs" / "openapi.swagger.yaml"
 

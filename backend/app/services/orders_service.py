@@ -2,12 +2,12 @@ import math
 import random
 import re
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
-from fastapi.encoders import jsonable_encoder
 from fastapi import HTTPException, status
-from sqlalchemy import and_, func, or_, select
+from fastapi.encoders import jsonable_encoder
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -26,24 +26,24 @@ from app.models.logistics import (
 from app.models.order import Order, OrderItem
 from app.models.user import Role, User
 from app.models.warehouse import ReturnGrading, Warehouse
-from app.services import geocoding_service
-from app.utils.email import delivery_otp_email_html, send_email
+from app.schemas.logistics import LogisticsEscalationItem
 from app.schemas.orders import (
-    DeliveryOtpSendResponse,
     CancelOrderRequest,
-    OrderTripIntelligenceItem,
+    DeliveryOtpSendResponse,
     OrderAssignRequest,
     OrderCreate,
-    TripCommandPushRequest,
-    TripDeviationReportRequest,
     OrderEscalateRequest,
     OrderItemResponse,
     OrderItemUpsert,
     OrderListResponse,
     OrderResponse,
+    OrderTripIntelligenceItem,
     OrderUpdate,
+    TripCommandPushRequest,
+    TripDeviationReportRequest,
 )
-from app.schemas.logistics import LogisticsEscalationItem
+from app.services import geocoding_service
+from app.utils.email import delivery_otp_email_html, send_email
 
 ORDER_TYPES = {"INDIVIDUAL", "VENDOR", "SERVICE_MOVE"}
 ORDER_STATUSES = {
@@ -84,7 +84,7 @@ def _tracking_code() -> str:
 
 
 def _now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 async def _hydrate_order_coordinates(order: Order) -> None:
@@ -481,7 +481,9 @@ async def create_order(db: AsyncSession, data: OrderCreate, user: User) -> Order
             detail="Only logistics operations roles can create service moves",
         )
 
-    from app.services.return_charge_service import attach_pending_transport_charges_to_order
+    from app.services.return_charge_service import (
+        attach_pending_transport_charges_to_order,
+    )
 
     requested_warehouse_id = data.warehouse_id
     if requested_warehouse_id is None and user.role.name in {"WAREHOUSE_MANAGER", "DISPATCHER"}:
@@ -599,7 +601,7 @@ async def create_order(db: AsyncSession, data: OrderCreate, user: User) -> Order
     if order.status == "CONFIRMED":
         await _push_notification(
             db,
-            title=f"New Order in Queue",
+            title="New Order in Queue",
             message=f"{order_label} ({order_type_label}) has arrived and is awaiting dispatch.",
             notif_type="order",
             audience_roles=["DISPATCHER"],
@@ -1039,8 +1041,9 @@ async def _release_order_resources(db: AsyncSession, order: Order) -> None:
                 )).scalar_one_or_none()
 
                 if driver_user and order.delivery_lat is not None:
-                    from app.routers.ws_fleet import fleet_manager
                     import asyncio
+
+                    from app.routers.ws_fleet import fleet_manager
                     asyncio.ensure_future(
                         fleet_manager.broadcast({
                             "type": "location_update",
@@ -1772,7 +1775,7 @@ def _clamp(value: int | float, minimum: int | float, maximum: int | float) -> in
 
 def _eta_label_from_minutes(eta_minutes: int, reference_time: datetime | None = None) -> str:
     arrival = (reference_time or _now()) + timedelta(minutes=max(eta_minutes, 0))
-    return arrival.astimezone(timezone.utc).strftime("%I:%M %p").lstrip("0")
+    return arrival.astimezone(UTC).strftime("%I:%M %p").lstrip("0")
 
 
 def _build_route_signal(key: str, label: str, severity: str) -> dict:
@@ -1863,10 +1866,12 @@ def _compute_alternate_waypoints(
 async def _enrich_with_gemini(base: dict) -> dict:
     """Replace templated messages with Gemini-generated operational intelligence."""
     import json as _json
+
     from loguru import logger
     try:
-        from app.utils.gemini import generate_with_fallback
         from google.genai import types as genai_types
+
+        from app.utils.gemini import generate_with_fallback
 
         signals_text = "\n".join(
             f"- [{s['severity'].upper()}] {s['label']}" for s in base.get("signals", [])
@@ -1960,7 +1965,7 @@ def _build_trip_intelligence_item(
     no_go_zone_hit = False
     hit_zones: list[LogisticsZone] = []
 
-    hour = now.astimezone(timezone.utc).hour
+    hour = now.astimezone(UTC).hour
     peak_window = 8 <= hour <= 10 or 17 <= hour <= 20
     if peak_window:
         primary_penalty += 10
@@ -2025,7 +2030,7 @@ def _build_trip_intelligence_item(
     if order.scheduled_at:
         scheduled_at = order.scheduled_at
         if scheduled_at.tzinfo is None:
-            scheduled_at = scheduled_at.replace(tzinfo=timezone.utc)
+            scheduled_at = scheduled_at.replace(tzinfo=UTC)
         projected_primary = now + timedelta(minutes=base_drive_minutes + handling_minutes + primary_penalty)
         slack_minutes = int((scheduled_at - projected_primary).total_seconds() / 60)
         if slack_minutes < 0:
@@ -2759,6 +2764,6 @@ async def soft_delete_order(db: AsyncSession, order_id: UUID, caller: User) -> O
     if not order:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Order not found")
     order.is_deleted = True
-    order.deleted_at = datetime.now(timezone.utc)
+    order.deleted_at = datetime.now(UTC)
     await db.flush()
     return order

@@ -2,16 +2,18 @@ from __future__ import annotations
 
 import math
 import re
-import httpx
 from datetime import UTC, datetime, timedelta
 from urllib.parse import quote_plus
 from uuid import UUID
 
+import httpx
 from fastapi import HTTPException, status
 from sqlalchemy import and_, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.config import get_settings
+from app.models.document import LogisticsDocument
 from app.models.inventory import InventoryItem, RestockRequest
 from app.models.labour import LabourAttendance, Labourer
 from app.models.logistics import (
@@ -20,63 +22,24 @@ from app.models.logistics import (
     LogisticsChatThread,
     LogisticsDailyStats,
     LogisticsDriverProfile,
+    LogisticsEquipmentLedger,
     LogisticsEscalation,
     LogisticsManifest,
     LogisticsMeeting,
+    LogisticsMetric,
     LogisticsNotification,
     LogisticsReturnCase,
     LogisticsTask,
     LogisticsTransaction,
     LogisticsVehicle,
     LogisticsZone,
-    LogisticsMetric,
-    LogisticsEquipmentLedger,
 )
-from app.models.document import LogisticsDocument
 from app.models.order import DamageReport, Order
-from app.models.payment import OrderPayment
 from app.models.user import Role, User
 from app.models.warehouse import ReturnGrading, Warehouse
 from app.schemas.auth import MessageResponse
 from app.schemas.logistics import (
     DispatchContactItem,
-    LogisticsAiQueryResponse,
-    LogisticsAlertItem,
-    LogisticsBootstrapResponse,
-    LogisticsChatMessageCreate,
-    LogisticsChatMessageItem,
-    LogisticsChatThreadCreate,
-    LogisticsChatThreadItem,
-    LogisticsChatThreadUpdate,
-    LogisticsDashboardStats,
-    LogisticsDriverItem,
-    LogisticsEscalationItem,
-    LogisticsEscalationStatusUpdate,
-    LogisticsHubItem,
-    LogisticsMaintenanceItem,
-    LogisticsNotificationItem,
-    LogisticsNotificationUpdate,
-    LogisticsReportItem,
-    LogisticsReturnCaseItem,
-    LogisticsEquipmentItem,
-    LogisticsReturnCaseUpdate,
-    LogisticsTaskCreate,
-    LogisticsTaskItem,
-    LogisticsTaskUpdate,
-    LogisticsTransactionCreate,
-    LogisticsTransactionItem,
-    LogisticsUserItem,
-    LogisticsDriverCreate,
-    LogisticsDriverUpdate,
-    LogisticsVehicleCreate,
-    LogisticsVehicleItem,
-    LogisticsVehicleUpdate,
-    LogisticsZoneCreate,
-    LogisticsZoneItem,
-    LogisticsZoneUpdate,
-    LogisticsDocumentItem,
-    LogisticsDocumentCreate,
-    LogisticsDocumentUpdateStatus,
     DriverAuditEventItem,
     DriverCashoutRequest,
     DriverCrewMemberItem,
@@ -91,16 +54,52 @@ from app.schemas.logistics import (
     DriverTelemetryResponse,
     DriverValidationItem,
     DriverVehicleBindRequest,
+    LogisticsAiQueryResponse,
+    LogisticsAlertItem,
+    LogisticsBootstrapResponse,
+    LogisticsChatMessageCreate,
+    LogisticsChatMessageItem,
+    LogisticsChatThreadCreate,
+    LogisticsChatThreadItem,
+    LogisticsChatThreadUpdate,
+    LogisticsDashboardStats,
+    LogisticsDocumentCreate,
+    LogisticsDocumentItem,
+    LogisticsDocumentUpdateStatus,
+    LogisticsDriverCreate,
+    LogisticsDriverItem,
+    LogisticsDriverUpdate,
+    LogisticsEquipmentItem,
+    LogisticsEscalationItem,
+    LogisticsEscalationStatusUpdate,
+    LogisticsHubItem,
+    LogisticsMaintenanceItem,
     LogisticsManifestCreate,
     LogisticsManifestItem,
     LogisticsMeetingCreate,
     LogisticsMeetingItem,
     LogisticsMeetingParticipantItem,
     LogisticsMeetingUpdate,
+    LogisticsNotificationItem,
+    LogisticsNotificationUpdate,
+    LogisticsReportItem,
+    LogisticsReturnCaseItem,
+    LogisticsReturnCaseUpdate,
+    LogisticsTaskCreate,
+    LogisticsTaskItem,
+    LogisticsTaskUpdate,
+    LogisticsTransactionCreate,
+    LogisticsTransactionItem,
+    LogisticsUserItem,
+    LogisticsVehicleCreate,
+    LogisticsVehicleItem,
+    LogisticsVehicleUpdate,
+    LogisticsZoneCreate,
+    LogisticsZoneItem,
+    LogisticsZoneUpdate,
 )
 from app.utils.hashing import hash_password
 from app.utils.username import generate_unique_username, normalize_username
-from app.config import get_settings
 
 
 def _now() -> datetime:
@@ -248,7 +247,7 @@ async def _reconcile_restock_escalations(db: AsyncSession) -> None:
 
     restock_requests = (
         await db.execute(
-            select(RestockRequest).where(RestockRequest.id.in_([UUID(value) for value in request_ids.keys()]))
+            select(RestockRequest).where(RestockRequest.id.in_([UUID(value) for value in request_ids]))
         )
     ).scalars().all()
 
@@ -374,7 +373,7 @@ def _notification_role_set(notification: LogisticsNotification) -> set[str]:
     }
 
 
-def _notification_visible_to_user(notification: LogisticsNotification, user: "User") -> bool:
+def _notification_visible_to_user(notification: LogisticsNotification, user: User) -> bool:
     # Per-user notifications (vendor/customer order events) are only visible to that user
     if notification.target_user_id is not None:
         return notification.target_user_id == user.id
@@ -1300,7 +1299,7 @@ async def get_dispatch_contacts(db: AsyncSession) -> list[DispatchContactItem]:
 async def add_chat_message(
     db: AsyncSession,
     thread_id: UUID,
-    data: "LogisticsChatMessageCreate",
+    data: LogisticsChatMessageCreate,
 ) -> LogisticsChatThreadItem:
     thread = await _get_chat_thread(db, thread_id)
     msg = LogisticsChatMessage(
@@ -1326,7 +1325,7 @@ async def add_chat_message(
 
 async def create_chat_thread(
     db: AsyncSession,
-    data: "LogisticsChatThreadCreate",
+    data: LogisticsChatThreadCreate,
 ) -> LogisticsChatThreadItem:
     # Return existing thread if one with this name already exists (prevents duplicates)
     existing = (
@@ -1369,7 +1368,7 @@ async def delete_chat_thread(db: AsyncSession, thread_id: UUID) -> MessageRespon
 async def mute_chat_thread(
     db: AsyncSession,
     thread_id: UUID,
-    data: "LogisticsChatThreadUpdate",
+    data: LogisticsChatThreadUpdate,
 ) -> LogisticsChatThreadItem:
     thread = await _get_chat_thread(db, thread_id)
     thread.muted = data.muted
@@ -2071,8 +2070,7 @@ async def build_bootstrap(db: AsyncSession) -> LogisticsBootstrapResponse:
     STAFF_SESSION_RATE = 1600.0  # per active shift/session for WH managers / dispatchers
 
     # Query which users already had their payroll paid this month
-    from datetime import timezone as _tz
-    _current_month_start = _now().replace(day=1, hour=0, minute=0, second=0, microsecond=0).replace(tzinfo=_tz.utc)
+    _current_month_start = _now().replace(day=1, hour=0, minute=0, second=0, microsecond=0).replace(tzinfo=UTC)
     _payroll_paid_result = await db.execute(
         select(LogisticsTransaction.metadata_json)
         .where(
@@ -2210,7 +2208,7 @@ async def build_bootstrap(db: AsyncSession) -> LogisticsBootstrapResponse:
         {
             "id": str(doc.id),
             "vehicleId": doc.entity_id,
-            "vehicleCode": vehicle_map[UUID(doc.entity_id)].code if doc.entity_id.replace('-', '') in [str(k).replace('-', '') for k in vehicle_map.keys()] else "N/A",
+            "vehicleCode": vehicle_map[UUID(doc.entity_id)].code if doc.entity_id.replace('-', '') in [str(k).replace('-', '') for k in vehicle_map] else "N/A",
             "hubId": str(doc.hub_id) if doc.hub_id else "all",
             "type": doc.doc_type,
             "status": doc.status,
@@ -3018,7 +3016,9 @@ async def update_return_case(db: AsyncSession, case_id: UUID, data: LogisticsRet
 
     if should_apply_transport_charge:
         from app.models.order import Order as OriginalOrder
-        from app.services.return_charge_service import apply_rejected_claim_transport_charge
+        from app.services.return_charge_service import (
+            apply_rejected_claim_transport_charge,
+        )
 
         customer_id = None
         if case.order_id:
@@ -3165,7 +3165,7 @@ async def schedule_return_pickup(db: AsyncSession, case_id: UUID) -> LogisticsRe
             order_id=case.order_id,
             rma_code=rma_code,
             item_condition="Awaiting Pickup",
-            condition_notes=f"Approved by Logistic Manager. Driver pickup scheduled.",
+            condition_notes="Approved by Logistic Manager. Driver pickup scheduled.",
             disposition="pending",
             status="pending",
         )
@@ -4151,8 +4151,9 @@ async def update_driver_location(db: AsyncSession, user: User, latitude: float, 
     ).scalar_one_or_none()
 
     # Broadcast location to all connected dashboard WebSocket clients (fire-and-forget)
-    from app.routers.ws_fleet import fleet_manager
     import asyncio
+
+    from app.routers.ws_fleet import fleet_manager
     asyncio.ensure_future(
         fleet_manager.broadcast({
             "type": "location_update",
@@ -4678,7 +4679,7 @@ async def get_driver_audit_log(
             id=str(event_id),
             icon="directions_car",
             color="text-accent-blue",
-            action=f"Vehicle Bound",
+            action="Vehicle Bound",
             detail=f"{v.code} · {v.license_plate or 'No plate'}",
             time=_fmt(v.updated_at),
         ))

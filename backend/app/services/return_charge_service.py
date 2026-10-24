@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID
 
@@ -10,13 +10,12 @@ from sqlalchemy.orm import aliased
 from app.models.logistics import LogisticsReturnCase, LogisticsTransaction
 from app.models.order import Order
 
-
 _RATES_PATH = Path(__file__).resolve().parent.parent.parent / "rates_config.json"
 _DEFAULT_TRANSPORT_CHARGE = 500.0
 
 
 def _now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def _round_amount(value: float) -> float:
@@ -25,7 +24,7 @@ def _round_amount(value: float) -> float:
 
 def _load_transport_charge_amount() -> float:
     try:
-        with open(_RATES_PATH, "r", encoding="utf-8") as fh:
+        with open(_RATES_PATH, encoding="utf-8") as fh:
             payload = json.load(fh)
         return _round_amount(payload.get("minimumCharge", _DEFAULT_TRANSPORT_CHARGE))
     except Exception:
@@ -84,7 +83,10 @@ async def apply_rejected_claim_transport_charge(
 
     if charge_amount > 0:
         from app.services.finance_service import _gen_ref, _upsert_daily_stats
-        from app.services.wallet_service import _record_wallet_transaction, get_wallet_balance
+        from app.services.wallet_service import (
+            _record_wallet_transaction,
+            get_wallet_balance,
+        )
 
         wallet_balance = await get_wallet_balance(db, customer_id)
         wallet_applied = min(wallet_balance, charge_amount)

@@ -7,15 +7,14 @@ Usage:
     python backfill_order_geocodes.py
 """
 
-import asyncio
 import sys
 import time
 
 # Add parent directory to path for imports
 sys.path.insert(0, '.')
 
-import psycopg2
 import httpx
+import psycopg2
 
 NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
 USER_AGENT = "CargoCore-Logistics/1.0"
@@ -53,7 +52,7 @@ def geocode_address_sync(address: str) -> tuple[float, float] | None:
         results = response.json()
         
         if not results:
-            print(f"  ⚠ No results found")
+            print("  ⚠ No results found")
             return None
         
         lat = float(results[0]["lat"])
@@ -116,7 +115,7 @@ def backfill_orders():
     conn.close()
     
     print(f"\n{'='*50}")
-    print(f"📊 Summary:")
+    print("📊 Summary:")
     print(f"   ✓ Updated: {updated}")
     print(f"   ✗ Failed:  {failed}")
     print(f"   Total:     {total}")

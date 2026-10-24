@@ -1,7 +1,10 @@
 import asyncio
+
 from sqlalchemy import select
+
 from app.database import AsyncSessionLocal
 from app.models.warehouse import Warehouse
+
 
 async def update_warehouse_coords():
     async with AsyncSessionLocal() as db:

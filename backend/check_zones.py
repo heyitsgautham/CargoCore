@@ -1,7 +1,10 @@
 import asyncio
+
 from sqlalchemy import select
+
 from app.database import AsyncSessionLocal
 from app.models.logistics import LogisticsZone
+
 
 async def check_zones():
     async with AsyncSessionLocal() as db:

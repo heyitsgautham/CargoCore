@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
-from uuid import uuid4
 from urllib.parse import unquote_plus
+from uuid import uuid4
 
 import pytest
 from fastapi import HTTPException
@@ -42,7 +42,7 @@ def test_title_case_status_and_driver_codes() -> None:
     user = SimpleNamespace(id=uuid4())
     title = logistics_service._title_case_status("in_transit")
     code = logistics_service._driver_code(user)
-    shift = logistics_service._shift_code(user, started_at=datetime(2026, 4, 17, 9, 0, tzinfo=timezone.utc))
+    shift = logistics_service._shift_code(user, started_at=datetime(2026, 4, 17, 9, 0, tzinfo=UTC))
 
     assert title == "In Transit"
     assert code.startswith("DRV-")
@@ -50,7 +50,7 @@ def test_title_case_status_and_driver_codes() -> None:
 
 
 def test_time_and_date_format_helpers() -> None:
-    dt = datetime(2026, 4, 17, 9, 5, tzinfo=timezone.utc)
+    dt = datetime(2026, 4, 17, 9, 5, tzinfo=UTC)
 
     assert logistics_service._coerce_utc(None) is None
     assert logistics_service._format_duration_label(125) == "2h 05m"
@@ -153,7 +153,7 @@ def test_duration_and_crew_role_helpers() -> None:
 
 
 def test_latest_attendance_event_and_crew_item() -> None:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     check_in = SimpleNamespace(event_type="CHECK_IN", created_at=now - timedelta(minutes=15))
     check_out = SimpleNamespace(event_type="CHECK_OUT", created_at=now - timedelta(minutes=5))
 
@@ -195,9 +195,9 @@ def test_task_to_item_maps_repeat_field() -> None:
         id=uuid4(),
         text="Call driver",
         status="pending",
-        target_time=datetime(2026, 4, 17, 13, 0, tzinfo=timezone.utc),
+        target_time=datetime(2026, 4, 17, 13, 0, tzinfo=UTC),
         repeat_rule="daily",
-        created_at=datetime(2026, 4, 17, 10, 0, tzinfo=timezone.utc),
+        created_at=datetime(2026, 4, 17, 10, 0, tzinfo=UTC),
         last_alert_time=None,
         silenced=False,
     )
