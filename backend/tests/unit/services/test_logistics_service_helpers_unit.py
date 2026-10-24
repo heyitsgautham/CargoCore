@@ -8,7 +8,9 @@ from uuid import uuid4
 import pytest
 from fastapi import HTTPException
 
-from app.services import logistics_service
+from app.services.logistics import formatting as logistics_formatting
+from app.services.logistics import meetings as logistics_meetings
+from app.services.logistics import operations as logistics_operations
 
 
 def _make_order(**overrides) -> SimpleNamespace:
@@ -26,23 +28,23 @@ def _make_order(**overrides) -> SimpleNamespace:
 
 
 def test_fmt_relative_variants() -> None:
-    now = logistics_service._now()
-    assert logistics_service._fmt_relative(now) == "Just now"
-    assert logistics_service._fmt_relative(now - timedelta(minutes=5)) == "5m ago"
-    assert logistics_service._fmt_relative(now - timedelta(hours=2)) == "2h ago"
+    now = logistics_formatting._now()
+    assert logistics_formatting._fmt_relative(now) == "Just now"
+    assert logistics_formatting._fmt_relative(now - timedelta(minutes=5)) == "5m ago"
+    assert logistics_formatting._fmt_relative(now - timedelta(hours=2)) == "2h ago"
 
 
 def test_status_badge_class_rules() -> None:
-    assert logistics_service._status_badge_class("Overdue") == "bg-red-500/10 text-red-500"
-    assert logistics_service._status_badge_class("Scheduled") == "bg-yellow-500/10 text-yellow-500"
-    assert logistics_service._status_badge_class("Delivered") == "bg-green-500/10 text-green-500"
+    assert logistics_formatting._status_badge_class("Overdue") == "bg-red-500/10 text-red-500"
+    assert logistics_formatting._status_badge_class("Scheduled") == "bg-yellow-500/10 text-yellow-500"
+    assert logistics_formatting._status_badge_class("Delivered") == "bg-green-500/10 text-green-500"
 
 
 def test_title_case_status_and_driver_codes() -> None:
     user = SimpleNamespace(id=uuid4())
-    title = logistics_service._title_case_status("in_transit")
-    code = logistics_service._driver_code(user)
-    shift = logistics_service._shift_code(user, started_at=datetime(2026, 4, 17, 9, 0, tzinfo=UTC))
+    title = logistics_formatting._title_case_status("in_transit")
+    code = logistics_formatting._driver_code(user)
+    shift = logistics_formatting._shift_code(user, started_at=datetime(2026, 4, 17, 9, 0, tzinfo=UTC))
 
     assert title == "In Transit"
     assert code.startswith("DRV-")
@@ -52,14 +54,14 @@ def test_title_case_status_and_driver_codes() -> None:
 def test_time_and_date_format_helpers() -> None:
     dt = datetime(2026, 4, 17, 9, 5, tzinfo=UTC)
 
-    assert logistics_service._coerce_utc(None) is None
-    assert logistics_service._format_duration_label(125) == "2h 05m"
-    assert logistics_service._format_time_label(dt) == "09:05 AM"
-    assert "Apr 17 2026" in logistics_service._format_date_label(dt)
+    assert logistics_formatting._coerce_utc(None) is None
+    assert logistics_formatting._format_duration_label(125) == "2h 05m"
+    assert logistics_formatting._format_time_label(dt) == "09:05 AM"
+    assert "Apr 17 2026" in logistics_formatting._format_date_label(dt)
 
 
 def test_avatar_url_contains_encoded_name() -> None:
-    url = logistics_service._avatar_url("Driver One")
+    url = logistics_formatting._avatar_url("Driver One")
     assert "ui-avatars.com" in url
     assert unquote_plus(url).find("Driver One") != -1
 
@@ -69,19 +71,19 @@ def test_order_job_type_and_status_helpers() -> None:
     pickup = _make_order(order_type="VENDOR", cargo_type="Pickup")
     delivery = _make_order(order_type="VENDOR", cargo_type="Docs")
 
-    assert logistics_service._order_job_type(house_shift) == "HOUSE_SHIFT"
-    assert logistics_service._order_job_type(pickup) == "PARCEL_PICKUP"
-    assert logistics_service._order_job_type(delivery) == "PARCEL_DELIVERY"
+    assert logistics_formatting._order_job_type(house_shift) == "HOUSE_SHIFT"
+    assert logistics_formatting._order_job_type(pickup) == "PARCEL_PICKUP"
+    assert logistics_formatting._order_job_type(delivery) == "PARCEL_DELIVERY"
 
-    assert logistics_service._is_terminal_order(_make_order(status="CLOSED")) is True
-    assert logistics_service._is_completed_order(_make_order(status="DELIVERED")) is True
-    assert logistics_service._is_active_order(_make_order(status="ASSIGNED")) is True
+    assert logistics_formatting._is_terminal_order(_make_order(status="CLOSED")) is True
+    assert logistics_formatting._is_completed_order(_make_order(status="DELIVERED")) is True
+    assert logistics_formatting._is_active_order(_make_order(status="ASSIGNED")) is True
 
 
 def test_vehicle_defaults_and_metrics() -> None:
-    heavy = logistics_service._vehicle_defaults("Heavy Truck")
-    van = logistics_service._vehicle_defaults("Cargo Van")
-    bike = logistics_service._vehicle_defaults("Bike")
+    heavy = logistics_formatting._vehicle_defaults("Heavy Truck")
+    van = logistics_formatting._vehicle_defaults("Cargo Van")
+    bike = logistics_formatting._vehicle_defaults("Bike")
 
     assert heavy == (3.5, 3, 460)
     assert van == (1.5, 2, 340)
@@ -92,7 +94,7 @@ def test_vehicle_defaults_and_metrics() -> None:
         mileage=143,
         assigned_driver_id=uuid4(),
     )
-    metrics = logistics_service._vehicle_metrics(vehicle)
+    metrics = logistics_formatting._vehicle_metrics(vehicle)
 
     assert metrics["telemetry_status"] == "LIVE"
     assert metrics["range_km"] > 0
@@ -103,12 +105,12 @@ def test_profile_coords_and_haversine_distance() -> None:
     profile = SimpleNamespace(current_location="19.0760,72.8777")
     bad_profile = SimpleNamespace(current_location="invalid")
 
-    lat, lng = logistics_service._parse_profile_coords(profile)
+    lat, lng = logistics_formatting._parse_profile_coords(profile)
     assert lat == pytest.approx(19.0760)
     assert lng == pytest.approx(72.8777)
-    assert logistics_service._parse_profile_coords(bad_profile) == (None, None)
+    assert logistics_formatting._parse_profile_coords(bad_profile) == (None, None)
 
-    distance = logistics_service._haversine_km(19.0760, 72.8777, 19.2183, 72.9781)
+    distance = logistics_formatting._haversine_km(19.0760, 72.8777, 19.2183, 72.9781)
     assert distance > 0
 
 
@@ -120,8 +122,8 @@ def test_manifest_distance_estimation_with_and_without_coordinates() -> None:
     ]
     orders_without_coords = [_make_order(), _make_order()]
 
-    with_coords = logistics_service._estimate_manifest_distance_km(warehouse, orders_with_coords)
-    fallback = logistics_service._estimate_manifest_distance_km(None, orders_without_coords)
+    with_coords = logistics_formatting._estimate_manifest_distance_km(warehouse, orders_with_coords)
+    fallback = logistics_formatting._estimate_manifest_distance_km(None, orders_without_coords)
 
     assert with_coords > 0
     assert fallback == 17.0
@@ -133,23 +135,23 @@ def test_notification_visibility_helpers() -> None:
     all_roles = SimpleNamespace(audience_roles="", target_user_id=None)
     direct = SimpleNamespace(audience_roles="", target_user_id=user.id)
 
-    assert logistics_service._notification_role_set(by_role) == {"DISPATCHER", "LOGISTIC_MANAGER"}
-    assert logistics_service._notification_visible_to_user(by_role, user) is True
-    assert logistics_service._notification_visible_to_user(all_roles, user) is True
-    assert logistics_service._notification_visible_to_user(direct, user) is True
-    assert logistics_service._notification_visible_to_role(direct, "DISPATCHER") is False
+    assert logistics_formatting._notification_role_set(by_role) == {"DISPATCHER", "LOGISTIC_MANAGER"}
+    assert logistics_formatting._notification_visible_to_user(by_role, user) is True
+    assert logistics_formatting._notification_visible_to_user(all_roles, user) is True
+    assert logistics_formatting._notification_visible_to_user(direct, user) is True
+    assert logistics_formatting._notification_visible_to_role(direct, "DISPATCHER") is False
 
 
 def test_duration_and_crew_role_helpers() -> None:
-    assert logistics_service._estimate_duration_minutes(5.0, 2) >= 45
+    assert logistics_formatting._estimate_duration_minutes(5.0, 2) >= 45
 
     labourer_with_skill = SimpleNamespace(skill_tags=["heavy_lift"], user=SimpleNamespace(role=SimpleNamespace(name="LABOURER")))
     labourer_with_role = SimpleNamespace(skill_tags=[], user=SimpleNamespace(role=SimpleNamespace(name="SUPERVISOR")))
     labourer_generic = SimpleNamespace(skill_tags=[], user=SimpleNamespace(role=SimpleNamespace(name="LABOURER")))
 
-    assert logistics_service._crew_role(labourer_with_skill) == "Heavy Lift"
-    assert logistics_service._crew_role(labourer_with_role) == "Supervisor"
-    assert logistics_service._crew_role(labourer_generic) == "Crew"
+    assert logistics_formatting._crew_role(labourer_with_skill) == "Heavy Lift"
+    assert logistics_formatting._crew_role(labourer_with_role) == "Supervisor"
+    assert logistics_formatting._crew_role(labourer_generic) == "Crew"
 
 
 def test_latest_attendance_event_and_crew_item() -> None:
@@ -165,8 +167,8 @@ def test_latest_attendance_event_and_crew_item() -> None:
         attendance_events=[check_in, check_out],
     )
 
-    latest = logistics_service._latest_attendance_event(labourer)
-    item = logistics_service._to_crew_item(labourer)
+    latest = logistics_formatting._latest_attendance_event(labourer)
+    item = logistics_formatting._to_crew_item(labourer)
 
     assert latest is check_out
     assert item.status == "ASSIGNED"
@@ -174,19 +176,19 @@ def test_latest_attendance_event_and_crew_item() -> None:
 
 
 def test_meeting_helpers_and_validation() -> None:
-    assert logistics_service._normalize_meeting_type("zoom") == "zoom"
-    assert logistics_service._normalize_meeting_type("teams") == "other"
-    assert logistics_service._normalize_meeting_link("meet.google.com/abc-defg-hij") == "https://meet.google.com/abc-defg-hij"
-    assert logistics_service._normalize_meeting_link("https://example.com/meeting") == "https://example.com/meeting"
+    assert logistics_meetings._normalize_meeting_type("zoom") == "zoom"
+    assert logistics_meetings._normalize_meeting_type("teams") == "other"
+    assert logistics_meetings._normalize_meeting_link("meet.google.com/abc-defg-hij") == "https://meet.google.com/abc-defg-hij"
+    assert logistics_meetings._normalize_meeting_link("https://example.com/meeting") == "https://example.com/meeting"
 
-    logistics_service._validate_meeting_time_range("09:00", "09:30")
+    logistics_meetings._validate_meeting_time_range("09:00", "09:30")
 
     with pytest.raises(HTTPException) as bad_format:
-        logistics_service._validate_meeting_time_range("9:00", "09:30")
+        logistics_meetings._validate_meeting_time_range("9:00", "09:30")
     assert bad_format.value.status_code == 400
 
     with pytest.raises(HTTPException) as bad_range:
-        logistics_service._validate_meeting_time_range("10:00", "09:30")
+        logistics_meetings._validate_meeting_time_range("10:00", "09:30")
     assert bad_range.value.status_code == 400
 
 
@@ -202,7 +204,7 @@ def test_task_to_item_maps_repeat_field() -> None:
         silenced=False,
     )
 
-    item = logistics_service._task_to_item(task)
+    item = logistics_operations._task_to_item(task)
 
     assert item.text == "Call driver"
     assert item.repeat == "daily"
