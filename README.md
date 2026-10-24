@@ -31,8 +31,10 @@ Drivers use the Android app for manifests, GPS tracking and proof of delivery.
         utils/     JWT, hashing, Redis client, Gemini client, geocoding
 ```
 
-- `middleware/logging_middleware.py` logs method, path, status and duration for every request with Loguru.
+- `middleware/logging_middleware.py` logs method, path, status and duration for every request with Loguru, tags every log line with a request id, and returns that id in the `X-Request-ID` header.
+- `app/logging_config.py` writes one JSON object per line when `LOG_JSON` is on, which is the default in production.
 - `GET /health` returns `{"status": "ok"}` and backs the container health check.
+- `GET /health/ready` also checks Postgres and Redis, and returns 503 when the database is unreachable.
 - Auth issues HS256 access and refresh tokens, and Redis holds the logout blacklist and password-reset OTPs.
 - The AI assistant calls Google Gemini when `GEMINI_API_KEY` is set and answers from rules and database lookups when it is not.
 
@@ -128,7 +130,9 @@ Redis and Gemini are mocked.
 | `REFRESH_TOKEN_EXPIRE_DAYS` | backend | `7` | refresh token lifetime |
 | `DATABASE_URL` | backend | local `logistics_db` | async SQLAlchemy URL, `postgresql+asyncpg://...` |
 | `REDIS_URL` | backend | `redis://localhost:6379/0` | token blacklist and OTP storage |
-| `ALLOWED_ORIGINS` | backend | `http://localhost:5173,http://localhost:3000` | CORS allow list, comma separated |
+| `ALLOWED_ORIGINS` | backend | `http://localhost:5173,http://localhost:3000` | extra CORS origins, comma separated |
+| `LOG_LEVEL` | backend | `INFO` | lowest level written to stdout |
+| `LOG_JSON` | backend | on in production | `true` writes one JSON object per log line |
 | `GOOGLE_CLIENT_ID` | backend | empty | Google sign-in token audience |
 | `GOOGLE_MAPS_API_KEY` | backend | empty | geocoding and distance lookups |
 | `GEMINI_API_KEY` | backend | empty | AI assistant and room photo estimates |
