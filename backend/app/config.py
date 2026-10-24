@@ -1,6 +1,7 @@
 from functools import lru_cache
 from pathlib import Path
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -60,6 +61,12 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.app_env == "production"
+
+    @field_validator("log_json", mode="before")
+    @classmethod
+    def _blank_log_json_means_unset(cls, value):
+        # `LOG_JSON=` in an .env file should follow APP_ENV, not fail startup.
+        return None if isinstance(value, str) and not value.strip() else value
 
     @property
     def log_json_enabled(self) -> bool:

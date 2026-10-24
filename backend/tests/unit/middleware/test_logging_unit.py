@@ -130,7 +130,13 @@ async def test_middleware_logs_unhandled_exceptions_and_reraises(json_log_stream
 
 @pytest.mark.parametrize(
     ("app_env", "log_json", "expected"),
-    [("development", None, False), ("production", None, True), ("production", False, False), ("development", True, True)],
+    [
+        ("development", None, False),
+        ("production", None, True),
+        ("production", "", True),
+        ("production", False, False),
+        ("development", True, True),
+    ],
 )
 def test_json_logging_defaults_to_on_in_production(app_env, log_json, expected) -> None:
     settings = Settings(app_env=app_env, log_json=log_json, _env_file=None)
