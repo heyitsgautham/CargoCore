@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.database import AsyncSessionLocal, engine, ro_engine
+from app.logging_config import configure_logging
 from app.middleware.logging_middleware import LoggingMiddleware
 from app.routers import ai as ai_router
 from app.routers import auth as auth_router
@@ -27,6 +28,7 @@ from app.routers import warehouses as warehouses_router
 from app.routers import ws_fleet as ws_fleet_router
 
 settings = get_settings()
+configure_logging(level=settings.log_level, json_logs=settings.log_json_enabled)
 
 
 @asynccontextmanager
@@ -106,6 +108,8 @@ def create_app() -> FastAPI:
             "https://192.168.1.3",
             "http://192.168.1.3:5173",
             "capacitor://192.168.1.3",
+            # Extra origins from ALLOWED_ORIGINS, such as the Docker web app on :8080
+            *settings.allowed_origins_list,
         ],
         allow_credentials=True,
         allow_methods=["*"],

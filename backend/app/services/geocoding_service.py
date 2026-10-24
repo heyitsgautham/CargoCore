@@ -5,6 +5,7 @@ import time
 from typing import Any
 
 import httpx
+from loguru import logger
 
 NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org"
 PHOTON_BASE_URL = "https://photon.komoot.io"
@@ -121,7 +122,7 @@ async def search_address(query: str, limit: int = 5) -> list[dict[str, Any]]:
             _cache_set(_search_cache, cache_key, formatted_results)
             return formatted_results
         except Exception as e:
-            print(f"Geocoding error: {e}")
+            logger.warning("Geocoding search failed: {}", e)
             return []
 
 
@@ -133,13 +134,13 @@ async def reverse_geocode(lat: float, lon: float) -> dict[str, Any]:
     cache_key = f"{lat:.7f}|{lon:.7f}"
     cached = _cache_get(_reverse_cache, cache_key)
     if cached is not None:
-        print(f"Returning cached reverse geocode for {lat}, {lon}")
+        logger.debug("Returning cached reverse geocode for {}, {}", lat, lon)
         return cached
 
     async with httpx.AsyncClient() as client:
         try:
             try:
-                print(f"Requesting reverse geocode from Nominatim for {lat}, {lon}")
+                logger.debug("Requesting reverse geocode from Nominatim for {}, {}", lat, lon)
                 response = await client.get(
                     f"{NOMINATIM_BASE_URL}/reverse",
                     params={
@@ -153,7 +154,7 @@ async def reverse_geocode(lat: float, lon: float) -> dict[str, Any]:
                 )
                 response.raise_for_status()
                 result = response.json()
-                print(f"Nominatim response: {result.get('display_name', 'No display_name')}")
+                logger.debug("Nominatim response: {}", result.get("display_name", "No display_name"))
                 payload = {
                     "display_name": result.get("display_name", f"{lat:.6f}, {lon:.6f}"),
                     "address": result.get("address", {}),
@@ -165,7 +166,7 @@ async def reverse_geocode(lat: float, lon: float) -> dict[str, Any]:
             except httpx.HTTPStatusError as e:
                 if e.response.status_code != 429:
                     raise
-                print("Nominatim rate limited, falling back to Photon")
+                logger.info("Nominatim rate limited, falling back to Photon")
 
             photon_response = await client.get(
                 f"{PHOTON_BASE_URL}/reverse",
@@ -183,11 +184,11 @@ async def reverse_geocode(lat: float, lon: float) -> dict[str, Any]:
                     "lat": lat,
                     "lon": lon,
                 }
-                print(f"Photon response: {payload.get('display_name')}")
+                logger.debug("Photon response: {}", payload.get("display_name"))
                 _cache_set(_reverse_cache, cache_key, payload)
                 return payload
 
-            print("No results from Photon, returning coordinates")
+            logger.info("No results from Photon, returning coordinates")
             payload = {
                 "display_name": f"{lat:.6f}, {lon:.6f}",
                 "address": {},
@@ -197,7 +198,7 @@ async def reverse_geocode(lat: float, lon: float) -> dict[str, Any]:
             _cache_set(_reverse_cache, cache_key, payload)
             return payload
         except Exception as e:
-            print(f"Reverse geocoding error: {e}")
+            logger.warning("Reverse geocoding failed: {}", e)
             return {
                 "display_name": f"{lat:.6f}, {lon:.6f}",
                 "address": {},

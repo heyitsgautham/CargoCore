@@ -45,6 +45,11 @@ class Settings(BaseSettings):
     smtp_user: str = ""
     smtp_password: str = ""
 
+    # ── Logging ───────────────────────────────────────────────────────────────
+    log_level: str = "INFO"
+    # One JSON object per line when true; defaults to true when APP_ENV=production.
+    log_json: bool | None = None
+
     # ── CORS ──────────────────────────────────────────────────────────────────
     allowed_origins: str = "http://localhost:5173,http://localhost:3000"
 
@@ -55,6 +60,10 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.app_env == "production"
+
+    @property
+    def log_json_enabled(self) -> bool:
+        return self.is_production if self.log_json is None else self.log_json
 
 
 @lru_cache

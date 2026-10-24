@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, status
 from fastapi.responses import HTMLResponse
+from loguru import logger
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -435,13 +436,14 @@ async def get_proof_of_delivery_html(
     # Fetch order with POD data
     order = await orders_service.get_order_detail(db, order_id, user)
 
-    # Debug logging
-    print(f"[POD HTML] Order {order.id}")
-    print(f"[POD HTML] Driver: {order.assigned_driver_name}")
-    print(f"[POD HTML] Customer: {order.customer_name} / {order.customer_phone}")
-    print(f"[POD HTML] Signature length: {len(order.pod_signature) if order.pod_signature else 0}")
-    print(f"[POD HTML] Photos count: {len(order.pod_photos)}")
-    print(f"[POD HTML] Delivered at: {order.delivered_at}")
+    # Customer name and phone stay out of the log.
+    logger.debug(
+        "Rendering POD HTML for order {}: signature={} photos={} delivered_at={}",
+        order.id,
+        bool(order.pod_signature),
+        len(order.pod_photos or []),
+        order.delivered_at,
+    )
 
     # Read HTML template
     template_path = Path(__file__).parent.parent.parent.parent / "html-slips" / "ProofOfDelivery.html"

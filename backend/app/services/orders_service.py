@@ -7,6 +7,7 @@ from uuid import UUID
 
 from fastapi import HTTPException, status
 from fastapi.encoders import jsonable_encoder
+from loguru import logger
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -96,7 +97,9 @@ async def _hydrate_order_coordinates(order: Order) -> None:
                 order.pickup_lng = float(results[0]["lon"])
         except Exception as e:
             # Don't fail order creation/update if pickup geocoding fails
-            print(f"Auto-geocoding failed for order pickup address: {e}")
+            logger.warning(
+                "Auto-geocoding failed for order {} pickup address: {}", order.id, e
+            )
 
     if order.delivery_addr and (order.delivery_lat is None or order.delivery_lng is None):
         try:
@@ -106,7 +109,9 @@ async def _hydrate_order_coordinates(order: Order) -> None:
                 order.delivery_lng = float(results[0]["lon"])
         except Exception as e:
             # Don't fail order creation/update if delivery geocoding fails
-            print(f"Auto-geocoding failed for order delivery address: {e}")
+            logger.warning(
+                "Auto-geocoding failed for order {} delivery address: {}", order.id, e
+            )
 
 
 def _mask_email(email: str) -> str:
