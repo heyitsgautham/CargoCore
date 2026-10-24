@@ -1,0 +1,93 @@
+# Brings up the whole stack from the repo root:
+#   cp .env.example .env   # optional, every value has a default
+#   docker compose up --build
+# Web app: http://localhost:8080  API: http://localhost:8000  Swagger: http://localhost:8000/docs
+
+services:
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: logistics_app
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-logistics_user}:${POSTGRES_PASSWORD:-logistics_pass}@db:5432/${POSTGRES_DB:-logistics_db}
+      REDIS_URL: redis://redis:6379/0
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:8080,http://localhost:5173}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - logistics_net
+    volumes:
+      - uploads:/app/uploads
+    command: >
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
+    container_name: logistics_web
+    ports:
+      - "8080:80"
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - logistics_net
+
+  db:
+    image: postgres:16-alpine
+    container_name: logistics_dbw
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-logistics_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-logistics_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-logistics_db}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - logistics_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-logistics_user} -d ${POSTGRES_DB:-logistics_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: logistics_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - logistics_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
+  uploads:
+
+networks:
+  logistics_net:
+    driver: bridge
