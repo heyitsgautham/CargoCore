@@ -468,6 +468,7 @@
 </template>
 
 <script setup>
+import { API_BASE_URL } from '@/config/api'
 import { ref, computed, inject, watch, onMounted, onUnmounted } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 
@@ -518,7 +519,7 @@ async function submitDamageReview() {
         }
         // PATCH the damage report with WM assessment and set status to Claims Reviewed
         const reviewRes = await fetch(
-            `http://localhost:8000/api/v1/damage-reports/${selectedDamageReport.value.id}/review`,
+            `${API_BASE_URL}/api/v1/damage-reports/${selectedDamageReport.value.id}/review`,
             {
                 method: 'POST',
                 headers,
@@ -551,7 +552,7 @@ async function fetchDamageReviewQueue() {
     try {
         const headers = { 'Authorization': `Bearer ${authStore.authToken}` }
         const res = await fetch(
-            `http://localhost:8000/api/v1/damage-reports?status=Under%20Review&flow_type=photo_review&page_size=50`,
+            `${API_BASE_URL}/api/v1/damage-reports?status=Under%20Review&flow_type=photo_review&page_size=50`,
             { headers }
         )
         if (res.ok) {
@@ -611,7 +612,7 @@ async function fetchWarehouseId() {
             'Authorization': `Bearer ${authStore.authToken}`,
             'Content-Type': 'application/json'
         }
-        const response = await fetch('http://localhost:8000/api/v1/warehouses?page=1&page_size=100', { headers })
+        const response = await fetch(`${API_BASE_URL}/api/v1/warehouses?page=1&page_size=100`, { headers })
         if (!response.ok) return
 
         const data = await response.json()
@@ -662,7 +663,7 @@ async function fetchReturns({ silent = false } = {}) {
         if (warehouseId.value) {
             // Fetch pending return gradings (created but not yet completed)
             const pendingRes = await fetch(
-                `http://localhost:8000/api/v1/warehouses/${warehouseId.value}/operations/returns?status_filter=pending&page_size=50`,
+                `${API_BASE_URL}/api/v1/warehouses/${warehouseId.value}/operations/returns?status_filter=pending&page_size=50`,
                 { headers }
             )
             if (pendingRes.ok) {
@@ -672,7 +673,7 @@ async function fetchReturns({ silent = false } = {}) {
 
             // Fetch completed return gradings (status_filter is the correct param name)
             const completedRes = await fetch(
-                `http://localhost:8000/api/v1/warehouses/${warehouseId.value}/operations/returns?status_filter=completed&page_size=50`,
+                `${API_BASE_URL}/api/v1/warehouses/${warehouseId.value}/operations/returns?status_filter=completed&page_size=50`,
                 { headers }
             )
             if (completedRes.ok) {
@@ -848,7 +849,7 @@ async function submitReturn() {
         if (gradingId) {
             // Existing pending grading — update it first, then complete
             await fetch(
-                `http://localhost:8000/api/v1/warehouses/${warehouseId.value}/operations/returns/${gradingId}`,
+                `${API_BASE_URL}/api/v1/warehouses/${warehouseId.value}/operations/returns/${gradingId}`,
                 {
                     method: 'PUT',
                     headers,
@@ -865,7 +866,7 @@ async function submitReturn() {
         } else {
             // New grading — create it
             const response = await fetch(
-                `http://localhost:8000/api/v1/warehouses/${warehouseId.value}/operations/returns`,
+                `${API_BASE_URL}/api/v1/warehouses/${warehouseId.value}/operations/returns`,
                 {
                     method: 'POST',
                     headers,
@@ -893,7 +894,7 @@ async function submitReturn() {
 
         // Mark as completed — this is what moves it to the "Completed" tab
         const completeRes = await fetch(
-            `http://localhost:8000/api/v1/warehouses/${warehouseId.value}/operations/returns/${gradingId}/complete`,
+            `${API_BASE_URL}/api/v1/warehouses/${warehouseId.value}/operations/returns/${gradingId}/complete`,
             { method: 'POST', headers }
         )
         if (!completeRes.ok) throw new Error(`Complete failed: HTTP ${completeRes.status}`)
@@ -951,7 +952,7 @@ async function uploadDamagePhoto(gradingId, photoData) {
         formData.append('file', blob, 'damage_photo.jpg')
 
         const response = await fetch(
-            `http://localhost:8000/api/v1/warehouses/${warehouseId.value}/operations/returns/${gradingId}/photo`,
+            `${API_BASE_URL}/api/v1/warehouses/${warehouseId.value}/operations/returns/${gradingId}/photo`,
             {
                 method: 'POST',
                 headers: {

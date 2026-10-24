@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '@/config/api'
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
@@ -224,7 +225,7 @@ export const useWarehouseFloorStore = defineStore('warehouseFloor', () => {
                 savedAt: new Date().toISOString()
             }
 
-            const res = await fetch(`http://localhost:8000/api/v1/warehouses/${warehouseId}/floor-plan`, {
+            const res = await fetch(`${API_BASE_URL}/api/v1/warehouses/${warehouseId}/floor-plan`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${authToken}`,
@@ -260,7 +261,7 @@ export const useWarehouseFloorStore = defineStore('warehouseFloor', () => {
         loadError.value = ''
 
         try {
-            const res = await fetch(`http://localhost:8000/api/v1/warehouses/${warehouseId}`, {
+            const res = await fetch(`${API_BASE_URL}/api/v1/warehouses/${warehouseId}`, {
                 headers: {
                     'Authorization': `Bearer ${authToken}`,
                     'Content-Type': 'application/json'
@@ -310,7 +311,7 @@ export const useWarehouseFloorStore = defineStore('warehouseFloor', () => {
         let allRows = []
 
         while (true) {
-            let url = `http://localhost:8000/api/v1/inventory?page=${page}&page_size=${pageSize}`
+            let url = `${API_BASE_URL}/api/v1/inventory?page=${page}&page_size=${pageSize}`
             if (warehouseId) {
                 url += `&warehouse_id=${warehouseId}`
             }

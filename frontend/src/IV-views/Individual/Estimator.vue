@@ -246,6 +246,7 @@
 </template>
 
 <script setup>
+import { API_BASE_URL } from '@/config/api'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useIndividualStore } from '@/stores/individualStore'
@@ -332,7 +333,7 @@ async function analyzePhoto() {
         const formData = new FormData()
         formData.append('file', uploadedFile.value)
 
-        const res = await fetch('http://localhost:8000/api/v1/ai/estimate-image', {
+        const res = await fetch(`${API_BASE_URL}/api/v1/ai/estimate-image`, {
             method: 'POST',
             body: formData,
         })

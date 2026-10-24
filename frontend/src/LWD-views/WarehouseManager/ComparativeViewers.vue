@@ -262,6 +262,7 @@
 </template>
 
 <script setup>
+import { API_BASE_URL } from '@/config/api'
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useWarehouseFloorStore } from '@/stores/warehouseFloorStore'
 import { useAuthStore } from '@/stores/authStore'
@@ -303,7 +304,7 @@ async function fetchWarehouseId() {
             'Authorization': `Bearer ${authStore.authToken}`,
             'Content-Type': 'application/json'
         }
-        const response = await fetch('http://localhost:8000/api/v1/warehouses?page=1&page_size=10', { headers })
+        const response = await fetch(`${API_BASE_URL}/api/v1/warehouses?page=1&page_size=10`, { headers })
         if (response.ok) {
             const data = await response.json()
             const warehouses = data.items || data || []
@@ -347,7 +348,7 @@ async function fetchZoneMetrics(zoneId) {
         })
 
         const response = await fetch(
-            `http://localhost:8000/api/v1/warehouses/${warehouseId.value}/operations/zones/${zoneId}/metrics?${params}`,
+            `${API_BASE_URL}/api/v1/warehouses/${warehouseId.value}/operations/zones/${zoneId}/metrics?${params}`,
             { headers }
         )
 

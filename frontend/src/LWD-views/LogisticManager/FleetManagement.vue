@@ -1836,7 +1836,7 @@ const forceEndDriverShift = async (driver) => {
     const updatePayload = { status: 'Off-Duty', current_job: null }
     if (warehouseLocation) updatePayload.current_location = warehouseLocation
 
-    await fetch(`http://localhost:8000/api/v1/logistics/drivers/${driver.id}`, {
+    await fetch(`${API_BASE_URL}/api/v1/logistics/drivers/${driver.id}`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${authStore.token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(updatePayload),
@@ -1848,7 +1848,7 @@ const forceEndDriverShift = async (driver) => {
         await store.updateVehicle(byName.id, { assigned_driver_id: null, status: 'Active' })
     } else {
         try {
-            const res = await fetch(`http://localhost:8000/api/v1/logistics/vehicles`, {
+            const res = await fetch(`${API_BASE_URL}/api/v1/logistics/vehicles`, {
                 headers: { 'Authorization': `Bearer ${authStore.token}` }
             })
             if (res.ok) {

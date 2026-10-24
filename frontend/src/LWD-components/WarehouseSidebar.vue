@@ -224,6 +224,7 @@
 </template>
 
 <script setup>
+import { API_BASE_URL } from '@/config/api'
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
@@ -306,8 +307,8 @@ async function fetchSidebarBadges() {
         }
 
         const [ordersRes, inboundRes] = await Promise.allSettled([
-            fetch('http://localhost:8000/api/v1/orders?page=1&page_size=100', { headers }),
-            fetch('http://localhost:8000/api/v1/orders?page=1&page_size=50&status_filter=CONFIRMED', { headers })
+            fetch(`${API_BASE_URL}/api/v1/orders?page=1&page_size=100`, { headers }),
+            fetch(`${API_BASE_URL}/api/v1/orders?page=1&page_size=50&status_filter=CONFIRMED`, { headers })
         ])
 
         // New Orders → push to notification bell instead of sidebar badge

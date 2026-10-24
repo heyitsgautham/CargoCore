@@ -329,6 +329,7 @@
 </template>
 
 <script setup>
+import { API_BASE_URL } from '@/config/api'
 import { ref, computed, reactive, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { getEffectiveWarehouseSubstatus, patchWarehouseOrderUiState } from '@/utils/warehouseOrderState'
@@ -432,10 +433,10 @@ async function fetchDockData() {
 
         // Fetch loading docks from new API + packed orders in parallel
         const [docksRes, packedRes] = await Promise.allSettled([
-            fetch(`http://localhost:8000/api/v1/warehouses/${warehouseId}/operations/loading-docks`, {
+            fetch(`${API_BASE_URL}/api/v1/warehouses/${warehouseId}/operations/loading-docks`, {
                 headers: { 'Authorization': `Bearer ${authStore.authToken}`, 'Content-Type': 'application/json' }
             }),
-            fetch('http://localhost:8000/api/v1/orders?page=1&page_size=30', {
+            fetch(`${API_BASE_URL}/api/v1/orders?page=1&page_size=30`, {
                 headers: { 'Authorization': `Bearer ${authStore.authToken}`, 'Content-Type': 'application/json' }
             })
         ])
@@ -509,7 +510,7 @@ async function completeDock() {
     }
 
     try {
-        const response = await fetch(`http://localhost:8000/api/v1/warehouses/${warehouseId}/operations/loading-docks/${verifyDock.value.rawId}/release`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/warehouses/${warehouseId}/operations/loading-docks/${verifyDock.value.rawId}/release`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${authStore.authToken}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -559,7 +560,7 @@ async function confirmAssign() {
     }
 
     try {
-        const response = await fetch(`http://localhost:8000/api/v1/warehouses/${warehouseId}/operations/loading-docks/${assignDock.value.rawId}/assign`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/warehouses/${warehouseId}/operations/loading-docks/${assignDock.value.rawId}/assign`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${authStore.authToken}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -609,7 +610,7 @@ async function saveSettings() {
         const isMaintenance = settingsForm.status === 'Maintenance'
         try {
             const res = await fetch(
-                `http://localhost:8000/api/v1/warehouses/${warehouseId}/operations/loading-docks/${dockRawId}/maintenance?is_maintenance=${isMaintenance}`,
+                `${API_BASE_URL}/api/v1/warehouses/${warehouseId}/operations/loading-docks/${dockRawId}/maintenance?is_maintenance=${isMaintenance}`,
                 { method: 'POST', headers: { 'Authorization': `Bearer ${authStore.authToken}` } }
             )
             if (!res.ok) throw new Error('API error')
@@ -631,7 +632,7 @@ async function clearMaintenance(dock) {
     if (warehouseId && dock.rawId) {
         try {
             const res = await fetch(
-                `http://localhost:8000/api/v1/warehouses/${warehouseId}/operations/loading-docks/${dock.rawId}/maintenance?is_maintenance=false`,
+                `${API_BASE_URL}/api/v1/warehouses/${warehouseId}/operations/loading-docks/${dock.rawId}/maintenance?is_maintenance=false`,
                 { method: 'POST', headers: { 'Authorization': `Bearer ${authStore.authToken}` } }
             )
             if (!res.ok) throw new Error('API error')
@@ -648,7 +649,7 @@ async function clearMaintenance(dock) {
 
 async function fetchFleetVehicles() {
     try {
-        const res = await fetch('http://localhost:8000/api/v1/logistics/vehicles', {
+        const res = await fetch(`${API_BASE_URL}/api/v1/logistics/vehicles`, {
             headers: { 'Authorization': `Bearer ${authStore.authToken}` }
         })
         if (res.ok) {

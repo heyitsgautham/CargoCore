@@ -578,7 +578,7 @@
 <script setup>
 import { ref, computed, reactive, inject, watch } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
-import { getStoredAccessToken } from '@/config/api'
+import { getStoredAccessToken, API_BASE_URL } from '@/config/api'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
@@ -815,7 +815,7 @@ async function fetchCategories() {
     if (!warehouseId) return
 
     try {
-        const response = await fetch(`http://localhost:8000/api/v1/inventory/categories?warehouse_id=${warehouseId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/inventory/categories?warehouse_id=${warehouseId}`, {
             headers: {
                 'Authorization': `Bearer ${authStore.authToken}`,
                 'Content-Type': 'application/json'
@@ -841,7 +841,7 @@ async function fetchInventory() {
             return
         }
 
-        const response = await fetch(`http://localhost:8000/api/v1/inventory?page=1&page_size=100&warehouse_id=${warehouseId}`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/inventory?page=1&page_size=100&warehouse_id=${warehouseId}`, {
             headers: {
                 'Authorization': `Bearer ${authStore.authToken}`,
                 'Content-Type': 'application/json'
@@ -1028,7 +1028,7 @@ async function addNewStock() {
 
     try {
         const category = ensureCategoryAvailable(addForm.category || 'General', warehouseId)
-        const response = await fetch('http://localhost:8000/api/v1/inventory', {
+        const response = await fetch(`${API_BASE_URL}/api/v1/inventory`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${authStore.authToken}`,

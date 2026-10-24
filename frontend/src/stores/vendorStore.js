@@ -1,9 +1,10 @@
+import { API_BASE_URL } from '@/config/api'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useRates } from '@/composables/useRates'
 import { buildPodData } from '@/utils/pod'
 
-const API_BASE = 'http://localhost:8000/api/v1'
+const API_BASE = `${API_BASE_URL}/api/v1`
 const VENDOR_WALLET_TOPUP_OFFSET_KEY = 'vendor_wallet_topup_offset'
 
 function clearLegacyWalletTopupOffset() {

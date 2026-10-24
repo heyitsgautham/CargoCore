@@ -367,6 +367,7 @@
 </template>
 
 <script setup>
+import { API_BASE_URL } from '@/config/api'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Line, Doughnut, Bar, Pie } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, ArcElement, Filler } from 'chart.js'
@@ -437,10 +438,10 @@ async function fetchDashboardFallback(warehouseId) {
     }
 
     const [kpisRes, inventoryRes, ordersRes, labourRes] = await Promise.allSettled([
-        fetch(`http://localhost:8000/api/v1/warehouses/${warehouseId}/kpis`, { headers }),
-        fetch('http://localhost:8000/api/v1/inventory?page=1&page_size=100', { headers }),
-        fetch('http://localhost:8000/api/v1/orders?page=1&page_size=100', { headers }),
-        fetch('http://localhost:8000/api/v1/labourers?page=1&page_size=100', { headers })
+        fetch(`${API_BASE_URL}/api/v1/warehouses/${warehouseId}/kpis`, { headers }),
+        fetch(`${API_BASE_URL}/api/v1/inventory?page=1&page_size=100`, { headers }),
+        fetch(`${API_BASE_URL}/api/v1/orders?page=1&page_size=100`, { headers }),
+        fetch(`${API_BASE_URL}/api/v1/labourers?page=1&page_size=100`, { headers })
     ])
 
     let kpis = null
@@ -633,7 +634,7 @@ async function fetchDashboardData() {
             return
         }
 
-        const response = await fetch(`http://localhost:8000/api/v1/warehouses/${warehouseId}/dashboard`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/warehouses/${warehouseId}/dashboard`, {
             headers: {
                 'Authorization': `Bearer ${authStore.authToken}`,
                 'Content-Type': 'application/json'
@@ -665,7 +666,7 @@ async function fetchDashboardData() {
 async function markComplete(order) {
     try {
         const warehouseId = authStore.currentUser?.warehouse_id
-        const response = await fetch(`http://localhost:8000/api/v1/warehouses/${warehouseId}/orders/${order.order_id}/complete`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/warehouses/${warehouseId}/orders/${order.order_id}/complete`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${authStore.authToken}`,
@@ -691,7 +692,7 @@ async function markComplete(order) {
 async function reassign(order) {
     try {
         const warehouseId = authStore.currentUser?.warehouse_id
-        const response = await fetch(`http://localhost:8000/api/v1/warehouses/${warehouseId}/orders/${order.order_id}/reassign`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/warehouses/${warehouseId}/orders/${order.order_id}/reassign`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${authStore.authToken}`,
@@ -720,7 +721,7 @@ async function processRestock() {
         isProcessingRestock.value = true
         const warehouseId = authStore.currentUser?.warehouse_id
 
-        const response = await fetch(`http://localhost:8000/api/v1/warehouses/${warehouseId}/restock`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/warehouses/${warehouseId}/restock`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${authStore.authToken}`,
