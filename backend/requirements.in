@@ -1,0 +1,32 @@
+# Runtime dependencies. Edit this file, then regenerate the lockfile with
+#   uv pip compile requirements.in --universal --python-version 3.12 -o requirements.txt
+
+# ─── Core ─────────────────────────────────────────────────────────────────────
+fastapi
+uvicorn[standard]
+pydantic-settings
+pydantic[email]
+python-multipart
+httpx
+
+# ─── Database ─────────────────────────────────────────────────────────────────
+sqlalchemy[asyncio]
+asyncpg
+alembic
+
+# ─── Auth ─────────────────────────────────────────────────────────────────────
+python-jose[cryptography]
+bcrypt
+
+# ─── Redis ────────────────────────────────────────────────────────────────────
+redis
+
+# ─── Background Tasks (stub – active in Phase 6+) ────────────────────────────
+celery
+
+# ─── Logging ──────────────────────────────────────────────────────────────────
+loguru
+
+# ─── AI / Gemini ──────────────────────────────────────────────────────────────
+google-genai
+sqlparse
