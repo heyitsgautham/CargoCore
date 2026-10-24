@@ -41,7 +41,8 @@ The backend suite needs Postgres with a `logistics_db_test` database, as `README
 - Python follows the ruff rules in `backend/pyproject.toml`.
 - JavaScript and Vue follow `frontend/eslint.config.js`.
 - New frontend files follow `frontend/.prettierrc.json`.
-  `frontend/.prettierignore` keeps the older `src/` tree out of the format check, so when you touch a file there, format it and drop it from the ignore list in the same pull request if you can.
+  `frontend/.prettierignore` keeps the older `src/` tree out of the format check for now.
+  Format a `src/` file with `npx prettier --write <file>` in its own commit when you next change it, so the reformat stays out of the behavior diff.
 - Keep new files under 500 lines.
   Split a view or service by feature before it grows past that.
 - CI runs `python scripts/check_file_size.py`, which fails when a source file passes 800 lines.
