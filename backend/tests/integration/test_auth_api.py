@@ -5,6 +5,7 @@ from types import SimpleNamespace
 import pytest
 from httpx import AsyncClient
 
+from app.database import get_db
 from app.services import auth_service
 
 from tests.utils.sample_data import make_login_response, make_registration_response
@@ -176,14 +177,31 @@ async def test_auth_me_requires_authentication(
 
 async def test_auth_me_success(
     authorized_client: AsyncClient,
+    fake_user: SimpleNamespace,
+    dependency_override_manager,
     record_evidence,
 ) -> None:
+    # The route refreshes the ORM user's relationships, which a plain
+    # namespace cannot go through, so stub the session's refresh call.
+    fake_user.warehouse = None
+
+    class _FakeSession:
+        async def refresh(self, _instance, attribute_names=None) -> None:
+            return None
+
+    async def _override_db():
+        yield _FakeSession()
+
+    dependency_override_manager(get_db, _override_db)
+
     response = await authorized_client.get(f"{AUTH_BASE}/me")
     body = response.json()
 
     assert response.status_code == 200
     assert body["email"] == "test.user@example.com"
     assert body["role"] == "LOGISTIC_MANAGER"
+    assert body["warehouse_name"] is None
+    assert body["warehouse_status"] is None
 
     record_evidence(
         case_id="AUTH-INT-007",

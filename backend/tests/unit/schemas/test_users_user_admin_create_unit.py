@@ -19,6 +19,6 @@ def test_user_admin_create_rejects_short_password() -> None:
         UserAdminCreate(
             name="Admin User",
             email="admin@example.com",
-            password="short",
+            password="abc",
             role="LOGISTIC_MANAGER",
         )
