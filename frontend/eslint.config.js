@@ -19,7 +19,7 @@ export default [
       },
     },
     rules: {
-      'no-unused-vars': ['warn', { argsIgnorePattern: '^_', caughtErrors: 'none' }],
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_', caughtErrors: 'none' }],
       'vue/multi-word-component-names': 'off',
       'no-empty': ['error', { allowEmptyCatch: true }],
     },

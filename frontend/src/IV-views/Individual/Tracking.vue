@@ -582,7 +582,7 @@
 
 <script setup>
 import { ref, computed, watch, nextTick, onMounted, onActivated, onUnmounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useIndividualStore } from '@/stores/individualStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useSlipPrinter } from '@/composables/useSlipPrinter'
@@ -601,7 +601,6 @@ L.Icon.Default.mergeOptions({
 });
 
 const route = useRoute()
-const router = useRouter()
 const store = useIndividualStore()
 const authStore = useAuthStore()
 const { openSlipWithData } = useSlipPrinter()

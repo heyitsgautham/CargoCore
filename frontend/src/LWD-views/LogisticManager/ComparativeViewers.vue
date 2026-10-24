@@ -325,14 +325,6 @@ const removeWarehouse = (id) => {
     store.comparedWarehouses = store.comparedWarehouses.filter(w => w.id !== id)
 }
 
-const downloadReport = (name) => {
-    notification.value = `Downloading report for ${name}...`
-    setTimeout(() => {
-        notification.value = `Report for ${name} downloaded successfully.`
-        setTimeout(() => notification.value = null, 3000)
-    }, 1500)
-}
-
 // --- Real data helpers (per hub) ---
 
 const getHubAlerts = (_hubId) => store.alerts

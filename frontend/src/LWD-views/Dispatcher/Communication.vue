@@ -356,11 +356,6 @@ const renderedMessages = computed(() => currentMessages.value.map(msg => ({
 
 const commLog = ref([])
 
-function addSystemMessage(text) {
-    if (!messageHistory.value[activeChat.value]) messageHistory.value[activeChat.value] = []
-    messageHistory.value[activeChat.value].push({ id: Date.now(), from: 'system', text, time: '', type: 'system' })
-}
-
 async function ensureActiveThread(contact, contactId) {
     let threadId = contact?.threadId
 

@@ -848,7 +848,7 @@ import { getEffectiveWarehouseSubstatus, patchWarehouseOrderUiState } from '@/ut
 import { apiUrl } from '@/config/api'
 import { useSlipPrinter } from '@/composables/useSlipPrinter'
 
-const { openSlip, openSlipWithData } = useSlipPrinter()
+const { openSlipWithData } = useSlipPrinter()
 
 const authStore = useAuthStore()
 const openScanner = inject('openScanner', null)
@@ -905,8 +905,6 @@ const showMultiLabourerModal = ref(false)
 const multiLabourerWave = ref(null)
 const selectedLabourers = ref([])
 
-// Kanban view state
-const kanbanViewMode = ref('board') // 'board' or 'table'
 const selectedStatusTab = ref('ALL') // ALL, ON_HOLD, AWAITING_PICK, PICKING, PICKED, PACKING
 
 // Station monitor state
@@ -1856,35 +1854,6 @@ async function completePickList() {
 // ==================
 // Assign Picker
 // ==================
-
-async function openAssignPicker(wave) {
-    selectedWave.value = wave
-    selectedLabourer.value = null
-    showAssignPickerModal.value = true
-    labourersLoading.value = true
-
-    try {
-        const warehouseId = getWarehouseId()
-        const url = warehouseId
-            ? apiUrl(`api/v1/labourers?warehouse_id=${warehouseId}&page_size=50`)
-            : apiUrl('api/v1/labourers?page_size=50')
-
-        const response = await fetch(url, {
-            headers: { 'Authorization': `Bearer ${authStore.authToken}`, 'Content-Type': 'application/json' }
-        })
-
-        if (response.ok) {
-            const data = await response.json()
-            availableLabourers.value = (data.items || []).filter(labourer =>
-                labourer.is_active && (!labourer.assigned_order_id || labourer.assigned_order_id === wave.rawId)
-            )
-        }
-    } catch (error) {
-        console.error('Error fetching labourers:', error)
-    } finally {
-        labourersLoading.value = false
-    }
-}
 
 async function assignPicker() {
     if (!selectedLabourer.value || !selectedWave.value) return

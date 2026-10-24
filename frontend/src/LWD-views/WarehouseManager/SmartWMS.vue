@@ -161,7 +161,6 @@ const totalStaff = computed(() => dashboardData.value?.total_labor ?? labourers.
 const predictedOrders = computed(() => Math.round(totalOrders.value * 1.2))
 const predictedStaffNeeded = computed(() => Math.round(totalStaff.value * 1.15))
 const extraStaffNeeded = computed(() => Math.max(0, predictedStaffNeeded.value - availableStaff.value))
-const capacityPercent = computed(() => totalOrders.value > 0 ? Math.round((pickingOrders.value / totalOrders.value) * 100) : 0)
 
 async function fetchLiveData() {
     try {

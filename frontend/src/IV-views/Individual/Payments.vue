@@ -170,7 +170,6 @@ const detailModal = reactive({ show: false, payment: null })
 function viewDetail(p) { detailModal.payment = p; detailModal.show = true }
 
 const showPaymentModal = ref(false)
-const isProcessingPayment = ref(false)
 const selectedOrder = ref(null)
 
 function initiatePayment(order) {

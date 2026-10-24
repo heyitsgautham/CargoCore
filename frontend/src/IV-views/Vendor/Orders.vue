@@ -312,7 +312,7 @@ import { useAuthStore } from '@/stores/authStore'
 import BaseModal from '@/components/BaseModal.vue'
 import { useSlipPrinter } from '@/composables/useSlipPrinter'
 
-const { openSlip, openSlipWithData } = useSlipPrinter()
+const { openSlipWithData } = useSlipPrinter()
 
 const store = useVendorStore()
 const authStore = useAuthStore()

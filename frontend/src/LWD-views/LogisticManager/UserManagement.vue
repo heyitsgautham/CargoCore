@@ -922,10 +922,6 @@ const formatLastLogin = (dateStr) => {
 
 const isVendorRequest = (user) => user.role === 'Vendor' && user.approvalStatus === 'PENDING'
 
-const hasVendorApplicationData = (user) => user.role === 'Vendor' && Boolean(
-    user.companyName || user.contactPerson || user.businessEmail || user.businessPhone || user.taxId
-)
-
 const formatApprovalStatus = (status) => {
     if (!status) return 'Approved'
     return status.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase())

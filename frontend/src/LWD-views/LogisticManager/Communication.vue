@@ -604,11 +604,6 @@ const scrollToBottom = async () => {
     }
 }
 
-const selectChat = (id) => {
-    activeChatId.value = id
-    scrollToBottom()
-}
-
 const sendMessage = async () => {
     const text = messageInput.value.trim()
     if (!text || !activeChat.value) return

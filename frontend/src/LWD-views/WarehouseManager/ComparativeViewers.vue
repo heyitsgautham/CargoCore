@@ -497,12 +497,6 @@ const getStaffingStatus = (zoneId) => {
     return { label: 'Low Staff', color: 'text-red-500' }
 }
 
-// Returns true when metrics have been fetched but are empty (no DB records)
-const hasNoData = (zoneId) => {
-    const cache = zoneMetricsCache.value[zoneId]
-    return cache !== undefined && cache.latest === null
-}
-
 // Chart — uses real time-series; null when no data
 const getLineChartData = (zoneId, label, color = 'blue') => {
     const cache = zoneMetricsCache.value[zoneId]

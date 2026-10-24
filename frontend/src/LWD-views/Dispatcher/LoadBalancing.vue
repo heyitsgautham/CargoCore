@@ -692,7 +692,6 @@ const dispatchQueue = computed(() => {
 const readyOrdersCount = computed(() => dispatchQueue.value.length)
 const vehicleAssignedCount = computed(() => dispatchQueue.value.filter((item) => item.vehicleId || item.recommendedVehicle).length)
 const atRiskCount = computed(() => dispatchQueue.value.filter((item) => item.risk.level !== 'Low').length)
-const highRiskWithoutDriver = computed(() => dispatchQueue.value.filter((item) => !item.recommendedDriver).length)
 const coverageScore = computed(() => {
     if (!dispatchQueue.value.length) return 100
     const matched = dispatchQueue.value.filter((item) => orderHasAssignableResources(item)).length

@@ -692,13 +692,6 @@ const vehicleOptions = computed(() => {
 // Alias used in template
 const realVehicleOptions = vehicleOptions
 
-// Available laborers (from store if you have labor data)
-const availableLaborers = computed(() => {
-    // Try to get from store if it has labor/staff data
-    // For now, we'll use drivers as potential crew members
-    return store.dispatcherDrivers.slice(0, 10)
-})
-
 const completedToday = ref(0)
 const showNewMove = ref(false)
 const showCrewChat = ref(false)

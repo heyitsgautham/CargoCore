@@ -770,7 +770,7 @@ async function sendItemsToWarehouse() {
     }
 }
 
-const { rates, ratesReady, saveRates } = useRates()
+const { rates, saveRates } = useRates()
 
 // Materials as array (reactive, synced with rates)
 const materialsArray = computed({

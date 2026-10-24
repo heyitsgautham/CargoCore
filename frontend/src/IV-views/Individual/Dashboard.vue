@@ -385,7 +385,6 @@ const walletBalance = computed(() => Number(store.walletBalance || 0))
 let autoRefreshInterval = null
 
 const apiDashboard = computed(() => store.dashboardSummary)
-const selectedMoveIdx = ref(0)
 
 // Cargo types from the "Small Package / Parcel" booking mode — these use OTP delivery
 const SMALL_PKG_CARGO_TYPES = new Set(['document', 'fragile item', 'soft item', 'hard item'])
@@ -442,7 +441,6 @@ const activeMoves = computed(() => {
     return single ? [mapMove(single)] : []
 })
 
-const activeMove = computed(() => activeMoves.value[selectedMoveIdx.value] || activeMoves.value[0] || null)
 const recentOrders = computed(() => apiDashboard.value?.recent_orders || [])
 
 // Live vehicle tracking for in-transit/dispatched orders

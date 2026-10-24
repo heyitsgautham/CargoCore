@@ -892,7 +892,6 @@ const confirmedOrderId = ref('')
 const confirmedOrder = ref(null)
 
 const showPaymentModal = ref(false)
-const isProcessingPayment = ref(false)
 
 const paymentAmount = computed(() => {
     if (form.paymentMode === 'Partial') return Math.round((bookingBaseTotal.value / 2) + carryForwardCharge.value)
@@ -1029,7 +1028,6 @@ watch(() => form.hubId, async (hubId) => {
 const packingCatalog = ref([])
 const packingCatalogLoading = ref(false)
 
-const PACKING_KEYWORDS = ['pack', 'wrap', 'box', 'carton', 'tape', 'label', 'blanket', 'crate', 'film', 'pallet', 'protector', 'bag', 'rope', 'bubble', 'foam', 'sheet']
 const MATERIAL_ICONS = { box: 'inventory_2', carton: 'inventory_2', wrap: 'bubble_chart', bubble: 'bubble_chart', tape: 'straighten', blanket: 'bedding', crate: 'deployed_code', pallet: 'pallet', bag: 'shopping_bag', foam: 'layers', sheet: 'layers', default: 'package_2' }
 
 function iconForItem(name) {

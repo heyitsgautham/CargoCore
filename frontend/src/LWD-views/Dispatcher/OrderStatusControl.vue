@@ -538,7 +538,6 @@ const actionModal = ref({
     error: '',
 })
 const alertResolved = ref({})
-const alertRerouted = ref({})
 const actionPending = ref({})
 const transitionPending = ref({})
 const bulkUpdating = ref(false)
@@ -1138,13 +1137,4 @@ function resolveAlert(orderId) {
     }
 }
 
-function rerouteAlert(orderId) {
-    alertRerouted.value[orderId] = true
-    const order = orders.value.find(o => o.id === orderId || o.backendId === orderId)
-    if (order) {
-        order.etaOverdue = false
-        order.slaStatus = 'Rerouted'
-        order.slaClass = 'bg-blue-500/20 text-blue-400'
-    }
-}
 </script>

@@ -163,7 +163,7 @@ import BaseModal from '@/components/BaseModal.vue'
 import RazorpayCheckout from '@/components/RazorpayCheckout.vue'
 import { useSlipPrinter } from '@/composables/useSlipPrinter'
 
-const { openSlip, openSlipWithData } = useSlipPrinter()
+const { openSlipWithData } = useSlipPrinter()
 const authStore = useAuthStore()
 
 const store = useVendorStore()
@@ -212,10 +212,6 @@ async function payAllDue() {
     const unpaid = store.invoices.filter(i => i.status !== 'Paid')
     await Promise.all(unpaid.map(inv => store.payInvoice(inv.id, inv.amount - inv.paid, 'Bank Transfer')))
     showToast('All invoices settled')
-}
-
-function downloadInvoice(inv) {
-    openSlipWithData('finalTaxInvoice', store.shipments.find(s => s.id === inv.orderId), authStore.currentUser)
 }
 
 function exportReport() {

@@ -1031,7 +1031,7 @@ import { useSlipPrinter } from '@/composables/useSlipPrinter'
 import { fetchRoadDistanceKm } from '@/composables/useOsrmDistance'
 import { useRates } from '@/composables/useRates'
 
-const { openSlip, openSlipWithData } = useSlipPrinter()
+const { openSlipWithData } = useSlipPrinter()
 
 const MapPicker = defineAsyncComponent(() => import('@/components/MapPicker.vue'))
 
@@ -1084,7 +1084,6 @@ const shipmentSearch = ref('')
 const shipmentStatusFilter = ref('all')
 const editingEntry = ref(null)
 const isDark = ref(false)
-const showSampleData = ref(false)
 const bookingNotice = ref('')
 let themeObserver = null
 

@@ -1058,9 +1058,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useLogisticStore } from '@/stores/logisticStore'
 import { useDispatcherStore } from '@/stores/dispatcherStore'
-import { useAuthStore } from '@/stores/authStore'
 import { storeToRefs } from 'pinia'
-import { useSlipPrinter } from '@/composables/useSlipPrinter'
 import { apiUrl, API_BASE_URL } from '@/config/api'
 import { LMap, LTileLayer, LMarker, LPopup } from '@vue-leaflet/vue-leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -1074,11 +1072,9 @@ L.Icon.Default.mergeOptions({
     shadowUrl: new URL('leaflet/dist/images/marker-shadow.png', import.meta.url).href,
 })
 
-const { openSlip, openSlipWithData } = useSlipPrinter()
 
 const store = useLogisticStore()
-const authStore = useAuthStore()
-const { filteredTopDrivers, filteredMaintenance, filteredVehicles } = storeToRefs(store)
+const { filteredTopDrivers, filteredMaintenance } = storeToRefs(store)
 
 // Dispatcher store — shared reactive suspend state (same Pinia instance, no localStorage polling needed)
 const dispatcherStore = useDispatcherStore()
@@ -1262,41 +1258,6 @@ const openUploadModal = (mode) => {
     isUploadModalOpen.value = true
 }
 
-const closeUploadModal = () => {
-    isUploadModalOpen.value = false
-}
-
-const handleFileUpload = (event) => {
-    const file = event.target.files[0]
-    if (file) {
-        uploadFormData.value.fileName = file.name
-        const reader = new FileReader()
-        reader.onload = (e) => {
-            uploadFormData.value.fileBase64 = e.target.result
-        }
-        reader.readAsDataURL(file)
-    }
-}
-
-const submitDocument = async () => {
-    if (!uploadFormData.value.entityId || !uploadFormData.value.docType) return
-    
-    await store.uploadDocument({
-        entity_type: uploadMode.value,
-        entity_id: uploadFormData.value.entityId,
-        hub_id: store.activeWarehouse === 'all' ? null : store.activeWarehouse,
-        doc_type: uploadFormData.value.docType,
-        document_url: uploadFormData.value.fileBase64 || `https://placehold.co/400x500?text=${uploadFormData.value.docType.replace(/ /g, '+')}+Upload`,
-        expiry_date: uploadFormData.value.expiryDate ? new Date(uploadFormData.value.expiryDate).toISOString() : null
-    })
-    closeUploadModal()
-}
-
-const verifyDocumentStatus = async (docId, status) => {
-    await store.updateDocumentStatus(docId, status)
-    activeDoc.value = null // Close the viewer
-}
-
 // Share Modal State
 
 const isShareModalOpen = ref(false)
@@ -1309,18 +1270,7 @@ const shareFormData = ref({
 })
 
 // Profile Viewers state
-const activeDriverProfile = ref(null)
 const activeVehicleProfile = ref(null)
-const chatInput = ref('')
-const managerChatLoading = ref(false)
-const LM_SENDERS = new Set(['me', 'manager', 'logistics manager'])
-
-const activeDriverMessages = computed(() => {
-    const threadId = activeDriverProfile.value?.managerThreadId
-    if (!threadId) return []
-    const thread = store.chats.find(c => c.id === threadId)
-    return thread?.messages || []
-})
 
 const isDriverSuspendedInFleet = (driver) => {
     const id = String(driver?.id || '')
@@ -1514,67 +1464,7 @@ const groupedDriverDocs = computed(() => {
     return Object.values(groups)
 })
 
-const vehicleLocationData = computed(() => {
-    const data = filteredVehicles.value.map(vehicle => {
-        // Find assigned driver from store.drivers (we use store.filteredDrivers but need to ensure we catch all if needed, 
-        // though filteredDrivers fits the current view context)
-        const driver = store.drivers.find(d => d.name === vehicle.driver)
-        
-        // Find driver license from local driverDocs
-        let licenseNo = 'N/A'
-        if (driver) {
-            const doc = store.driverDocuments.find(d => d.driverId === driver.id && d.type.includes('License'))
-            if (doc) licenseNo = doc.licenseNo
-        }
-
-        return {
-            ...vehicle,
-            driverId: driver ? driver.id : null,
-            licenseNo: licenseNo,
-            currentLocation: driver ? driver.location : 'Depot (Parked)',
-            currentJob: driver ? driver.currentJob : 'Idle',
-            speed: driver && driver.status?.toLowerCase() === 'active' ? `${35 + (driver.efficiency % 18)} mph` : '0 mph',
-            gps: driver ? `${34.05 + ((driver.efficiency || 0) / 1000)}, -118.24` : '34.0522, -118.2437',
-            lastUpdate: 'Just now'
-        }
-    })
-
-    // Search Filter for Locations
-    const q = searchQuery.value.toLowerCase()
-    if (!q) return data
-
-    return data.filter(v => 
-        String(v.id || '').toLowerCase().includes(q) || 
-        String(v.type || '').toLowerCase().includes(q) || 
-        String(v.licensePlate || '').toLowerCase().includes(q) || 
-        String(v.driver || '').toLowerCase().includes(q) || 
-        String(v.driverId || '').toLowerCase().includes(q) || 
-        String(v.currentLocation || '').toLowerCase().includes(q) ||
-        String(v.currentJob || '').toLowerCase().includes(q)
-    )
-})
-
 // Report & Doc Actions
-const openSafetyChecklist = () => {
-    const vehicle = store.filteredVehicles[0] || null
-    const driver = store.filteredDrivers.find(d => vehicle && d.vehicle === vehicle.code) || store.filteredDrivers[0] || null
-    if (driver || vehicle) {
-        openSlipWithData('vehicleSafetyChecklist', driver, vehicle)
-    } else {
-        openSlip('vehicleSafetyChecklist')
-    }
-}
-
-const openSafetyChecklistForVehicle = (vehicle) => {
-    const driver = store.filteredDrivers.find(d => d.vehicle === vehicle.code) || null
-    openSlipWithData('vehicleSafetyChecklist', driver, vehicle)
-}
-
-const openSafetyChecklistForDriver = (driver) => {
-    const vehicle = store.filteredVehicles.find(v => v.code === driver.vehicle) || null
-    openSlipWithData('vehicleSafetyChecklist', driver, vehicle)
-}
-
 const generateMaintenanceReport = () => {
     const vehicles = store.filteredVehicles
     if (!vehicles.length) {
@@ -1606,7 +1496,7 @@ const downloadDoc = (doc) => {
     window.alert(`Starting download for ${doc.type}.pdf...`)
 }
 
-const printDoc = (doc) => {
+const printDoc = (_doc) => {
     window.print()
 }
 
@@ -1783,101 +1673,7 @@ const maintenanceCost = (vehicleId) => {
     return log?.cost != null ? `₹${log.cost.toLocaleString()}` : '—'
 }
 
-// Helper: get performance stats from topDrivers list
-const driverStats = (driver) => {
-    if (!driver) return {}
-    const top = store.topDrivers.find(d => d.id === driver.id || d.name === driver.name)
-    return {
-        trips: top?.trips ?? null,
-        rating: top?.rating ?? null,
-        ontime: top?.ontime ?? null,
-    }
-}
-
 // Profiles logic
-const openDriverProfile = async (driver) => {
-    const dispatcherSuspended = isDriverSuspendedInFleet(driver)
-    // Merge fields without injecting fake/static data
-    activeDriverProfile.value = {
-        ...driver,
-        dispatcherSuspended,
-        id: driver.id || null,
-        phone: driver.phone || null,
-        status: dispatcherSuspended ? 'Suspended' : (driver.status || 'active'),
-        efficiency: driver.efficiency ?? null,
-        vehicle: driver.vehicle || 'Company Fleet',
-        currentJob: dispatcherSuspended ? 'Blocked from dispatch' : (driver.currentJob || 'On Route'),
-        location: driver.location || null,
-        avatarColor: driver.avatarColor || 'bg-blue-600',
-        managerThreadId: null,
-    }
-    managerChatLoading.value = true
-    try {
-        const thread = await store.ensureManagerDriverThread(activeDriverProfile.value)
-        activeDriverProfile.value = {
-            ...activeDriverProfile.value,
-            managerThreadId: String(thread.id),
-        }
-    } finally {
-        managerChatLoading.value = false
-    }
-}
-const closeDriverProfile = () => {
-    activeDriverProfile.value = null
-    chatInput.value = ''
-}
-
-const forceEndDriverShift = async (driver) => {
-    // 1. Resolve warehouse coords to snap driver location back to hub
-    const hub = store.hubs.find(h => h.id === driver.hubId)
-    const warehouseLocation = (hub?.lat && hub?.lng) ? `${hub.lat},${hub.lng}` : null
-
-    // 2. Set driver Off-Duty + reset location to warehouse in one call
-    const updatePayload = { status: 'Off-Duty', current_job: null }
-    if (warehouseLocation) updatePayload.current_location = warehouseLocation
-
-    await fetch(`${API_BASE_URL}/api/v1/logistics/drivers/${driver.id}`, {
-        method: 'PUT',
-        headers: { 'Authorization': `Bearer ${authStore.token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatePayload),
-    }).catch(() => {})
-
-    // 3. Release the vehicle assigned to this driver
-    const byName = store.filteredVehicles.find(v => v.driver === driver.name)
-    if (byName) {
-        await store.updateVehicle(byName.id, { assigned_driver_id: null, status: 'Active' })
-    } else {
-        try {
-            const res = await fetch(`${API_BASE_URL}/api/v1/logistics/vehicles`, {
-                headers: { 'Authorization': `Bearer ${authStore.token}` }
-            })
-            if (res.ok) {
-                const list = await res.json()
-                const veh = (Array.isArray(list) ? list : list.items || [])
-                    .find(v => String(v.assigned_driver_id) === String(driver.id))
-                if (veh) await store.updateVehicle(veh.id, { assigned_driver_id: null, status: 'Active' })
-            }
-        } catch (_) { /* best-effort */ }
-    }
-
-    await store.refresh()
-
-    // 4. Update the open profile badge reactively
-    if (activeDriverProfile.value?.id === driver.id) {
-        activeDriverProfile.value = { ...activeDriverProfile.value, status: 'Off-Duty' }
-    }
-}
-const sendChat = async () => {
-    if (!chatInput.value.trim() || !activeDriverProfile.value?.managerThreadId) return
-    const text = chatInput.value.trim()
-    chatInput.value = ''
-    await store.sendChatMessage(activeDriverProfile.value.managerThreadId, text)
-}
-
-const isLmOutgoing = (msg) => {
-    return LM_SENDERS.has(String(msg?.sender || '').toLowerCase())
-}
-
 const openVehicleProfile = (vehicle, viewMode = 'full') => {
     const history = [
         ...(store.fleetLogs['Service Logs'] || []).filter(item => item.vehicleId === vehicle.id).map(item => ({

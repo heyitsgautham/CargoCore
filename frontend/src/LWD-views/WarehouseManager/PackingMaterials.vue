@@ -580,10 +580,6 @@ const orderAssignedLabourers = computed(() => {
     return labourers.value.filter(l => l.status === 'ASSIGNED' && l.assigned_order_tracking === issueForm.orderId)
 })
 
-const offDutyLabourers = computed(() => {
-    return labourers.value.filter(l => l.status === 'OFF_DUTY')
-})
-
 const issuableLabourers = computed(() => {
     const byId = new Map()
     for (const labourer of orderAssignedLabourers.value) byId.set(String(labourer.id), labourer)
@@ -632,64 +628,6 @@ const canSubmitIssue = computed(() => {
     })
     return hasItems
 })
-
-// Calculate recommended materials based on order details
-function calculateRecommendedMaterials(order) {
-    if (!order) return []
-
-    const recommendations = []
-
-    // Estimate number of items (from order details or default)
-    const numItems = order.estimated_items || order.item_count || 5
-    const isFragile = order.is_fragile || false
-    const isLarge = order.is_large || numItems > 10
-
-    // Find materials by keywords
-    const findMaterial = (keywords) => {
-        return packingItems.value.find(item => {
-            const text = item.name.toLowerCase()
-            return keywords.some(kw => text.includes(kw))
-        })
-    }
-
-    // Boxes/Cartons - base on items
-    const box = findMaterial(['box', 'carton'])
-    if (box) {
-        recommendations.push({
-            ...box,
-            suggestedQty: Math.max(1, Math.ceil(numItems / 3))
-        })
-    }
-
-    // Bubble wrap for fragile items
-    const bubbleWrap = findMaterial(['bubble', 'wrap'])
-    if (bubbleWrap && (isFragile || numItems > 5)) {
-        recommendations.push({
-            ...bubbleWrap,
-            suggestedQty: Math.ceil(numItems / 2)
-        })
-    }
-
-    // Tape - always needed
-    const tape = findMaterial(['tape'])
-    if (tape) {
-        recommendations.push({
-            ...tape,
-            suggestedQty: Math.max(2, Math.ceil(numItems / 4))
-        })
-    }
-
-    // Labels
-    const label = findMaterial(['label'])
-    if (label) {
-        recommendations.push({
-            ...label,
-            suggestedQty: Math.max(1, Math.ceil(numItems / 2))
-        })
-    }
-
-    return recommendations
-}
 
 async function onOrderSelected() {
     const selected = activeOrders.value.find(o => o.tracking_code === issueForm.orderId)
@@ -1064,7 +1002,6 @@ async function submitIssue() {
 
 async function submitRestock() {
     restocking.value = true
-    const warehouseId = getWarehouseId()
 
     try {
         const headers = {

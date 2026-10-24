@@ -1129,7 +1129,6 @@ const getInventoryCount = (keywords) => {
 }
 
 // --- Interaction Handlers ---
-const isDownloading = ref(false)
 const aiThinking = ref(false)
 const notification = ref(null)
 

@@ -211,13 +211,6 @@ const driverMarkers = {}
 const orderMarkers = {}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-function haversine(lat1, lng1, lat2, lng2) {
-    const R = 6371
-    const dLat = (lat2 - lat1) * Math.PI / 180
-    const dLng = (lng2 - lng1) * Math.PI / 180
-    const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-}
 
 function parseLatLng(locationStr) {
     if (!locationStr || typeof locationStr !== 'string') return null
@@ -374,10 +367,6 @@ const driversWithLocation = computed(() => {
 
 const availableDrivers = computed(() =>
     driversWithLocation.value.filter(d => !['On Trip', 'IN_TRANSIT', 'Busy', 'off-duty', 'Off-Duty'].includes(d.liveStatus))
-)
-
-const activeDrivers = computed(() =>
-    driversWithLocation.value.filter(d => ['On Trip', 'IN_TRANSIT', 'Busy'].includes(d.liveStatus))
 )
 
 const unassignedOrders = computed(() =>

@@ -133,7 +133,6 @@ const hasInteracted = ref(false)
 
 const routePath = computed(() => route.path)
 const showTabs = computed(() => ['/login', '/register'].includes(routePath.value) && routePath.value !== '/forgot-password')
-const isRegister = computed(() => activeTab.value === 'register')
 
 const currentView = computed(() => {
   switch (routePath.value) {
