@@ -44,6 +44,9 @@ The backend suite needs Postgres with a `logistics_db_test` database, as `README
   `frontend/.prettierignore` keeps the older `src/` tree out of the format check, so when you touch a file there, format it and drop it from the ignore list in the same pull request if you can.
 - Keep new files under 500 lines.
   Split a view or service by feature before it grows past that.
+- CI runs `python scripts/check_file_size.py`, which fails when a source file passes 800 lines.
+  Files that were already longer are listed in `scripts/file_size_baseline.json` and may shrink but not grow.
+  After you split one, run the script with `--update` and commit the lower baseline.
 
 ## Dependencies
 
