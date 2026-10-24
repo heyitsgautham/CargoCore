@@ -7,18 +7,20 @@ from uuid import uuid4
 import pytest
 from fastapi import HTTPException
 
-from app.services import ai_support_service
+from app.services.support import analytics_format as support_analytics_format
+from app.services.support import common as support_common
+from app.services.support import ticket_helpers as support_ticket_helpers
 
 
 def test_normalize_analytics_range_defaults_and_accepts_valid_values() -> None:
-    assert ai_support_service._normalize_analytics_range(None) == "7D"
-    assert ai_support_service._normalize_analytics_range("24h") == "24H"
-    assert ai_support_service._normalize_analytics_range("30D") == "30D"
+    assert support_analytics_format._normalize_analytics_range(None) == "7D"
+    assert support_analytics_format._normalize_analytics_range("24h") == "24H"
+    assert support_analytics_format._normalize_analytics_range("30D") == "30D"
 
 
 def test_normalize_analytics_range_rejects_invalid_value() -> None:
     with pytest.raises(HTTPException) as exc_info:
-        ai_support_service._normalize_analytics_range("365D")
+        support_analytics_format._normalize_analytics_range("365D")
 
     assert exc_info.value.status_code == 400
     assert "analytics range" in str(exc_info.value.detail).lower()
@@ -27,10 +29,10 @@ def test_normalize_analytics_range_rejects_invalid_value() -> None:
 def test_analytics_bucket_starts_lengths_and_ordering() -> None:
     now = datetime(2026, 4, 17, 14, 42, tzinfo=UTC)
 
-    h24 = ai_support_service._analytics_bucket_starts("24H", now)
-    d7 = ai_support_service._analytics_bucket_starts("7D", now)
-    d30 = ai_support_service._analytics_bucket_starts("30D", now)
-    d90 = ai_support_service._analytics_bucket_starts("90D", now)
+    h24 = support_analytics_format._analytics_bucket_starts("24H", now)
+    d7 = support_analytics_format._analytics_bucket_starts("7D", now)
+    d30 = support_analytics_format._analytics_bucket_starts("30D", now)
+    d90 = support_analytics_format._analytics_bucket_starts("90D", now)
 
     assert len(h24) == 24
     assert len(d7) == 7
@@ -43,74 +45,74 @@ def test_analytics_bucket_starts_lengths_and_ordering() -> None:
 def test_next_analytics_window_start_by_range() -> None:
     start = datetime(2026, 4, 17, 10, 0, tzinfo=UTC)
 
-    assert ai_support_service._next_analytics_window_start("24H", start) == start + timedelta(hours=1)
-    assert ai_support_service._next_analytics_window_start("7D", start) == start + timedelta(days=1)
-    assert ai_support_service._next_analytics_window_start("30D", start) == start + timedelta(days=1)
-    assert ai_support_service._next_analytics_window_start("90D", start) == start + timedelta(weeks=1)
+    assert support_analytics_format._next_analytics_window_start("24H", start) == start + timedelta(hours=1)
+    assert support_analytics_format._next_analytics_window_start("7D", start) == start + timedelta(days=1)
+    assert support_analytics_format._next_analytics_window_start("30D", start) == start + timedelta(days=1)
+    assert support_analytics_format._next_analytics_window_start("90D", start) == start + timedelta(weeks=1)
 
 
 def test_analytics_label_by_range() -> None:
     bucket = datetime(2026, 4, 17, 9, 0, tzinfo=UTC)
 
-    assert ai_support_service._analytics_label("24H", bucket) == "09:00"
-    assert len(ai_support_service._analytics_label("7D", bucket)) == 3
-    assert "Apr" in ai_support_service._analytics_label("30D", bucket)
+    assert support_analytics_format._analytics_label("24H", bucket) == "09:00"
+    assert len(support_analytics_format._analytics_label("7D", bucket)) == 3
+    assert "Apr" in support_analytics_format._analytics_label("30D", bucket)
 
 
 def test_bucket_for_datetime_normalization() -> None:
     value = datetime(2026, 4, 17, 15, 37, 22, tzinfo=UTC)
 
-    assert ai_support_service._bucket_for_datetime(value, "24H") == datetime(2026, 4, 17, 15, 0, tzinfo=UTC)
-    assert ai_support_service._bucket_for_datetime(value, "7D") == datetime(2026, 4, 17, 0, 0, tzinfo=UTC)
-    assert ai_support_service._bucket_for_datetime(value, "30D") == datetime(2026, 4, 17, 0, 0, tzinfo=UTC)
-    assert ai_support_service._bucket_for_datetime(value, "90D") == datetime(2026, 4, 13, 0, 0, tzinfo=UTC)
+    assert support_analytics_format._bucket_for_datetime(value, "24H") == datetime(2026, 4, 17, 15, 0, tzinfo=UTC)
+    assert support_analytics_format._bucket_for_datetime(value, "7D") == datetime(2026, 4, 17, 0, 0, tzinfo=UTC)
+    assert support_analytics_format._bucket_for_datetime(value, "30D") == datetime(2026, 4, 17, 0, 0, tzinfo=UTC)
+    assert support_analytics_format._bucket_for_datetime(value, "90D") == datetime(2026, 4, 13, 0, 0, tzinfo=UTC)
 
 
 def test_percent_delta_and_format_helpers() -> None:
-    assert ai_support_service._percent_delta(10, 0) == 100.0
-    assert ai_support_service._percent_delta(0, 0) == 0.0
-    assert ai_support_service._percent_delta(120, 100) == 20.0
+    assert support_analytics_format._percent_delta(10, 0) == 100.0
+    assert support_analytics_format._percent_delta(0, 0) == 0.0
+    assert support_analytics_format._percent_delta(120, 100) == 20.0
 
-    assert ai_support_service._format_count(1530.1) == "1,530"
-    assert ai_support_service._format_currency(999) == "\u20b9999"
-    assert ai_support_service._format_currency(2500) == "\u20b92.5k"
-    assert ai_support_service._format_duration_seconds(0) == "0s"
-    assert ai_support_service._format_duration_seconds(22.2) == "22s"
-    assert ai_support_service._format_duration_seconds(130) == "2m"
+    assert support_analytics_format._format_count(1530.1) == "1,530"
+    assert support_analytics_format._format_currency(999) == "\u20b9999"
+    assert support_analytics_format._format_currency(2500) == "\u20b92.5k"
+    assert support_analytics_format._format_duration_seconds(0) == "0s"
+    assert support_analytics_format._format_duration_seconds(22.2) == "22s"
+    assert support_analytics_format._format_duration_seconds(130) == "2m"
 
 
 def test_trend_descriptor_positive_negative_and_inverse() -> None:
-    msg, tone = ai_support_service._trend_descriptor(120, 100, "period", formatter=ai_support_service._format_count)
+    msg, tone = support_analytics_format._trend_descriptor(120, 100, "period", formatter=support_analytics_format._format_count)
     assert "+20.0%" in msg
     assert tone == "positive"
 
-    msg2, tone2 = ai_support_service._trend_descriptor(90, 100, "period", formatter=ai_support_service._format_count)
+    msg2, tone2 = support_analytics_format._trend_descriptor(90, 100, "period", formatter=support_analytics_format._format_count)
     assert "-10.0%" in msg2
     assert tone2 == "negative"
 
-    msg3, tone3 = ai_support_service._trend_descriptor(40, 50, "period", formatter=ai_support_service._format_duration_seconds, inverse=True)
+    msg3, tone3 = support_analytics_format._trend_descriptor(40, 50, "period", formatter=support_analytics_format._format_duration_seconds, inverse=True)
     assert tone3 == "positive"
     assert "-10s" in msg3
 
 
 def test_escalation_reason_label_mapping() -> None:
-    assert ai_support_service._escalation_reason_label("refund and payment issue") == "Refund Dispute"
-    assert ai_support_service._escalation_reason_label("delivery delay and tracking") == "Late Delivery"
-    assert ai_support_service._escalation_reason_label("item damaged") == "Damaged Item"
-    assert ai_support_service._escalation_reason_label("driver was rude") == "Driver Conduct"
-    assert ai_support_service._escalation_reason_label("random note") == "Other"
+    assert support_analytics_format._escalation_reason_label("refund and payment issue") == "Refund Dispute"
+    assert support_analytics_format._escalation_reason_label("delivery delay and tracking") == "Late Delivery"
+    assert support_analytics_format._escalation_reason_label("item damaged") == "Damaged Item"
+    assert support_analytics_format._escalation_reason_label("driver was rude") == "Driver Conduct"
+    assert support_analytics_format._escalation_reason_label("random note") == "Other"
 
 
 def test_analytics_marker_helpers() -> None:
-    marker = ai_support_service._analytics_ticket_marker("clear_contact_backlog")
+    marker = support_analytics_format._analytics_ticket_marker("clear_contact_backlog")
 
     assert marker == "[analytics:clear_contact_backlog]"
-    assert ai_support_service._extract_analytics_ticket_marker("foo [analytics:clear_contact_backlog] bar") == "clear_contact_backlog"
-    assert ai_support_service._extract_analytics_ticket_marker("no marker") is None
+    assert support_analytics_format._extract_analytics_ticket_marker("foo [analytics:clear_contact_backlog] bar") == "clear_contact_backlog"
+    assert support_analytics_format._extract_analytics_ticket_marker("no marker") is None
 
 
 def test_build_analytics_insights_multi_signal_path() -> None:
-    insights = ai_support_service._build_analytics_insights(
+    insights = support_analytics_format._build_analytics_insights(
         top_reason_label="Refund Dispute",
         top_reason_pct=35,
         negative_sessions=8,
@@ -135,7 +137,7 @@ def test_build_analytics_insights_multi_signal_path() -> None:
 
 
 def test_build_analytics_insights_fallback_path() -> None:
-    insights = ai_support_service._build_analytics_insights(
+    insights = support_analytics_format._build_analytics_insights(
         top_reason_label="Other",
         top_reason_pct=5,
         negative_sessions=0,
@@ -152,51 +154,51 @@ def test_build_analytics_insights_fallback_path() -> None:
 
 
 def test_keyword_sentiment_label_behavior() -> None:
-    assert ai_support_service._keyword_sentiment_label("refund delay issue") == "Negative"
-    assert ai_support_service._keyword_sentiment_label("thank you great work") == "Positive"
-    assert ai_support_service._keyword_sentiment_label("please check") == "Neutral"
+    assert support_analytics_format._keyword_sentiment_label("refund delay issue") == "Negative"
+    assert support_analytics_format._keyword_sentiment_label("thank you great work") == "Positive"
+    assert support_analytics_format._keyword_sentiment_label("please check") == "Neutral"
 
 
 def test_normalize_contact_status_and_priority() -> None:
-    assert ai_support_service._normalize_contact_status(None) is None
-    assert ai_support_service._normalize_contact_status(" In_Progress ") == "in_progress"
-    assert ai_support_service._normalize_contact_priority("URGENT") == "urgent"
+    assert support_common._normalize_contact_status(None) is None
+    assert support_common._normalize_contact_status(" In_Progress ") == "in_progress"
+    assert support_common._normalize_contact_priority("URGENT") == "urgent"
 
     with pytest.raises(HTTPException):
-        ai_support_service._normalize_contact_status("done")
+        support_common._normalize_contact_status("done")
     with pytest.raises(HTTPException):
-        ai_support_service._normalize_contact_priority("p0")
+        support_common._normalize_contact_priority("p0")
 
 
 def test_ensure_support_manager_role_guard() -> None:
     allowed_user = SimpleNamespace(role=SimpleNamespace(name="LOGISTIC_MANAGER"))
     blocked_user = SimpleNamespace(role=SimpleNamespace(name="VENDOR"))
 
-    ai_support_service._ensure_support_manager(allowed_user)
+    support_common._ensure_support_manager(allowed_user)
     with pytest.raises(HTTPException) as exc_info:
-        ai_support_service._ensure_support_manager(blocked_user)
+        support_common._ensure_support_manager(blocked_user)
     assert exc_info.value.status_code == 403
 
 
 def test_vendor_support_status_and_priority_mappings() -> None:
-    assert ai_support_service._vendor_ticket_display_code(uuid4()).startswith("TK-")
+    assert support_ticket_helpers._vendor_ticket_display_code(uuid4()).startswith("TK-")
 
-    assert ai_support_service._support_status_from_vendor("Open") == "new"
-    assert ai_support_service._support_status_from_vendor("In Progress") == "in_progress"
-    assert ai_support_service._support_status_from_vendor("Resolved") == "resolved"
-    assert ai_support_service._vendor_status_from_support("new") == "Open"
-    assert ai_support_service._vendor_status_from_support("in_progress") == "In Progress"
-    assert ai_support_service._vendor_status_from_support("resolved") == "Resolved"
+    assert support_ticket_helpers._support_status_from_vendor("Open") == "new"
+    assert support_ticket_helpers._support_status_from_vendor("In Progress") == "in_progress"
+    assert support_ticket_helpers._support_status_from_vendor("Resolved") == "resolved"
+    assert support_ticket_helpers._vendor_status_from_support("new") == "Open"
+    assert support_ticket_helpers._vendor_status_from_support("in_progress") == "In Progress"
+    assert support_ticket_helpers._vendor_status_from_support("resolved") == "Resolved"
 
-    assert ai_support_service._support_priority_from_vendor("HIGH") == "high"
-    assert ai_support_service._support_priority_from_vendor("unknown") == "medium"
-    assert ai_support_service._vendor_priority_from_support("urgent") == "Urgent"
+    assert support_ticket_helpers._support_priority_from_vendor("HIGH") == "high"
+    assert support_ticket_helpers._support_priority_from_vendor("unknown") == "medium"
+    assert support_ticket_helpers._vendor_priority_from_support("urgent") == "Urgent"
 
 
 def test_handoff_ticket_priority_logic() -> None:
-    assert ai_support_service._handoff_ticket_priority("legal notice sent") == "urgent"
-    assert ai_support_service._handoff_ticket_priority("customer very upset") == "high"
-    assert ai_support_service._handoff_ticket_priority(None) == "medium"
+    assert support_ticket_helpers._handoff_ticket_priority("legal notice sent") == "urgent"
+    assert support_ticket_helpers._handoff_ticket_priority("customer very upset") == "high"
+    assert support_ticket_helpers._handoff_ticket_priority(None) == "medium"
 
 
 def test_split_and_compose_ticket_notes_metadata_round_trip() -> None:
@@ -208,12 +210,12 @@ def test_split_and_compose_ticket_notes_metadata_round_trip() -> None:
         ]
     )
 
-    metadata, visible = ai_support_service._split_ticket_notes(raw_notes)
+    metadata, visible = support_ticket_helpers._split_ticket_notes(raw_notes)
 
     assert metadata == {"source": "warehouse_inbound", "linked_order_id": "abc-123"}
     assert visible == "Visible note line"
 
-    recomposed = ai_support_service._compose_ticket_notes(
+    recomposed = support_ticket_helpers._compose_ticket_notes(
         metadata={"source": "warehouse_inbound", "linked_order_id": "abc-123", "empty": ""},
         visible_notes="Visible note line",
     )
@@ -242,7 +244,7 @@ def test_linked_uuid_extractors_from_ticket_metadata() -> None:
         )
     )
 
-    assert ai_support_service._linked_vendor_ticket_uuid_from_ticket(ticket) == vendor_ticket_id
-    assert ai_support_service._linked_order_uuid_from_ticket(ticket) == order_id
-    assert ai_support_service._linked_vendor_ticket_uuid_from_ticket(invalid_ticket) is None
-    assert ai_support_service._linked_order_uuid_from_ticket(invalid_ticket) is None
+    assert support_ticket_helpers._linked_vendor_ticket_uuid_from_ticket(ticket) == vendor_ticket_id
+    assert support_ticket_helpers._linked_order_uuid_from_ticket(ticket) == order_id
+    assert support_ticket_helpers._linked_vendor_ticket_uuid_from_ticket(invalid_ticket) is None
+    assert support_ticket_helpers._linked_order_uuid_from_ticket(invalid_ticket) is None

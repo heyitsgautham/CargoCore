@@ -770,7 +770,7 @@ class TestSupportAnalytics:
         await db_session.commit()
 
         with patch(
-            "app.services.ai_support_service.get_gemini_client",
+            "app.services.support.analytics_format.get_gemini_client",
             side_effect=AssertionError("Support analytics should not call Gemini"),
         ):
             resp = await client.get(

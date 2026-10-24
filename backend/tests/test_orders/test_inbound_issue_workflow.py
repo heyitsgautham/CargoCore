@@ -8,7 +8,7 @@ from app.models.support_ticket import SupportTicket
 from app.models.user import Role, User
 from app.models.vendor import VendorSupportTicket
 from app.models.warehouse import Warehouse
-from app.schemas.ai import TicketUpdate
+from app.schemas.ai import AgentReplyRequest, TicketUpdate
 from app.schemas.warehouse_operations import InboundDamageReport
 from app.services import ai_support_service
 from app.services.warehouse_operations_service import (
@@ -255,7 +255,7 @@ async def test_support_reply_is_blocked_after_inbound_issue_is_resolved(db_sessi
         await ai_support_service.reply_to_ticket(
             db_session,
             support_ticket.id,
-            ai_support_service.AgentReplyRequest(message="Please confirm once more."),
+            AgentReplyRequest(message="Please confirm once more."),
             support_manager,
         )
 
