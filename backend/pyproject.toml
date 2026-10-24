@@ -37,7 +37,7 @@ source = ["app"]
 branch = true
 
 [tool.coverage.report]
-# Measured at 36% line and branch coverage with the unit, contract and integration suites.
+# Measured at 39% line and branch coverage with the unit, contract and integration suites.
 # Raise it as tests land.
-fail_under = 35
+fail_under = 38
 skip_covered = true

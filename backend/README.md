@@ -56,7 +56,7 @@ Redis is mocked.
 
 ```bash
 createdb logistics_db_test
-pytest --cov          # unit, contract and integration suites, fails under 35% coverage
+pytest --cov          # unit, contract and integration suites, fails under 38% coverage
 ruff check .          # lint
 pip-audit -r requirements.txt --no-deps --disable-pip
 ```
