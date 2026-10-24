@@ -31,3 +31,13 @@ filterwarnings = [
     # starlette 0.37.x still uses `import multipart` internally; fixed in a later release
     "ignore:Please use.*python_multipart:PendingDeprecationWarning",
 ]
+
+[tool.coverage.run]
+source = ["app"]
+branch = true
+
+[tool.coverage.report]
+# Measured at 36% line and branch coverage with the unit, contract and integration suites.
+# Raise it as tests land.
+fail_under = 35
+skip_covered = true

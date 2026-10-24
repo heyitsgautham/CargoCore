@@ -1,0 +1,10 @@
+# Secret scanning config for gitleaks, used by CI on every push and pull request.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Fixture passwords in backend tests and placeholder tokens in curl examples"
+regexes = [
+  '''(New)?StrongPass\w*''',
+  '''YOUR_(ACCESS_)?TOKEN(_HERE)?''',
+]
