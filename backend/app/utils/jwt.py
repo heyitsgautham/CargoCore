@@ -2,8 +2,8 @@ import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+import jwt
 from fastapi import HTTPException, status
-from jose import JWTError, jwt
 
 from app.config import get_settings
 
@@ -60,8 +60,17 @@ def decode_token(token: str) -> dict[str, Any]:
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    payload = try_decode_token(token)
+    if payload is None:
+        raise credentials_exception
+    return payload
+
+
+def try_decode_token(token: str | None) -> dict[str, Any] | None:
+    """Verify a JWT and return its claims, or None when it is missing or invalid."""
+    if not token:
+        return None
     try:
-        payload = jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
-        return payload
-    except JWTError as e:
-        raise credentials_exception from e
+        return jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
+    except jwt.PyJWTError:
+        return None

@@ -19,7 +19,8 @@ import json
 from typing import Any
 
 from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect, status
-from jose import JWTError
+
+from app.utils.jwt import try_decode_token
 
 router = APIRouter(tags=["Fleet WebSocket"])
 
@@ -125,37 +126,14 @@ fleet_manager = FleetConnectionManager()
 driver_alert_manager = DriverAlertManager()
 
 
-ALGORITHM = "HS256"
-
-
 async def _authenticate_ws_token(token: str | None) -> bool:
     """Return True if the JWT token is valid (any authenticated user)."""
-    if not token:
-        return False
-    try:
-        from jose import jwt as jose_jwt
-
-        from app.config import get_settings
-        settings = get_settings()
-        jose_jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
-        return True
-    except (JWTError, Exception):
-        return False
+    return try_decode_token(token) is not None
 
 
 async def _decode_ws_token(token: str | None) -> dict | None:
     """Decode JWT token and return payload with user_id (sub)."""
-    if not token:
-        return None
-    try:
-        from jose import jwt as jose_jwt
-
-        from app.config import get_settings
-        settings = get_settings()
-        payload = jose_jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
-        return payload
-    except (JWTError, Exception):
-        return None
+    return try_decode_token(token)
 
 
 @router.websocket("/ws/fleet")
