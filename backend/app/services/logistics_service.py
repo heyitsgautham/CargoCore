@@ -1296,33 +1296,6 @@ async def get_dispatch_contacts(db: AsyncSession) -> list[DispatchContactItem]:
     return result
 
 
-async def add_chat_message(
-    db: AsyncSession,
-    thread_id: UUID,
-    data: LogisticsChatMessageCreate,
-) -> LogisticsChatThreadItem:
-    thread = await _get_chat_thread(db, thread_id)
-    msg = LogisticsChatMessage(
-        thread_id=thread.id,
-        sender=data.sender,
-        text=data.text,
-        created_at=_now(),
-    )
-    db.add(msg)
-    thread.last_message = data.text
-    thread.last_message_at = _now()
-    db.add(thread)
-    await db.commit()
-    await db.refresh(thread)
-    # Reload messages for this thread
-    messages = (await db.execute(
-        select(LogisticsChatMessage)
-        .where(LogisticsChatMessage.thread_id == thread.id)
-        .order_by(LogisticsChatMessage.created_at.asc())
-    )).scalars().all()
-    return _build_thread_item(thread, list(messages))
-
-
 async def create_chat_thread(
     db: AsyncSession,
     data: LogisticsChatThreadCreate,
@@ -1521,14 +1494,14 @@ async def ensure_logistics_seed_data(db: AsyncSession, manager_user: User) -> No
     ])
 
     metrics = []
-    for i, (label, val) in enumerate(zip(["Jan", "Feb", "Mar", "Apr", "May", "Jun"], [5.2, 4.8, 4.4, 4.1, 3.9, 4.0])):
+    for i, (label, val) in enumerate(zip(["Jan", "Feb", "Mar", "Apr", "May", "Jun"], [5.2, 4.8, 4.4, 4.1, 3.9, 4.0], strict=True)):
         metrics.append(LogisticsMetric(metric_type="vendor_lead_time", label=label, value_main=val))
         metrics.append(LogisticsMetric(metric_type="safety_incidents", label=label, value_main=[2, 3, 1, 2, 1, 0][i]))
     
-    for i, (label, eff, ot) in enumerate(zip(["Shift A", "Shift B", "Shift C"], [92, 88, 95], [12, 18, 5])):
+    for label, eff, ot in zip(["Shift A", "Shift B", "Shift C"], [92, 88, 95], [12, 18, 5], strict=True):
         metrics.append(LogisticsMetric(metric_type="shift_efficiency", label=label, value_main=eff, value_secondary=ot))
     
-    for i, (label, val) in enumerate(zip(["6am-9am", "9am-12pm", "12pm-3pm", "3pm-6pm", "6pm-9pm"], [15, 45, 25, 60, 20])):
+    for label, val in zip(["6am-9am", "9am-12pm", "12pm-3pm", "3pm-6pm", "6pm-9pm"], [15, 45, 25, 60, 20], strict=True):
         metrics.append(LogisticsMetric(metric_type="dwell_time", label=label, value_main=val))
     
     db.add_all(metrics)
@@ -1865,10 +1838,6 @@ async def build_bootstrap(db: AsyncSession) -> LogisticsBootstrapResponse:
             driver_rating_counts[key] = driver_rating_counts.get(key, 0) + 1
 
     # EXPENSE_DRIVER rows in LogisticsTransaction sum gives total earned per driver session
-    expense_driver_rows = [tx for tx in transactions if tx.transaction_type == "EXPENSE_DRIVER"]
-    expense_labour_rows = [tx for tx in transactions if tx.transaction_type == "EXPENSE_LABOUR"]
-    total_driver_expense_booked = abs(sum(tx.amount for tx in expense_driver_rows))
-    total_labour_expense_booked = abs(sum(tx.amount for tx in expense_labour_rows))
 
     hubs = []
     for index, warehouse in enumerate(warehouses, start=1):
@@ -2223,7 +2192,7 @@ async def build_bootstrap(db: AsyncSession) -> LogisticsBootstrapResponse:
     driver_documents = [
         {
             "id": str(doc.id),
-            "driver": user_map[UUID(doc.entity_id)].name if doc.entity_id.replace('-', '') in [str(k).replace('-', '') for k in user_map.keys()] else "Unknown",
+            "driver": user_map[UUID(doc.entity_id)].name if doc.entity_id.replace('-', '') in [str(k).replace('-', '') for k in user_map] else "Unknown",
             "driverId": doc.entity_id,
             "hubId": str(doc.hub_id) if doc.hub_id else "all",
             "type": doc.doc_type,
@@ -2491,7 +2460,7 @@ async def build_bootstrap(db: AsyncSession) -> LogisticsBootstrapResponse:
             )
             for tx in transactions
         ],
-        reports=[LogisticsReportItem(id=f"report-{index}", hub_id=hub.id, title=f"{hub.name} Performance Report", date=_fmt_relative(_now() - timedelta(days=index)), icon="analytics", color=color) for index, (hub, color) in enumerate(zip(hubs, ["blue", "green", "orange"]), start=1)],
+        reports=[LogisticsReportItem(id=f"report-{index}", hub_id=hub.id, title=f"{hub.name} Performance Report", date=_fmt_relative(_now() - timedelta(days=index)), icon="analytics", color=color) for index, (hub, color) in enumerate(zip(hubs, ["blue", "green", "orange"], strict=False), start=1)],
         users=[LogisticsUserItem(id=user.id, hub_id=user.warehouse_id, name=user.name, email=user.email, role=role_by_id.get(user.role_id, ""), status="Active" if user.is_active else "Inactive", last_login=user.last_login.isoformat() if user.last_login else "", username=user.username, pending_payout=(
                     next((item["amount"] for item in finance_staff_records if item["userId"] == str(user.id) and item.get("status") == "Pending"), 0.0)
                     or next((item["amount"] for item in finance_driver_records if item["userId"] == str(user.id) and item.get("status") == "Pending"), 0.0)

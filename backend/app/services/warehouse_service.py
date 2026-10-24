@@ -223,7 +223,7 @@ async def get_warehouse_dashboard(db: AsyncSession, warehouse_id: UUID) -> Wareh
     ).scalars().all()
 
     total_labor = len(all_laborers)
-    active_labor = len([l for l in all_laborers if l.is_active])
+    active_labor = len([laborer for laborer in all_laborers if laborer.is_active])
 
     # Critical SKUs (low stock)
     critical_items = (
@@ -504,7 +504,7 @@ async def get_warehouse_dashboard(db: AsyncSession, warehouse_id: UUID) -> Wareh
     )
 
     # Labor distribution by task
-    assigned_laborers = len([l for l in all_laborers if l.assigned_order_id])
+    assigned_laborers = len([laborer for laborer in all_laborers if laborer.assigned_order_id])
     idle_laborers = active_labor - assigned_laborers
 
     # Simplified distribution

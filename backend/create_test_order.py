@@ -164,7 +164,7 @@ async def main():
         print("❌ Failed to get test vehicle")
         return
 
-    order = await create_test_order(driver, vehicle)
+    await create_test_order(driver, vehicle)
 
     print("\n📱 Driver App Login Credentials:")
     print("   Email: driver.test@cargocore.com")

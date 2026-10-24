@@ -10,6 +10,7 @@ ignore = [
     "B008",  # FastAPI declares dependencies as Depends() defaults
     "E711",  # SQLAlchemy filters need `== None` to build IS NULL
     "E712",  # SQLAlchemy filters need `== True` to build the SQL comparison
+    "SIM102",  # nested guards stay apart where each one carries its own comment
 ]
 
 [tool.black]

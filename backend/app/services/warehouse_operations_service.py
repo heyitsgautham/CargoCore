@@ -402,7 +402,7 @@ async def get_inbound_overview(
     db: AsyncSession,
     warehouse_id: UUID,
 ) -> InboundResponse:
-    warehouse = await _get_warehouse(db, warehouse_id)
+    await _get_warehouse(db, warehouse_id)
     orders = (
         await db.execute(
             select(Order)

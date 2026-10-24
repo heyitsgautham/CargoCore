@@ -144,16 +144,16 @@ async def estimate_image(
             if result_text.startswith("json"):
                 result_text = result_text[4:]
         return json.loads(result_text)
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as e:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="AI returned an unexpected response. Please try again.",
-        )
+        ) from e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=f"Gemini Vision error: {str(e)}",
-        )
+        ) from e
 
 
 
@@ -253,7 +253,7 @@ async def escalate_conversation(
             reason=data.reason,
         )
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 @router.get(
@@ -285,7 +285,7 @@ async def resolve_escalation(
     try:
         return await ai_service.resolve_escalation(db=db, escalation_id=escalation_id)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 @router.post(
@@ -541,7 +541,7 @@ async def resolve_escalation_center(
     try:
         return await ai_service.resolve_escalation(db=db, escalation_id=escalation_id)
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
 
 
 # ── Support Tickets ───────────────────────────────────────────────────────────

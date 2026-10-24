@@ -6,6 +6,7 @@ Handles: Gemini interaction, SQL validation & execution, conversation persistenc
 
 Uses the new unified `google-genai` SDK with async client (`client.aio`).
 """
+import contextlib
 import json
 import re
 import uuid
@@ -902,7 +903,7 @@ async def _answer_with_grounded_ai(
         facts = [fallback_message]
 
     try:
-        client = get_gemini_client()
+        get_gemini_client()  # fail fast when Gemini is not configured
     except GeminiConfigError:
         return fallback_message
 
@@ -2875,7 +2876,7 @@ async def _handle_function_call(
         columns = list(result.keys())
 
         # Serialize results to JSON-friendly format
-        query_result = [dict(zip(columns, row)) for row in rows]
+        query_result = [dict(zip(columns, row, strict=True)) for row in rows]
 
         # Convert non-serializable types (UUID, datetime, etc.)
         query_result = _make_json_serializable(query_result)
@@ -3844,10 +3845,8 @@ def _support_chat_order_snapshot(order: "Order") -> str:
     substatus = (order.warehouse_substatus or "").upper()
     scheduled = ""
     if order.scheduled_at:
-        try:
+        with contextlib.suppress(Exception):
             scheduled = f"Scheduled for: {order.scheduled_at.strftime('%d %b %Y %H:%M UTC')}\n"
-        except Exception:
-            pass
     driver_line = (
         f"Driver assigned: YES (assigned_driver_id={order.assigned_driver_id})\n"
         if order.assigned_driver_id
@@ -4225,7 +4224,7 @@ def _scope_sql_for_user(sql: str, user: User) -> str:
             pattern = rf"(?i)\b(FROM|JOIN)\s+{table}\b"
             scoped_sql = re.sub(
                 pattern,
-                lambda m, sq=subquery: f"{m.group(1)} {sq} {table}",
+                lambda m, sq=subquery, alias=table: f"{m.group(1)} {sq} {alias}",
                 scoped_sql,
             )
         return scoped_sql

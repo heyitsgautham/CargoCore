@@ -72,6 +72,7 @@ __all__ = [
 	"OrderItem",
 	"OrderPayment",
 	"PackingStation",
+	"PickedItem",
 	"QualityCheck",
 	"ReturnGrading",
 	"Role",

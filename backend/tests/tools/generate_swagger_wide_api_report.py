@@ -110,7 +110,7 @@ def _extract_operations_from_endpoint_text(endpoint: str) -> set[str]:
         return operations
 
     if len(paths) == len(methods):
-        for method, path in zip(methods, paths):
+        for method, path in zip(methods, paths, strict=True):
             operations.add(_normalize_operation(f"{method} {path}"))
         return operations
 

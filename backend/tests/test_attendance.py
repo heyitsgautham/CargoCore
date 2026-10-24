@@ -17,8 +17,8 @@ from sqlalchemy import select
 backend_path = Path(__file__).parent / "backend"
 sys.path.insert(0, str(backend_path))
 
-from app.database import AsyncSessionLocal
-from app.models.user import User
+from app.database import AsyncSessionLocal  # noqa: E402
+from app.models.user import User  # noqa: E402
 
 
 async def check_attendance():

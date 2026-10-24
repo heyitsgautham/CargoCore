@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, status
 from fastapi.responses import HTMLResponse
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -377,7 +378,6 @@ async def upsert_items(
     return await orders_service.upsert_order_items(db, order_id, items)
 
 
-from pydantic import BaseModel, Field
 
 
 class DeliveryOtpSendRequest(BaseModel):

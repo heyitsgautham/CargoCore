@@ -96,9 +96,7 @@ async def _override_redis():
 def auth_required(operation_spec: dict, global_security: list) -> bool:
     if "security" in operation_spec:
         operation_security = operation_spec.get("security")
-        if operation_security == []:
-            return False
-        return True
+        return operation_security != []
     return bool(global_security)
 
 

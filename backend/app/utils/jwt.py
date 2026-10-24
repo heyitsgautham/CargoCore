@@ -63,5 +63,5 @@ def decode_token(token: str) -> dict[str, Any]:
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
         return payload
-    except JWTError:
-        raise credentials_exception
+    except JWTError as e:
+        raise credentials_exception from e

@@ -1,5 +1,5 @@
 import asyncio
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -67,10 +67,8 @@ async def lifespan(app: FastAPI):
     yield
 
     recurring_task.cancel()
-    try:
+    with suppress(asyncio.CancelledError):
         await recurring_task
-    except asyncio.CancelledError:
-        pass
 
     # Shutdown: dispose async engines
     await engine.dispose()

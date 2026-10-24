@@ -1,10 +1,17 @@
+import json
+from pathlib import Path
 from uuid import UUID
 
 from fastapi import HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.inventory import InventoryItem, InventoryMovement, RestockRequest
+from app.models.inventory import (
+    InventoryItem,
+    InventoryMovement,
+    MaterialRequest,
+    RestockRequest,
+)
 from app.models.logistics import LogisticsEscalation
 from app.models.order import Order, OrderItem
 from app.models.user import User
@@ -16,6 +23,11 @@ from app.schemas.inventory import (
     InventoryMovementResponse,
     InventoryResponse,
     InventoryUpdate,
+    MaterialRequestApprove,
+    MaterialRequestCreate,
+    MaterialRequestListResponse,
+    MaterialRequestReject,
+    MaterialRequestResponse,
     PickingListItem,
     PickingListResponse,
     RestockRequestCreate,
@@ -586,17 +598,6 @@ async def escalate_restock_request(
 # Material Request Functions (WM requests new packing material -> LM approves)
 # ─────────────────────────────────────────────────────────────────────────────
 
-import json
-from pathlib import Path
-
-from app.models.inventory import MaterialRequest
-from app.schemas.inventory import (
-    MaterialRequestApprove,
-    MaterialRequestCreate,
-    MaterialRequestListResponse,
-    MaterialRequestReject,
-    MaterialRequestResponse,
-)
 
 _RATES_CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "rates_config.json"
 

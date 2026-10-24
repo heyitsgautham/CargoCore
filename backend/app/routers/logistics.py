@@ -2,6 +2,7 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
@@ -573,7 +574,6 @@ async def end_shift(
     return await logistics_service.end_shift(db, user)
 
 
-from pydantic import BaseModel
 
 
 class VehicleReturnRequest(BaseModel):

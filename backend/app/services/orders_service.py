@@ -113,10 +113,7 @@ def _mask_email(email: str) -> str:
     local, _, domain = email.partition("@")
     if not domain:
         return email
-    if len(local) <= 2:
-        masked_local = f"{local[:1]}***"
-    else:
-        masked_local = f"{local[:2]}***"
+    masked_local = f"{local[:1]}***" if len(local) <= 2 else f"{local[:2]}***"
     return f"{masked_local}@{domain}"
 
 
@@ -1723,7 +1720,7 @@ async def optimize_routes(
 
     # 7. Build route dicts
     routes = []
-    for driver_idx, (profile, user) in enumerate(drivers):
+    for driver_idx, (_profile, user) in enumerate(drivers):
         stops = driver_stops[driver_idx]
         if not stops:
             continue
@@ -2642,7 +2639,7 @@ async def auto_balance_drivers(db: AsyncSession) -> dict:
     
     # Build driver load map
     driver_loads = []
-    for profile, user in drivers:
+    for _profile, user in drivers:
         driver_id = str(user.id)
         count = order_counts.get(driver_id, 0)
         driver_loads.append({
@@ -2707,7 +2704,6 @@ async def auto_balance_drivers(db: AsyncSession) -> dict:
                 break
             
             # Transfer the order
-            old_driver_id = order_to_transfer.assigned_driver_id
             order_to_transfer.assigned_driver_id = under_driver["driver_id"]
             db.add(order_to_transfer)
             
@@ -2741,7 +2737,7 @@ async def auto_balance_drivers(db: AsyncSession) -> dict:
     new_loads = [d["order_count"] for d in driver_loads]
     if new_loads:
         mean = sum(new_loads) / len(new_loads)
-        variance = sum((l - mean) ** 2 for l in new_loads) / len(new_loads)
+        variance = sum((load - mean) ** 2 for load in new_loads) / len(new_loads)
         std_dev = math.sqrt(variance)
         balance_score = max(0, min(100, round(100 - (std_dev * 25))))
     else:

@@ -107,10 +107,8 @@ def _tracking_log(order: Order, qc_checked_at=None) -> list[dict]:
         ws = "AWAITING_PICK"
 
     AFTER_AWAITING = {"PICKING", "PICKED", "PACKING", "PACKED", "QC_PASSED", "READY_FOR_DISPATCH", "ON_DOCK", "DISPATCHED"}
-    AFTER_PICKING  = {"PICKED", "PACKING", "PACKED", "QC_PASSED", "READY_FOR_DISPATCH", "ON_DOCK", "DISPATCHED"}
     AFTER_PICKED   = {"PACKING", "PACKED", "QC_PASSED", "READY_FOR_DISPATCH", "ON_DOCK", "DISPATCHED"}
     AFTER_PACKING  = {"PACKED", "QC_PASSED", "READY_FOR_DISPATCH", "ON_DOCK", "DISPATCHED"}
-    AFTER_PACKED   = {"QC_PASSED", "READY_FOR_DISPATCH", "ON_DOCK", "DISPATCHED"}
     AFTER_QC       = {"READY_FOR_DISPATCH", "ON_DOCK", "DISPATCHED"}
     AFTER_READY    = {"ON_DOCK", "DISPATCHED"}
 
@@ -638,7 +636,7 @@ async def create_customer_damage_report(db: AsyncSession, user: User, data: Cust
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Invalid order ID format: '{data.order_id}'. Please select a valid order.",
-            )
+            ) from None
 
     resolution_type = data.resolution_type if data.resolution_type in {"photo_review", "pickup_inspection"} else "photo_review"
 

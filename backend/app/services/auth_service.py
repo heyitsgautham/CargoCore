@@ -7,6 +7,8 @@ import secrets
 from datetime import UTC, datetime
 
 from fastapi import HTTPException, status
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
 from loguru import logger
 from redis.asyncio import Redis
 from sqlalchemy import or_, select
@@ -719,8 +721,6 @@ async def verify_login_otp(db: AsyncSession, redis: Redis | None, data: VerifyOT
     return _build_login_response(user)
 
 
-from google.auth.transport import requests as google_requests
-from google.oauth2 import id_token
 
 
 async def google_login_or_register(db: AsyncSession, redis: Redis, data: GoogleLoginRequest) -> LoginResponse:
@@ -806,5 +806,5 @@ async def google_login_or_register(db: AsyncSession, redis: Redis, data: GoogleL
             settings.google_client_id,
             data.credential[:24] if data.credential else "",
         )
-        raise HTTPException(status_code=400, detail=f"Invalid Google token: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Invalid Google token: {str(e)}") from e
 

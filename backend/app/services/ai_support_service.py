@@ -1,3 +1,4 @@
+import contextlib
 import re
 import uuid
 from collections import defaultdict
@@ -2809,14 +2810,12 @@ async def _latest_sentiment_for_users(
 def _parse_support_messages(raw: list[dict] | None) -> list[SupportMessageItem]:
     result = []
     for m in (raw or []):
-        try:
+        with contextlib.suppress(Exception):
             result.append(SupportMessageItem(
                 text=m.get("text", ""),
                 sent_by=m.get("sent_by", "Support Agent"),
                 sent_at=m.get("sent_at", ""),
             ))
-        except Exception:
-            pass
     return result
 
 

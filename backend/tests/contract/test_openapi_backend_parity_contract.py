@@ -22,7 +22,7 @@ def _load_openapi() -> dict:
 def _collect_documented_operations(openapi_data: dict) -> set[tuple[str, str]]:
     documented: set[tuple[str, str]] = set()
     for path, methods in openapi_data.get("paths", {}).items():
-        for method in methods.keys():
+        for method in methods:
             method_name = str(method).lower()
             if method_name in {"get", "post", "put", "delete", "patch"}:
                 documented.add((str(path), method_name))

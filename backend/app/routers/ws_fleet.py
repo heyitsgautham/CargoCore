@@ -14,6 +14,7 @@ Driver Alert Flow:
   3. Driver app receives alert and shows notification.
 """
 import asyncio
+import contextlib
 import json
 from typing import Any
 
@@ -76,10 +77,8 @@ class DriverAlertManager:
             # Close existing connection if any
             old_ws = self._connections.get(driver_id)
             if old_ws:
-                try:
+                with contextlib.suppress(Exception):
                     await old_ws.close()
-                except Exception:
-                    pass
             self._connections[driver_id] = ws
 
     async def disconnect(self, driver_id: str):

@@ -26,7 +26,6 @@ def test_endpoints():
     print("\n--- 2. Vehicles ---")
     resp = requests.get(f"{base_url}/logistics/vehicles", headers=headers)
     print("✅ Vehicles (/logistics/vehicles):", "OK" if resp.ok else f"Failed {resp.status_code}")
-    vehicles = resp.json() if resp.ok else []
 
     # 4. Check Dashboard
     print("\n--- 3. Dashboard ---")
