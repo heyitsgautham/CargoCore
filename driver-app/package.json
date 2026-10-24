@@ -12,7 +12,7 @@
     },
     "dependencies": {
         "@capacitor-community/camera-preview": "^6.0.0",
-        "@capacitor-community/image-to-text": "^6.0.1",
+        "@capacitor-community/image-to-text": "^8.0.0",
         "@capacitor-community/speech-recognition": "^5.1.0",
         "@capacitor-community/text-to-speech": "^8.0.0",
         "@capacitor-mlkit/barcode-scanning": "^6.2.0",
