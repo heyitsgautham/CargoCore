@@ -15,6 +15,7 @@ from app.routers import damage_reports as damage_reports_router
 from app.routers import dev_seed as dev_seed_router
 from app.routers import finance as finance_router
 from app.routers import geocoding as geocoding_router
+from app.routers import health as health_router
 from app.routers import inventory as inventory_router
 from app.routers import labourers as labourers_router
 from app.routers import logistics as logistics_router
@@ -139,10 +140,8 @@ def create_app() -> FastAPI:
     # Role-gated (LOGISTIC_MANAGER / DISPATCHER) — safe to include in all envs.
     app.include_router(dev_seed_router.router)
 
-    # ── Health check ──────────────────────────────────────────────────────────
-    @app.get("/health", tags=["Health"])
-    async def health_check():
-        return {"status": "ok"}
+    # ── Health checks ─────────────────────────────────────────────────────────
+    app.include_router(health_router.router)
 
     return app
 
