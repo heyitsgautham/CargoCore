@@ -22,6 +22,8 @@ COPY --from=builder /install /usr/local
 COPY app/ ./app/
 COPY alembic/ ./alembic/
 COPY alembic.ini ./alembic.ini
+# Rate card read by the rates router, inventory and return-charge services
+COPY rates_config.json ./rates_config.json
 
 # Ownership
 RUN chown -R appuser:appgroup /app
