@@ -6,6 +6,7 @@ All Gemini API calls are mocked — no real LLM calls in tests.
 Uses the new google-genai SDK patterns (client.aio.models.generate_content).
 """
 import uuid
+from contextlib import ExitStack, contextmanager
 from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -19,6 +20,17 @@ from app.models.order import Order
 from app.models.support_ticket import SupportTicket
 from app.models.user import Role, User
 from tests.conftest import REGISTER_PAYLOAD
+
+
+@contextmanager
+def _patch_gemini(**kwargs):
+    """Patch the Gemini client everywhere the chat flow builds one."""
+    with ExitStack() as stack:
+        mocks = [
+            stack.enter_context(patch(f"app.services.ai_chat.{module}.get_gemini_client", **kwargs))
+            for module in ("chat", "support_handoff")
+        ]
+        yield mocks[0]
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -97,7 +109,7 @@ class TestChatGeneral:
         text_response = _mock_gemini_text_response("Hello! How can I help you today?")
         mock_client = _mock_gemini_client([text_response])
 
-        with patch("app.services.ai_service.get_gemini_client", return_value=mock_client):
+        with _patch_gemini(return_value=mock_client):
             resp = await client.post(
                 "/api/v1/ai/chat",
                 json={"message": "Hello!"},
@@ -122,7 +134,7 @@ class TestChatGeneral:
         )
         mock_client = _mock_gemini_client([text_response])
 
-        with patch("app.services.ai_service.get_gemini_client", return_value=mock_client):
+        with _patch_gemini(return_value=mock_client):
             resp = await client.post(
                 "/api/v1/ai/chat",
                 json={"message": "What is logistics management?"},
@@ -203,7 +215,7 @@ class TestChatDatabaseQuery:
         )
         mock_client = _mock_gemini_client([fn_call_response, final_response])
 
-        with patch("app.services.ai_service.get_gemini_client", return_value=mock_client):
+        with _patch_gemini(return_value=mock_client):
             resp = await client.post(
                 "/api/v1/ai/chat",
                 json={"message": "How many users are registered?"},
@@ -246,7 +258,7 @@ class TestChatDatabaseQuery:
             side_effect=RuntimeError("quota exceeded")
         )
 
-        with patch("app.services.ai_service.get_gemini_client", return_value=failing_client):
+        with _patch_gemini(return_value=failing_client):
             resp = await client.post(
                 "/api/v1/ai/chat",
                 json={"message": "QC-TEST123 order status"},
@@ -320,7 +332,7 @@ class TestChatSQLValidation:
         )
         mock_client = _mock_gemini_client([fn_call_response, error_response])
 
-        with patch("app.services.ai_service.get_gemini_client", return_value=mock_client):
+        with _patch_gemini(return_value=mock_client):
             resp = await client.post(
                 "/api/v1/ai/chat",
                 json={"message": "Drop the users table"},
@@ -346,7 +358,7 @@ class TestChatSQLValidation:
         )
         mock_client = _mock_gemini_client([fn_call_response, error_response])
 
-        with patch("app.services.ai_service.get_gemini_client", return_value=mock_client):
+        with _patch_gemini(return_value=mock_client):
             resp = await client.post(
                 "/api/v1/ai/chat",
                 json={"message": "Show me user passwords"},
@@ -395,7 +407,7 @@ class TestConversationPersistence:
         text_response = _mock_gemini_text_response("Hi there!")
         mock_client = _mock_gemini_client([text_response])
 
-        with patch("app.services.ai_service.get_gemini_client", return_value=mock_client):
+        with _patch_gemini(return_value=mock_client):
             resp = await client.post(
                 "/api/v1/ai/chat",
                 json={"message": "Hi"},
@@ -666,8 +678,7 @@ class TestGeminiUnconfigured:
 
         from app.utils.gemini import GeminiConfigError
 
-        with patch(
-            "app.services.ai_service.get_gemini_client",
+        with _patch_gemini(
             side_effect=GeminiConfigError("Gemini API key is not configured."),
         ):
             resp = await client.post(
