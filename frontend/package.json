@@ -35,7 +35,7 @@
   "devDependencies": {
     "@eslint/js": "9.39.5",
     "@tailwindcss/vite": "4.1.12",
-    "@vitejs/plugin-vue": "^5.2.1",
+    "@vitejs/plugin-vue": "^6.0.10",
     "@vitest/coverage-v8": "4.1.12",
     "@vue/test-utils": "2.5.1",
     "eslint": "9.39.5",
