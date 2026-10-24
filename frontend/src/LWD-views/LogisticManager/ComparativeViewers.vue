@@ -270,7 +270,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useLogisticStore } from '@/stores/logisticStore'
 import {
   Chart as ChartJS,
@@ -335,7 +335,7 @@ const downloadReport = (name) => {
 
 // --- Real data helpers (per hub) ---
 
-const getHubAlerts = (hubId) => store.alerts
+const getHubAlerts = (_hubId) => store.alerts
 
 const getHubOrders = (hubId) =>
     store.transactions.filter(t => t.hubId === hubId && t.amount > 0).length

@@ -4,13 +4,6 @@ import { apiUrl } from '@/config/api'
 import { useRates } from '@/composables/useRates'
 import { buildPodData } from '@/utils/pod'
 
-let orderCounter = 3050
-
-function generateOrderId() {
-    orderCounter++
-    return `MOV-${orderCounter}`
-}
-
 export const useIndividualStore = defineStore('individual', () => {
     const { rates } = useRates()
     const authUser = typeof window !== 'undefined'

@@ -47,7 +47,7 @@
 <script setup>
 import BaseModal from '../components/BaseModal.vue'
 
-const props = defineProps({
+defineProps({
     isOpen: Boolean,
     hubs: Array,
     activeId: [String, Number]

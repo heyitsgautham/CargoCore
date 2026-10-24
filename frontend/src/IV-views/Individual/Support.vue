@@ -284,7 +284,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { sendChat, fetchConversation } from '@/utils/aiApi'
 import { useIndividualStore } from '@/stores/individualStore'
 

@@ -1535,8 +1535,6 @@ export const useLogisticStore = defineStore('logistic', () => {
         filteredDamageClaims,
         filteredSecurityLogs,
         equipmentLedger,
-        reportAiInsights,
-        reportMetrics,
         openModal,
         closeModal,
         addTransaction,

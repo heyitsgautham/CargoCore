@@ -430,7 +430,7 @@ onMounted(() => {
         }
     })
 
-    frames.slice(1).forEach((frame, i) => {
+    frames.slice(1).forEach((frame) => {
         tlLogistic.to(frame, {
             yPercent: 0,
             duration: 1,

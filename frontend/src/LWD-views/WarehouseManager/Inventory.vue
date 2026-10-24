@@ -576,7 +576,7 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, inject, watch, onMounted } from 'vue'
+import { ref, computed, reactive, inject, watch } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { getStoredAccessToken } from '@/config/api'
 

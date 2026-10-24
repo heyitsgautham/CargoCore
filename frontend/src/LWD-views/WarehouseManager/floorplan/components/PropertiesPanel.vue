@@ -1,3 +1,5 @@
+<!-- The panel edits the selected floor-plan element in place; the parent owns that reactive object and saves it. -->
+<!-- eslint-disable vue/no-mutating-props -->
 <template>
     <div class="glass-panel rounded-xl p-4 space-y-3" v-if="element">
         <h3 class="font-bold text-gray-900 dark:text-white text-sm flex items-center gap-1">

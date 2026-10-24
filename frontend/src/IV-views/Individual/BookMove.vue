@@ -917,7 +917,7 @@ function handleBookingClick() {
 
 const razorpayMethod = ref('Online')
 
-function onRazorpaySuccess({ payment_id, method, amount }) {
+function onRazorpaySuccess({ payment_id, method }) {
     razorpayMethod.value = method
     showPaymentModal.value = false
     confirmBooking(payment_id, method)

@@ -99,7 +99,6 @@ const routes = [
           INDIVIDUAL: '/individual/dashboard',
           VENDOR: '/vendor/dashboard',
           LOGISTIC_MANAGER: '/logistic/dashboard',
-          LOGISTIC_MANAGER: '/logistic/dashboard',
           WAREHOUSE_MANAGER: '/warehouse/dashboard',
           DISPATCHER: '/dispatcher/dashboard',
           DRIVER: '/driver/dashboard',

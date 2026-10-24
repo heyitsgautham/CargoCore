@@ -262,7 +262,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useWarehouseFloorStore } from '@/stores/warehouseFloorStore'
 import { useAuthStore } from '@/stores/authStore'
 import {
@@ -277,7 +277,7 @@ import {
     LineElement,
     ArcElement
 } from 'chart.js'
-import { Bar, Doughnut, Line } from 'vue-chartjs'
+import { Doughnut, Line } from 'vue-chartjs'
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement, ArcElement)
 

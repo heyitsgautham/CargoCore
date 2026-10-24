@@ -478,7 +478,6 @@ import {
   Lock,
   Building2,
   MapPin,
-  Truck,
   CheckCircle2,
   ArrowRight,
   ArrowLeft,

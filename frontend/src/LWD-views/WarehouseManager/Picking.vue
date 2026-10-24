@@ -290,7 +290,7 @@
                                     {{ wave.laborAssigned?.length || 0 }}/{{ wave.laborRequired }}
                                 </span>
                                 <div v-if="wave.laborAssigned?.length" class="flex -space-x-1">
-                                    <span v-for="(l, idx) in wave.laborAssigned.slice(0, 3)" :key="l.id"
+                                    <span v-for="l in wave.laborAssigned.slice(0, 3)" :key="l.id"
                                         class="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center text-[9px] font-bold border border-white dark:border-gray-800">
                                         {{ (l.name || 'L')[0] }}
                                     </span>

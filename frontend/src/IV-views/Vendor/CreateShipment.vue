@@ -1305,7 +1305,7 @@ async function submitShipment() {
     }
 }
 
-async function onRazorpaySuccess({ payment_id, method, amount }) {
+async function onRazorpaySuccess({ method, amount }) {
     showPayModal.value = false
     if (pendingPayOrder.value) {
         const invoice = store.invoices.find(inv => inv.orderId === pendingPayOrder.value.id)

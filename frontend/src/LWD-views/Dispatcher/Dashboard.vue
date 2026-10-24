@@ -1759,7 +1759,7 @@ let chatMsgId = 1
 function chatWithDriver(driver) {
     chatDriver.value = driver
     driverChatMessages.value = [
-        { id: chatMsgId++, from: 'driver', text: `Hi dispatch, I\'m at ${driver.location}. Ready for next instructions.` },
+        { id: chatMsgId++, from: 'driver', text: `Hi dispatch, I'm at ${driver.location}. Ready for next instructions.` },
         { id: chatMsgId++, from: 'dispatch', text: `Copy ${driver.name.split(' ')[0]}. Stand by for assignment update.` }
     ]
     showChatModal.value = true
@@ -1814,7 +1814,7 @@ function onDriverDragOver(event, driver) {
     dragOverDriver.value = driver.id
 }
 
-function onDropOnDriverPanel(event) {
+function onDropOnDriverPanel(_event) {
     dragOverDriver.value = null
 }
 
