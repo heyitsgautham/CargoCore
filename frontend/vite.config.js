@@ -17,7 +17,14 @@ function htmlSlipsPlugin() {
         const filePath = path.join(__dirname, 'html-slips', req.url.replace(/^\//, ''))
         if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
           const ext = path.extname(filePath)
-          const mime = ext === '.html' ? 'text/html' : ext === '.png' ? 'image/png' : ext === '.jpeg' || ext === '.jpg' ? 'image/jpeg' : 'application/octet-stream'
+          const mime =
+            ext === '.html'
+              ? 'text/html'
+              : ext === '.png'
+                ? 'image/png'
+                : ext === '.jpeg' || ext === '.jpg'
+                  ? 'image/jpeg'
+                  : 'application/octet-stream'
           res.setHeader('Content-Type', mime)
           fs.createReadStream(filePath).pipe(res)
         } else {
@@ -30,16 +37,12 @@ function htmlSlipsPlugin() {
       const destDir = path.join(outDir, 'html-slips')
       fs.mkdirSync(destDir, { recursive: true })
       fs.cpSync(srcDir, destDir, { recursive: true })
-    }
+    },
   }
 }
 
 export default defineConfig({
-  plugins: [
-    vue(),
-    tailwindcss(),
-    htmlSlipsPlugin(),
-  ],
+  plugins: [vue(), tailwindcss(), htmlSlipsPlugin()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

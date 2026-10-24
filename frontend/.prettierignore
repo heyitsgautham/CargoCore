@@ -1,0 +1,11 @@
+# Existing source predates this config and keeps its current layout until each file is next edited.
+# New directories opt in by being left off this list.
+dist/
+coverage/
+node_modules/
+html-slips/
+public/
+src/
+package-lock.json
+*.md
+index.html
