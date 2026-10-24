@@ -8,6 +8,11 @@ import pytest
 from fastapi import HTTPException
 
 from app.services import vendor_service
+from app.services.vendor import billing as vendor_billing
+from app.services.vendor import recurring_estimate as vendor_recurring_estimate
+from app.services.vendor import recurring_rules as vendor_recurring_rules
+from app.services.vendor import recurring_runs as vendor_recurring_runs
+from app.services.vendor import shipments as vendor_shipments
 
 
 def _make_user(*, role_name: str = "VENDOR") -> SimpleNamespace:
@@ -71,28 +76,28 @@ def _make_order(**overrides) -> SimpleNamespace:
 
 def test_ensure_vendor_rejects_non_vendor_user() -> None:
     with pytest.raises(HTTPException) as exc_info:
-        vendor_service._ensure_vendor(_make_user(role_name="INDIVIDUAL"))
+        vendor_shipments._ensure_vendor(_make_user(role_name="INDIVIDUAL"))
 
     assert exc_info.value.status_code == 403
 
 
 def test_is_active_vendor_owner_helper() -> None:
-    assert vendor_service._is_active_vendor_owner(_make_user()) is True
-    assert vendor_service._is_active_vendor_owner(SimpleNamespace(is_active=False)) is False
-    assert vendor_service._is_active_vendor_owner(None) is False
+    assert vendor_shipments._is_active_vendor_owner(_make_user()) is True
+    assert vendor_shipments._is_active_vendor_owner(SimpleNamespace(is_active=False)) is False
+    assert vendor_shipments._is_active_vendor_owner(None) is False
 
 
 def test_status_key_and_shipment_status_key_mappings() -> None:
-    assert vendor_service._status_key("ASSIGNED") == "transit"
-    assert vendor_service._shipment_status_key("CONFIRMED", "AWAITING_PICK") == "warehouse"
-    assert vendor_service._shipment_status_key("IN_TRANSIT", None) == "transit"
+    assert vendor_shipments._status_key("ASSIGNED") == "transit"
+    assert vendor_shipments._shipment_status_key("CONFIRMED", "AWAITING_PICK") == "warehouse"
+    assert vendor_shipments._shipment_status_key("IN_TRANSIT", None) == "transit"
 
 
 def test_status_label_and_progress_values() -> None:
-    assert vendor_service._status_label("warehouse") == "In Warehouse"
-    assert vendor_service._status_label("custom_status") == "Custom Status"
-    assert vendor_service._progress("warehouse") == 35
-    assert vendor_service._progress("unknown") == 0
+    assert vendor_shipments._status_label("warehouse") == "In Warehouse"
+    assert vendor_shipments._status_label("custom_status") == "Custom Status"
+    assert vendor_shipments._progress("warehouse") == 35
+    assert vendor_shipments._progress("unknown") == 0
 
 
 def test_eta_label_variants() -> None:
@@ -100,24 +105,24 @@ def test_eta_label_variants() -> None:
     cancelled = _make_order(status="CANCELLED")
     scheduled = _make_order(status="ASSIGNED", scheduled_at=datetime(2026, 4, 30, 11, 0, tzinfo=UTC))
 
-    assert vendor_service._eta_label(delivered) == "Delivered"
-    assert vendor_service._eta_label(cancelled) == "Cancelled"
-    assert "2026" in vendor_service._eta_label(scheduled)
+    assert vendor_shipments._eta_label(delivered) == "Delivered"
+    assert vendor_shipments._eta_label(cancelled) == "Cancelled"
+    assert "2026" in vendor_shipments._eta_label(scheduled)
 
 
 def test_history_includes_cancelled_reason() -> None:
     order = _make_order(status="CANCELLED", cancel_reason="Customer stopped shipment")
 
-    history = vendor_service._history(order)
+    history = vendor_shipments._history(order)
 
     assert history[0].status == "Created"
     assert any(item.status == "Cancelled: Customer stopped shipment" for item in history)
 
 
 def test_parse_rule_details_handles_invalid_json() -> None:
-    assert vendor_service._parse_rule_details("not-json") == {}
-    assert vendor_service._parse_rule_details("[]") == {}
-    assert vendor_service._parse_rule_details('{"hub":"A"}') == {"hub": "A"}
+    assert vendor_recurring_runs._parse_rule_details("not-json") == {}
+    assert vendor_recurring_runs._parse_rule_details("[]") == {}
+    assert vendor_recurring_runs._parse_rule_details('{"hub":"A"}') == {"hub": "A"}
 
 
 @pytest.mark.parametrize(
@@ -132,31 +137,31 @@ def test_parse_rule_details_handles_invalid_json() -> None:
     ],
 )
 def test_is_auto_debit_enabled_variants(value, expected: bool) -> None:
-    assert vendor_service._is_auto_debit_enabled({"autoDebitEnabled": value}) is expected
+    assert vendor_recurring_runs._is_auto_debit_enabled({"autoDebitEnabled": value}) is expected
 
 
 def test_parse_rule_marker_valid_and_invalid() -> None:
     rule_id = uuid4()
     valid = f"RECURRING_RULE:{rule_id}|RUN:2026-04-20"
 
-    parsed_rule_id, run_iso = vendor_service._parse_rule_marker(valid)
+    parsed_rule_id, run_iso = vendor_recurring_runs._parse_rule_marker(valid)
     assert parsed_rule_id == rule_id
     assert run_iso == "2026-04-20"
 
-    assert vendor_service._parse_rule_marker("invalid") == (None, None)
+    assert vendor_recurring_runs._parse_rule_marker("invalid") == (None, None)
 
 
 def test_append_auto_debit_event_is_idempotent_for_same_marker() -> None:
     order = _make_order(delivery_notes="seed")
 
-    vendor_service._append_auto_debit_event(
+    vendor_recurring_runs._append_auto_debit_event(
         order,
         run_iso="2026-04-20",
         event_type="SUCCESS",
         message="Debited",
     )
     first = order.delivery_notes
-    vendor_service._append_auto_debit_event(
+    vendor_recurring_runs._append_auto_debit_event(
         order,
         run_iso="2026-04-20",
         event_type="SUCCESS",
@@ -175,42 +180,42 @@ def test_latest_auto_debit_note_formats_event_types() -> None:
         ]
     )
 
-    message = vendor_service._latest_auto_debit_note(notes)
+    message = vendor_shipments._latest_auto_debit_note(notes)
 
     assert message == "Auto-debit processed with wallet debt: Wallet -50"
 
 
 def test_safe_float_and_tracking_code() -> None:
-    assert vendor_service._safe_float("12.5") == 12.5
-    assert vendor_service._safe_float("abc") is None
-    code = vendor_service._tracking_code()
+    assert vendor_recurring_estimate._safe_float("12.5") == 12.5
+    assert vendor_recurring_estimate._safe_float("abc") is None
+    code = vendor_recurring_runs._tracking_code()
     assert code.startswith("QC-")
     assert len(code) == 13
 
 
 def test_normalize_uuid_and_estimate_note_helpers() -> None:
     raw = str(uuid4())
-    parsed = vendor_service._normalize_uuid(raw)
+    parsed = vendor_recurring_estimate._normalize_uuid(raw)
 
     assert parsed is not None
     assert str(parsed) == raw
-    assert vendor_service._normalize_uuid("not-a-uuid") is None
+    assert vendor_recurring_estimate._normalize_uuid("not-a-uuid") is None
 
-    zone_note = vendor_service._build_recurring_estimate_note(
+    zone_note = vendor_recurring_estimate._build_recurring_estimate_note(
         warehouse_name="BANGALORE-HUB",
         warehouse_source="hub_id",
         pickup_source="geofence_zone",
         pickup_reference="BANGALORE HUB-01",
         distance_method="road_route",
     )
-    missing_note = vendor_service._build_recurring_estimate_note(
+    missing_note = vendor_recurring_estimate._build_recurring_estimate_note(
         warehouse_name="BANGALORE-HUB",
         warehouse_source="first_active",
         pickup_source="missing_coordinates",
         pickup_reference=None,
         distance_method="road_route",
     )
-    fallback_note = vendor_service._build_recurring_estimate_note(
+    fallback_note = vendor_recurring_estimate._build_recurring_estimate_note(
         warehouse_name="BANGALORE-HUB",
         warehouse_source="hub_name",
         pickup_source="warehouse_coordinates",
@@ -224,8 +229,8 @@ def test_normalize_uuid_and_estimate_note_helpers() -> None:
 
 
 def test_fallback_route_km_uses_buffered_minimum_distance() -> None:
-    same_point = vendor_service._fallback_route_km(12.97, 77.59, 12.97, 77.59)
-    longer = vendor_service._fallback_route_km(12.97, 77.59, 13.08, 77.61)
+    same_point = vendor_recurring_estimate._fallback_route_km(12.97, 77.59, 12.97, 77.59)
+    longer = vendor_recurring_estimate._fallback_route_km(12.97, 77.59, 13.08, 77.61)
 
     assert same_point == 1.0
     assert longer > 1.0
@@ -244,9 +249,9 @@ async def test_estimate_recurring_cost_uses_road_route_distance(monkeypatch: pyt
     async def fake_road_route(*args, **kwargs):
         return 18.4, "road_route"
 
-    monkeypatch.setattr(vendor_service, "_resolve_recurring_warehouse", fake_resolve_warehouse)
-    monkeypatch.setattr(vendor_service, "_resolve_recurring_pickup_origin", fake_pickup_origin)
-    monkeypatch.setattr(vendor_service, "_road_route_distance_km", fake_road_route)
+    monkeypatch.setattr(vendor_recurring_estimate, "_resolve_recurring_warehouse", fake_resolve_warehouse)
+    monkeypatch.setattr(vendor_recurring_estimate, "_resolve_recurring_pickup_origin", fake_pickup_origin)
+    monkeypatch.setattr(vendor_recurring_estimate, "_road_route_distance_km", fake_road_route)
 
     estimate = await vendor_service.estimate_recurring_cost(
         None,
@@ -267,31 +272,31 @@ async def test_estimate_recurring_cost_uses_road_route_distance(monkeypatch: pyt
 def test_next_run_for_frequency_rules() -> None:
     current = date(2026, 4, 17)  # Friday
 
-    assert vendor_service._next_run_for_frequency(current, "daily") == date(2026, 4, 18)
-    assert vendor_service._next_run_for_frequency(current, "bi-weekly") == date(2026, 5, 1)
-    assert vendor_service._next_run_for_frequency(current, "1st of month") == date(2026, 5, 1)
-    assert vendor_service._next_run_for_frequency(current, "15th of month") == date(2026, 5, 15)
-    assert vendor_service._next_run_for_frequency(current, "every monday") == date(2026, 4, 20)
-    assert vendor_service._next_run_for_frequency(current, "unknown") == date(2026, 4, 24)
+    assert vendor_recurring_runs._next_run_for_frequency(current, "daily") == date(2026, 4, 18)
+    assert vendor_recurring_runs._next_run_for_frequency(current, "bi-weekly") == date(2026, 5, 1)
+    assert vendor_recurring_runs._next_run_for_frequency(current, "1st of month") == date(2026, 5, 1)
+    assert vendor_recurring_runs._next_run_for_frequency(current, "15th of month") == date(2026, 5, 15)
+    assert vendor_recurring_runs._next_run_for_frequency(current, "every monday") == date(2026, 4, 20)
+    assert vendor_recurring_runs._next_run_for_frequency(current, "unknown") == date(2026, 4, 24)
 
 
 def test_scheduled_datetime_parsing_and_fallback() -> None:
-    dt = vendor_service._scheduled_datetime("2026-04-20", "14:45")
+    dt = vendor_recurring_runs._scheduled_datetime("2026-04-20", "14:45")
     assert dt is not None
     assert dt.hour == 14
     assert dt.minute == 45
 
-    fallback = vendor_service._scheduled_datetime("2026-04-20", "bad")
+    fallback = vendor_recurring_runs._scheduled_datetime("2026-04-20", "bad")
     assert fallback is not None
     assert fallback.hour == 9
     assert fallback.minute == 0
 
-    assert vendor_service._scheduled_datetime("not-a-date", "10:30") is None
+    assert vendor_recurring_runs._scheduled_datetime("not-a-date", "10:30") is None
 
 
 def test_compact_route_truncates_long_values() -> None:
     route = "A" * 300
-    compact = vendor_service._compact_route(route)
+    compact = vendor_recurring_rules._compact_route(route)
 
     assert len(compact) == 255
     assert compact.endswith("...")
@@ -303,11 +308,11 @@ def test_invoice_status_and_record_variants() -> None:
     partial = _make_order(created_at=now - timedelta(days=5), payment_status="pending", paid_amount=100.0)
     paid = _make_order(created_at=now - timedelta(days=5), payment_status="paid", paid_amount=0.0, total_amount=900.0)
 
-    assert vendor_service._invoice_status(overdue, now) == "Overdue"
-    assert vendor_service._invoice_status(partial, now) == "Partial"
-    assert vendor_service._invoice_status(paid, now) == "Paid"
+    assert vendor_billing._invoice_status(overdue, now) == "Overdue"
+    assert vendor_billing._invoice_status(partial, now) == "Partial"
+    assert vendor_billing._invoice_status(paid, now) == "Paid"
 
-    paid_record = vendor_service._invoice_record(paid, now)
+    paid_record = vendor_billing._invoice_record(paid, now)
     assert paid_record.status == "Paid"
     assert paid_record.paid == 900.0
 
@@ -317,7 +322,7 @@ def test_invoice_summary_computes_totals() -> None:
     overdue = _make_order(created_at=now - timedelta(days=40), payment_status="pending", paid_amount=0.0, total_amount=1000.0)
     paid = _make_order(created_at=now - timedelta(days=2), payment_status="paid", paid_amount=0.0, total_amount=800.0)
 
-    summary = vendor_service._invoice_summary([overdue, paid], credit_balance=125.5)
+    summary = vendor_billing._invoice_summary([overdue, paid], credit_balance=125.5)
 
     assert summary.total_overdue == 1000.0
     assert summary.total_unpaid == 1
@@ -329,7 +334,7 @@ def test_shipment_includes_driver_cost_and_auto_debit_note() -> None:
     notes = "AUTODEBIT_EVENT|RUN:2026-04-20|TYPE:SUCCESS|TS:2026-04-20T00:00:00|MSG:Debited"
     order = _make_order(delivery_notes=notes, warehouse_substatus="PICKING")
 
-    shipment = vendor_service._shipment(
+    shipment = vendor_shipments._shipment(
         order,
         driver_name="Driver One",
         driver_phone="9999988888",
@@ -350,7 +355,7 @@ def test_analytics_returns_success_and_on_time_metrics() -> None:
         _make_order(status="IN_TRANSIT", created_at=now - timedelta(days=2), scheduled_at=now + timedelta(days=1), total_amount=700.0),
     ]
 
-    analytics = vendor_service._analytics(orders)
+    analytics = vendor_billing._analytics(orders)
 
     assert analytics.success_rate == pytest.approx(66.7, rel=1e-3)
     assert analytics.on_time == pytest.approx(50.0, rel=1e-3)
