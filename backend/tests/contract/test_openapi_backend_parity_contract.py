@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
 import yaml
-from fastapi.routing import APIRoute
 
 from app.main import app
 
@@ -30,26 +28,17 @@ def _collect_documented_operations(openapi_data: dict) -> set[tuple[str, str]]:
 
 
 def _collect_backend_operations() -> set[tuple[str, str]]:
+    # Read the schema FastAPI generates instead of walking app.routes. Since
+    # FastAPI 0.16x, included routers appear in app.routes as wrapper objects,
+    # not APIRoute instances, so a route walk only saw routes declared on app.
     backend: set[tuple[str, str]] = set()
-
-    def _normalize_path(path: str) -> str:
-        # FastAPI route objects may include path converters like {item_id:uuid}
-        # while OpenAPI exports use {item_id}. Normalize before comparison.
-        return re.sub(r"\{([^}:]+):[^}]+\}", r"{\1}", path)
-
-    for route in app.routes:
-        if not isinstance(route, APIRoute):
+    for path, methods in app.openapi().get("paths", {}).items():
+        if not (path.startswith("/api/v1") or path == "/health"):
             continue
-        if not route.include_in_schema:
-            continue
-        if not (route.path.startswith("/api/v1") or route.path == "/health"):
-            continue
-
-        for method in route.methods or []:
+        for method in methods:
             method_name = str(method).lower()
-            if method_name in {"head", "options"}:
-                continue
-            backend.add((_normalize_path(route.path), method_name))
+            if method_name in {"get", "post", "put", "delete", "patch"}:
+                backend.add((path, method_name))
     return backend
 
 

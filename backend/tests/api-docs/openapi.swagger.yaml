@@ -7047,6 +7047,37 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
       description: Update Order.
+    delete:
+      tags:
+      - Orders
+      summary: Soft Delete Order
+      operationId: soft_delete_order_api_v1_orders__order_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: order_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Order Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Not authenticated
+          content: &id001
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      description: Soft Delete Order.
   /api/v1/orders/{order_id}/confirm:
     post:
       tags:
@@ -11742,6 +11773,102 @@ paths:
             application/json:
               schema: {}
       description: Health Check.
+  /api/v1/auth/send-login-otp:
+    post:
+      tags:
+      - Authentication
+      summary: Send login OTP to existing customer or vendor email
+      operationId: send_login_otp_api_v1_auth_send_login_otp_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendOTPRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignupOtpSendResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Send login OTP to existing customer or vendor email.
+  /api/v1/auth/verify-login-otp:
+    post:
+      tags:
+      - Authentication
+      summary: Verify login OTP and issue JWT tokens
+      operationId: verify_login_otp_api_v1_auth_verify_login_otp_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyOTPRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      description: Verify login OTP and issue JWT tokens.
+  /api/v1/vendor/recurring/estimate-cost:
+    post:
+      tags:
+      - Vendor
+      summary: Estimate Recurring Cost
+      description: 'Estimate the per-run delivery cost for a recurring schedule.
+
+
+        Uses road-route distance from the resolved hub pickup point to the
+
+        destination and applies the platform rate card (baseBookingFee + perKmRate).
+
+        If live routing is unavailable, the backend falls back to a buffered estimate.
+
+        This is called from the vendor''s Create Schedule form after the vendor
+
+        selects a destination on the map, so they can see the expected wallet debit
+
+        before confirming the schedule.'
+      operationId: estimate_recurring_cost_api_v1_vendor_recurring_estimate_cost_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendorRecurringCostEstimateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorRecurringCostEstimate'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+        '401':
+          description: Not authenticated
+          content: *id001
+      security:
+      - OAuth2PasswordBearer: []
 components:
   schemas:
     AgentReplyRequest:
@@ -22881,6 +23008,84 @@ components:
         detail:
           type: string
           title: Detail
+    VendorRecurringCostEstimateRequest:
+      properties:
+        hub_name:
+          type: string
+          title: Hub Name
+        hub_id:
+          anyOf:
+          - type: string
+            format: uuid
+          - type: 'null'
+          title: Hub Id
+        destination_lat:
+          type: number
+          title: Destination Lat
+        destination_lon:
+          type: number
+          title: Destination Lon
+        destination_address:
+          type: string
+          title: Destination Address
+          default: ''
+      type: object
+      required:
+      - hub_name
+      - destination_lat
+      - destination_lon
+      title: VendorRecurringCostEstimateRequest
+    VendorRecurringCostEstimate:
+      properties:
+        distance_km:
+          type: number
+          title: Distance Km
+        base_fee:
+          type: number
+          title: Base Fee
+        distance_cost:
+          type: number
+          title: Distance Cost
+        total_estimate:
+          type: number
+          title: Total Estimate
+        rate_per_km:
+          type: number
+          title: Rate Per Km
+        distance_method:
+          type: string
+          title: Distance Method
+          default: road_route
+        resolved_hub_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Resolved Hub Name
+        pickup_source:
+          type: string
+          title: Pickup Source
+          default: warehouse_coordinates
+        pickup_reference:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Pickup Reference
+        currency:
+          type: string
+          title: Currency
+          default: INR
+        note:
+          type: string
+          title: Note
+          default: Estimate based on road-route distance.
+      type: object
+      required:
+      - distance_km
+      - base_fee
+      - distance_cost
+      - total_estimate
+      - rate_per_km
+      title: VendorRecurringCostEstimate
   securitySchemes:
     OAuth2PasswordBearer:
       type: oauth2
