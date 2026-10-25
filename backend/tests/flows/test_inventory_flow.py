@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from app.services import inventory_service
+from app.services import material_request_service
 
 pytestmark = pytest.mark.asyncio
 
@@ -16,7 +16,7 @@ def rates_file(tmp_path, monkeypatch):
     """Approving a material request writes the rate card, so point it at a scratch copy."""
     path = tmp_path / "rates_config.json"
     path.write_text(json.dumps({"materials": [{"id": "box", "name": "Box", "rate": 50, "unit": "pcs"}]}))
-    monkeypatch.setattr(inventory_service, "_RATES_CONFIG_PATH", path)
+    monkeypatch.setattr(material_request_service, "_RATES_CONFIG_PATH", path)
     return path
 
 

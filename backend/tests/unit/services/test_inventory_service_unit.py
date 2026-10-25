@@ -7,7 +7,7 @@ from uuid import uuid4
 
 import pytest
 
-from app.services import inventory_service
+from app.services import inventory_service, material_request_service
 
 
 def test_split_zone_and_aisle_variants() -> None:
@@ -128,16 +128,16 @@ def test_to_restock_response_maps_requester_and_item() -> None:
 
 
 def test_material_sku_generation() -> None:
-    assert inventory_service._material_sku("Bubble Wrap") == "PKG-BUBBLE-WRAP"
-    assert inventory_service._material_sku("Foam Sheet") == "PKG-FOAM-SHEET"
+    assert material_request_service._material_sku("Bubble Wrap") == "PKG-BUBBLE-WRAP"
+    assert material_request_service._material_sku("Foam Sheet") == "PKG-FOAM-SHEET"
 
 
 def test_add_material_to_rates_adds_and_updates_material(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
     rates_path = tmp_path / "rates_config.json"
     rates_path.write_text(json.dumps({"materials": []}), encoding="utf-8")
-    monkeypatch.setattr(inventory_service, "_RATES_CONFIG_PATH", rates_path)
+    monkeypatch.setattr(material_request_service, "_RATES_CONFIG_PATH", rates_path)
 
-    inventory_service._add_material_to_rates("Foam Sheet", 42.5, "pcs")
+    material_request_service._add_material_to_rates("Foam Sheet", 42.5, "pcs")
 
     data = json.loads(rates_path.read_text(encoding="utf-8"))
     materials = data["materials"]
@@ -146,7 +146,7 @@ def test_add_material_to_rates_adds_and_updates_material(monkeypatch: pytest.Mon
     assert foam[0]["rate"] == 42.5
     assert foam[0]["unit"] == "pcs"
 
-    inventory_service._add_material_to_rates("Foam Sheet", 47.0, "pack")
+    material_request_service._add_material_to_rates("Foam Sheet", 47.0, "pack")
 
     data = json.loads(rates_path.read_text(encoding="utf-8"))
     materials = data["materials"]
@@ -160,9 +160,9 @@ def test_add_material_to_rates_converts_legacy_materials_dict(monkeypatch: pytes
     rates_path = tmp_path / "rates_config.json"
     legacy = {"materials": {"box": 60, "bubbleWrap": 18, "crate": 210}}
     rates_path.write_text(json.dumps(legacy), encoding="utf-8")
-    monkeypatch.setattr(inventory_service, "_RATES_CONFIG_PATH", rates_path)
+    monkeypatch.setattr(material_request_service, "_RATES_CONFIG_PATH", rates_path)
 
-    inventory_service._add_material_to_rates("Kraft Paper", 15.0, "m")
+    material_request_service._add_material_to_rates("Kraft Paper", 15.0, "m")
 
     data = json.loads(rates_path.read_text(encoding="utf-8"))
     materials = data["materials"]

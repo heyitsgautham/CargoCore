@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.dependencies import require_role
 from app.models.inventory import InventoryItem
-from app.services.inventory_service import sync_packing_materials_to_inventory
+from app.services.material_request_service import sync_packing_materials_to_inventory
 
 router = APIRouter(prefix="/api/v1/rates", tags=["Rates"])
 
