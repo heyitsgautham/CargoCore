@@ -48,11 +48,12 @@ class Warehouse(Base):
     inventory_items = relationship("InventoryItem", back_populates="warehouse")
     labourers = relationship("Labourer", back_populates="warehouse")
     orders = relationship("Order", back_populates="warehouse")
-    loading_docks = relationship("LoadingDock", back_populates="warehouse")
-    packing_stations = relationship("PackingStation", back_populates="warehouse")
+    # Docks, stations and zone metrics belong to the hub and go with it.
+    loading_docks = relationship("LoadingDock", back_populates="warehouse", cascade="all, delete-orphan")
+    packing_stations = relationship("PackingStation", back_populates="warehouse", cascade="all, delete-orphan")
     quality_checks = relationship("QualityCheck", back_populates="warehouse")
     return_gradings = relationship("ReturnGrading", back_populates="warehouse")
-    zone_metrics = relationship("WarehouseZoneMetrics", back_populates="warehouse")
+    zone_metrics = relationship("WarehouseZoneMetrics", back_populates="warehouse", cascade="all, delete-orphan")
 
 
 class LoadingDock(Base):

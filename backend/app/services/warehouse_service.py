@@ -8,9 +8,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.inventory import InventoryItem, InventoryMovement
 from app.models.labour import Labourer
+from app.models.logistics import LogisticsZone
 from app.models.order import DamageReport, Order, OrderItem
 from app.models.user import User
-from app.models.warehouse import LoadingDock, Warehouse
+from app.models.warehouse import LoadingDock, QualityCheck, ReturnGrading, Warehouse
 from app.schemas.warehouse import (
     ChartData,
     ChartDataset,
@@ -114,8 +115,13 @@ async def delete_warehouse(db: AsyncSession, warehouse_id: UUID) -> None:
     ).scalar_one()
     order_count = (await db.execute(select(func.count(Order.id)).where(Order.warehouse_id == warehouse_id))).scalar_one()
     labour_count = (await db.execute(select(func.count(Labourer.id)).where(Labourer.warehouse_id == warehouse_id))).scalar_one()
+    record_count = 0
+    for model in (QualityCheck, ReturnGrading, LogisticsZone):
+        record_count += (
+            await db.execute(select(func.count()).select_from(model).where(model.warehouse_id == warehouse_id))
+        ).scalar_one()
 
-    if user_count or inventory_count or order_count or labour_count:
+    if user_count or inventory_count or order_count or labour_count or record_count:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Cannot delete warehouse with dependent records",
