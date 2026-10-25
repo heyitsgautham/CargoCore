@@ -28,13 +28,10 @@
   "frontend/src/LWD-views/WarehouseManager/LaborManagement.vue": 919,
   "frontend/src/LWD-views/WarehouseManager/PackingMaterials.vue": 1099,
   "frontend/src/LWD-views/WarehouseManager/ReturnsWarehouse.vue": 998,
-  "frontend/src/LWDDVI-views/Article.vue": 958,
-  "frontend/src/auth-views/Register.vue": 950,
   "frontend/src/components/HeaderMeetingScheduler.vue": 807,
   "frontend/src/pages/SignupWizard.vue": 836,
   "frontend/src/stores/dispatcherStore.js": 1028,
   "frontend/src/stores/individualStore.js": 1378,
   "frontend/src/stores/logisticStore.js": 802,
-  "frontend/src/stores/vendorStore.js": 1165,
-  "frontend/src/views/HubArchivedAccess.vue": 817
+  "frontend/src/stores/vendorStore.js": 1165
 }

@@ -1,0 +1,407 @@
+/* ── Featured Card ──────────────────────────── */
+.featured-card {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+}
+
+.featured-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.08), rgba(14, 165, 233, 0.04));
+    border-radius: inherit;
+}
+
+.featured-card:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-2px);
+}
+
+.featured-badge {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #a78bfa;
+    background: rgba(124, 58, 237, 0.12);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+}
+
+.featured-body {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.article-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.meta-tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #a78bfa;
+    background: rgba(124, 58, 237, 0.1);
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+}
+
+.meta-sep {
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 0.75rem;
+}
+
+.meta-date,
+.meta-read {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.featured-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+}
+
+.featured-excerpt {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+    max-width: 560px;
+}
+
+.read-more-btn {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #a78bfa;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.read-more-btn:hover {
+    color: #c4b5fd;
+}
+
+.featured-visual {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.visual-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(124, 58, 237, 0.08);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.visual-icon svg {
+    width: 48px;
+    height: 48px;
+    color: rgba(167, 139, 250, 0.7);
+}
+
+/* ── Article Grid ───────────────────────────── */
+.articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+}
+
+.article-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 1.1rem;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.article-card:hover {
+    background: rgba(255, 255, 255, 0.045);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.article-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.article-card h3 {
+    font-size: 0.975rem;
+    font-weight: 700;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.article-card p {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.45);
+    line-height: 1.65;
+    flex: 1;
+}
+
+.article-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.25rem;
+}
+
+.arrow-link {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 1rem;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.article-card:hover .arrow-link {
+    color: #a78bfa;
+    transform: translateX(3px);
+}
+
+/* ── Newsletter ─────────────────────────────── */
+.newsletter-section {
+    max-width: 700px;
+}
+
+.newsletter-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    text-align: center;
+}
+
+.newsletter-card h3 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.newsletter-card p {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 0.75rem;
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.newsletter-input {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.6rem;
+    color: #fff;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.newsletter-input::placeholder { color: rgba(255, 255, 255, 0.25); }
+.newsletter-input:focus { border-color: rgba(167, 139, 250, 0.5); }
+
+.newsletter-btn {
+    padding: 0.7rem 1.5rem;
+    background: #fff;
+    color: #000;
+    font-weight: 700;
+    font-size: 0.875rem;
+    border: none;
+    border-radius: 0.6rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.newsletter-btn:hover {
+    background: #e5e7eb;
+}
+
+.subscribed-msg {
+    margin-top: 0.75rem;
+    font-size: 0.82rem;
+    color: #1CE783;
+}
+
+/* ── Footer ─────────────────────────────────── */
+.page-footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.25);
+}
+
+@media (max-width: 768px) {
+    .featured-card { flex-direction: column; }
+    .featured-visual { display: none; }
+    .brand-tagline,
+    .nav-link:not(.nav-link--cta):not(.nav-link--active) { display: none; }
+}
+
+@media (max-width: 480px) {
+    .newsletter-form { flex-direction: column; }
+}
+
+/* ── Article Reader Modal ───────────────────── */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(6px);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.modal-panel {
+    position: relative;
+    width: min(680px, 100vw);
+    height: 100vh;
+    background: #0a0a0a;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    z-index: 10;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+.modal-close svg { width: 16px; height: 16px; }
+
+.modal-scroll {
+    padding: 3rem 2.5rem 4rem;
+    overflow-y: auto;
+    height: 100%;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+.modal-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.modal-title {
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    margin-bottom: 1rem;
+}
+
+.modal-lead {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.55);
+    line-height: 1.7;
+}
+
+.modal-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.07);
+    margin: 2rem 0;
+}
+
+.modal-body {
+    font-size: 0.925rem;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.8;
+}
+
+.modal-body :deep(p) {
+    margin-bottom: 1.2rem;
+}
+
+.modal-body :deep(h2) {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 2rem 0 0.75rem;
+    letter-spacing: -0.01em;
+}
+
+/* Modal slide transition */
+.modal-slide-enter-active,
+.modal-slide-leave-active {
+    transition: opacity 0.25s ease;
+}
+.modal-slide-enter-active .modal-panel,
+.modal-slide-leave-active .modal-panel {
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-slide-enter-from {
+    opacity: 0;
+}
+.modal-slide-enter-from .modal-panel {
+    transform: translateX(100%);
+}
+.modal-slide-leave-to {
+    opacity: 0;
+}
+.modal-slide-leave-to .modal-panel {
+    transform: translateX(100%);
+}

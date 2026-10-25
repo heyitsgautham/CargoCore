@@ -1,0 +1,263 @@
+.register-view {
+    width: 100%;
+}
+
+.animate-view>* {
+    animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.animate-view>*:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.animate-view>*:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.animate-view>*:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+@keyframes fade-in-up {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.reg-header {
+    margin-bottom: 1.25rem;
+}
+
+.reg-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #fff;
+    margin-bottom: 0.15rem;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+}
+
+.reg-subtitle {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+/* Step dots */
+.step-dots {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 1.5rem;
+    padding: 0 1rem;
+}
+
+.dot-line {
+    position: absolute;
+    top: 11px;
+    left: 50px;
+    right: 50px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.15);
+    z-index: 0;
+}
+
+.dot-line-fill {
+    height: 100%;
+    background: #1CE783;
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dot-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    position: relative;
+    z-index: 1;
+}
+
+.dot-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 600;
+    background: transparent;
+    border: 1.5px solid rgba(255, 255, 255, 0.45);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s;
+}
+
+.dot-active .dot-circle {
+    background: transparent;
+    border-color: #1CE783;
+    color: #1CE783;
+    box-shadow: 0 0 8px rgba(28, 231, 131, 0.2);
+}
+
+.dot-done .dot-circle {
+    background: #1CE783;
+    border-color: #1CE783;
+    color: #0a0e11;
+}
+
+.dot-check {
+    width: 14px;
+    height: 14px;
+}
+
+.dot-num {
+    font-size: 0.6rem;
+}
+
+.dot-label {
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.dot-active .dot-label {
+    color: #1CE783;
+}
+
+/* Step content animation */
+.step-content {
+    animation: step-in 0.3s ease;
+}
+
+@keyframes step-in {
+    from {
+        opacity: 0;
+        transform: translateX(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Role cards */
+.role-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.role-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.9rem 0.75rem;
+    background: transparent;
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-align: left;
+    font-family: inherit;
+    color: #fff;
+}
+
+.role-card:hover {
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+    background: transparent;
+}
+
+.role-selected {
+    border-color: rgba(28, 231, 131, 0.8) !important;
+    box-shadow: 0 0 15px rgba(28, 231, 131, 0.25) !important;
+    background: transparent !important;
+}
+
+.role-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.role-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.customer-ic {
+    background: transparent;
+    color: #44a8e9;
+}
+
+.vendor-ic {
+    background: transparent;
+    color: #a844e9;
+}
+
+.role-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.role-desc {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.role-badge {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+    padding: 0.1rem 0.35rem;
+    font-size: 0.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    background: rgba(255, 176, 32, 0.12);
+    color: #FFB020;
+    border-radius: 3px;
+}
+
+.role-tick {
+    position: absolute;
+    bottom: 0.4rem;
+    right: 0.4rem;
+    width: 18px;
+    height: 18px;
+    background: #1CE783;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pop-in 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.role-tick svg {
+    width: 12px;
+    height: 12px;
+    color: #0a0e11;
+}
+
+@keyframes pop-in {
+    from {
+        transform: scale(0);
+    }
+
+    to {
+        transform: scale(1);
+    }
+}
