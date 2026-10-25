@@ -33,10 +33,10 @@
                         {{ report.title }}
                     </div>
                     <div class="text-xs text-gray-500 dark:text-gray-400">Date: {{ report.date }} • {{
-                        activeWarehouseName }}</div>
+                        reportHubName(report, store.hubs, store.activeWarehouseName) }}</div>
                     <button @click.stop="downloadReport(report.id)"
                         class="mt-2 text-[10px] font-bold text-primary flex items-center gap-1 hover:underline">
-                        <span class="material-symbols-outlined text-[12px]">download</span> Download PDF
+                        <span class="material-symbols-outlined text-[12px]">download</span> Download CSV
                     </button>
                 </div>
             </div>
@@ -53,6 +53,7 @@
 import { inject } from 'vue'
 import { Bar, Line } from 'vue-chartjs'
 import { reportsPageKey } from './reportsPageContext'
+import { reportHubName } from './reportRows'
 
 const {
     activeTab,

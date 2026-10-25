@@ -143,7 +143,7 @@ import {
     vendorLeadTimeChart,
     workforceChart,
 } from './reports/reportCharts'
-import { attendanceCounts, downloadCsv, exportRows, loggedInOn, userLeave } from './reports/reportRows'
+import { attendanceCounts, downloadCsv, exportRows, loggedInOn, reportHubName, userLeave } from './reports/reportRows'
 import { useRestockReview } from './reports/useRestockReview'
 import { useCapitalInvestment } from './reports/useCapitalInvestment'
 
@@ -214,7 +214,7 @@ const downloadReport = (id) => {
     if (!report) return
     downloadCsv(`report_${id}_${today()}.csv`, [
         ['Report ID', 'Title', 'Date', 'Warehouse'],
-        [report.id, report.title, report.date, store.activeWarehouseName || ''],
+        [report.id, report.title, report.date, reportHubName(report, store.hubs, store.activeWarehouseName || '')],
     ])
     showNotification(`Report #${id} Downloaded`, 'success')
 }

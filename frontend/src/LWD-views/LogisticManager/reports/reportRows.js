@@ -30,6 +30,11 @@ export function userLeave(user) {
     return { allowed, taken, balance: allowed - taken, extra: Math.max(0, taken - allowed) }
 }
 
+/** The name of the hub a report belongs to, or the fallback when the hub is unknown. */
+export function reportHubName(report, hubs, fallback = '') {
+    return (hubs || []).find((hub) => hub.id === report.hubId)?.name || fallback
+}
+
 /** Header and rows for the tab's CSV export. A result of one row means nothing to export. */
 export function exportRows(tab, store, day) {
     switch (tab) {
@@ -72,7 +77,7 @@ export function exportRows(tab, store, day) {
         case 'reports_history':
             return [
                 ['Report ID', 'Title', 'Date', 'Warehouse'],
-                ...store.filteredReports.map(r => [r.id, r.title, r.date, store.activeWarehouseName || '']),
+                ...store.filteredReports.map(r => [r.id, r.title, r.date, reportHubName(r, store.hubs, store.activeWarehouseName || '')]),
             ]
         default:
             return []
