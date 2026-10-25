@@ -101,3 +101,74 @@ describe('Fleet management', () => {
     wrapper.unmount()
   })
 })
+
+describe('uploading a document', () => {
+  it('builds the request only when vehicle, type and file are all present', async () => {
+    const { buildDocumentPayload } =
+      await import('@/LWD-views/LogisticManager/fleet/useDocumentUpload')
+    const form = {
+      entityId: 'v1',
+      docType: 'Insurance Policy',
+      expiryDate: '2027-06-30',
+      fileBase64: 'data:application/pdf;base64,AAAA',
+    }
+
+    expect(buildDocumentPayload('VEHICLE', form, 'wh-1')).toEqual({
+      entity_type: 'VEHICLE',
+      entity_id: 'v1',
+      hub_id: 'wh-1',
+      doc_type: 'Insurance Policy',
+      document_url: 'data:application/pdf;base64,AAAA',
+      expiry_date: new Date('2027-06-30').toISOString(),
+    })
+    expect(buildDocumentPayload('DRIVER', { ...form, expiryDate: '' }, 'all')).toMatchObject({
+      hub_id: null,
+      expiry_date: null,
+    })
+    expect(buildDocumentPayload('VEHICLE', { ...form, fileBase64: null }, 'all')).toBeNull()
+  })
+
+  it('opens from the vehicle documents tab and posts the chosen document', async () => {
+    const router = stubFetch([
+      ['GET', '/logistics/bootstrap', bootstrap],
+      ['GET', '/finance/summary', {}],
+      ['GET', '/tracking/drivers', []],
+      ['POST', '/logistics/documents', { id: 'doc-1' }],
+    ])
+    const wrapper = await mountFleet()
+
+    await tab(wrapper, 'Vehicle Documents').trigger('click')
+    expect(wrapper.find('#upload-document-title').exists()).toBe(false)
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text().includes('Upload Doc'))
+      .trigger('click')
+
+    expect(wrapper.find('#upload-document-title').text()).toBe('Upload Vehicle Document')
+    const submit = () => wrapper.findAll('[role=dialog] button').at(-1)
+    expect(submit().attributes('disabled')).toBeDefined()
+
+    await wrapper.find('#upload-entity').setValue('v1')
+    await wrapper.find('#upload-doc-type').setValue('Vehicle Registration')
+    const file = new File(['%PDF'], 'rc.pdf', { type: 'application/pdf' })
+    const input = wrapper.find('[role=dialog] input[type=file]')
+    Object.defineProperty(input.element, 'files', { value: [file] })
+    await input.trigger('change')
+    await vi.waitFor(() => expect(submit().attributes('disabled')).toBeUndefined())
+
+    await submit().trigger('click')
+    await flushPromises()
+
+    const posted = router.calls.find(
+      (c) => c.method === 'POST' && c.url.includes('/logistics/documents'),
+    )
+    expect(posted.body).toMatchObject({
+      entity_type: 'VEHICLE',
+      entity_id: 'v1',
+      doc_type: 'Vehicle Registration',
+    })
+    expect(posted.body.document_url.startsWith('data:application/pdf')).toBe(true)
+    expect(wrapper.find('#upload-document-title').exists()).toBe(false)
+    wrapper.unmount()
+  })
+})

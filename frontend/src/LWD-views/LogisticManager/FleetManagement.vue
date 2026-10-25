@@ -93,6 +93,9 @@
         <VehicleProfileModal />
 
         <DocumentViewerModal />
+
+        <!-- Upload Document Modal -->
+        <UploadDocumentModal />
     </div>
 </template>
 
@@ -117,6 +120,8 @@ import L from 'leaflet'
 import { useFleetLiveTracking } from './fleet/useFleetLiveTracking'
 import { useVehicleForm } from './fleet/useVehicleForm'
 import { useFleetDocuments } from './fleet/useFleetDocuments'
+import { useDocumentUpload } from './fleet/useDocumentUpload'
+import UploadDocumentModal from './fleet/UploadDocumentModal.vue'
 import {
     computeLogStats,
     groupDriverDocs,
@@ -182,6 +187,8 @@ const {
     closeDocModal,
 } = useFleetDocuments(store)
 
+const upload = useDocumentUpload(store)
+
 // Selected driver for zoom-to focus on live map
 const selectedFleetDriver = ref(null)
 
@@ -192,16 +199,6 @@ const searchQuery = ref('')
 
 const logTypes = ['Fuel Logs', 'Service Logs', 'Maintenance Logs', 'Cleaning Logs']
 const activeLogType = ref('Fuel Logs')
-
-const isUploadModalOpen = ref(false)
-const uploadMode = ref('VEHICLE') // 'VEHICLE' or 'DRIVER'
-const uploadFormData = ref({ entityId: '', docType: '', expiryDate: '', fileBase64: null, fileName: '' })
-
-const openUploadModal = (mode) => {
-    uploadMode.value = mode
-    uploadFormData.value = { entityId: '', docType: '', expiryDate: '', fileBase64: null, fileName: '' }
-    isUploadModalOpen.value = true
-}
 
 const activeVehicleProfile = ref(null)
 
@@ -273,6 +270,7 @@ const closeVehicleProfile = () => {
 
 
 provide(fleetPageKey, {
+    ...upload,
     activeDoc,
     activeDropdown,
     activeLogType,
@@ -296,7 +294,6 @@ provide(fleetPageKey, {
     maintenanceCost,
     openDocModal,
     openShareModal,
-    openUploadModal,
     openVehicleModal,
     openVehicleProfile,
     printDoc,

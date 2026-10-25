@@ -1,0 +1,37 @@
+/* Dark form styling shared by the fleet modals. */
+.lm-vehicle-modal {
+    color: #e2e8f0;
+}
+
+.lm-vehicle-modal :deep(label) {
+    color: #cbd5e1 !important;
+}
+
+.lm-vehicle-modal :deep(input),
+.lm-vehicle-modal :deep(select),
+.lm-vehicle-modal :deep(textarea) {
+    background-color: rgba(15, 23, 42, 0.92) !important;
+    color: #f8fafc !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color-scheme: dark;
+}
+
+.lm-vehicle-modal :deep(input::placeholder),
+.lm-vehicle-modal :deep(textarea::placeholder) {
+    color: #94a3b8 !important;
+}
+
+.lm-vehicle-modal :deep(option) {
+    background-color: rgb(15 23 42) !important;
+    color: #f8fafc !important;
+}
+
+.lm-vehicle-modal :deep(.text-gray-400),
+.lm-vehicle-modal :deep(.text-gray-500) {
+    color: #94a3b8 !important;
+}
+
+.lm-vehicle-modal :deep(input[type='date']::-webkit-calendar-picker-indicator) {
+    filter: invert(1);
+    opacity: 0.85;
+}
