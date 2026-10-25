@@ -7,7 +7,7 @@ from pathlib import Path
 
 from app.main import app
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 DOCS_DIR = ROOT / "docs"
 OPENAPI_JSON_PATH = DOCS_DIR / "openapi.json"
 CATALOG_MD_PATH = DOCS_DIR / "API_ENDPOINT_CATALOG.md"

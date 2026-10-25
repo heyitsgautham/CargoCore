@@ -36,7 +36,7 @@ If you want to log in manually instead, you can still use `POST /api/v1/auth/log
 
 ```powershell
 cd backend
-python export_api_docs.py
+python -m scripts.export_api_docs
 ```
 
 ## Deliverables Created
