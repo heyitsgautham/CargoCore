@@ -32,6 +32,7 @@ The backend suite needs Postgres with a `logistics_db_test` database, as `README
 
 - A change that alters behavior lands with a test that fails without it.
 - Backend unit tests live in `backend/tests/unit/`, API-level tests in `backend/tests/integration/` and response-shape checks in `backend/tests/contract/`.
+- Whole-feature tests live in `backend/tests/flows/` and build their data with `backend/tests/factories.py`, which creates users with their role loaded and returns bearer tokens for them.
 - Frontend tests live in `frontend/tests/unit/` as `*.test.js` files and run on Vitest with jsdom.
 - Mock network calls in frontend tests with `vi.stubGlobal('fetch', ...)` or by mocking `@/utils/aiApi`, as the existing suites do.
 - Do not lower a coverage floor in `backend/pyproject.toml` or `frontend/vitest.config.js` to get a change through.

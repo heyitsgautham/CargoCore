@@ -35,9 +35,11 @@ filterwarnings = [
 [tool.coverage.run]
 source = ["app"]
 branch = true
+# SQLAlchemy async runs ORM work inside greenlets, which hides those lines from the default tracer.
+concurrency = ["thread", "greenlet"]
 
 [tool.coverage.report]
-# Measured at 39% line and branch coverage with the unit, contract and integration suites.
+# Measured at 71% line and branch coverage with every suite under testpaths.
 # Raise it as tests land.
-fail_under = 38
+fail_under = 70
 skip_covered = true

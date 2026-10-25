@@ -56,13 +56,13 @@ Redis is mocked.
 
 ```bash
 createdb logistics_db_test
-pytest --cov          # unit, contract and integration suites, fails under 38% coverage
+pytest --cov          # every backend suite, fails under 70% coverage
 ruff check .          # lint
 pip-audit -r requirements.txt --no-deps --disable-pip
 ```
 
-`pytest` collects `tests/unit`, `tests/contract` and `tests/integration` by default.
-The older suites under `tests/test_*` and the loose `tests/test_*.py` scripts expect live services and are not part of the default run.
+`pytest` collects `tests/unit`, `tests/contract`, `tests/integration`, `tests/flows` and the `tests/test_*` suites by default.
+`tests/flows` drives whole features over HTTP against a seeded hub built by `tests/factories.py`, with outbound network calls blocked.
 
 ## Updating dependencies
 

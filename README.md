@@ -102,7 +102,7 @@ These are the commands CI runs in `.github/workflows/ci.yml`.
 
 | Where | Command | What it does |
 |---|---|---|
-| `backend/` | `pytest --cov` | 715 unit, contract and integration tests, fails under 38% coverage |
+| `backend/` | `pytest --cov` | 879 unit, contract, integration and flow tests, fails under 70% coverage |
 | `backend/` | `ruff check .` | lint |
 | `backend/` | `pip-audit -r requirements.txt --no-deps --disable-pip` | dependency audit |
 | `frontend/` | `npm test` | 155 Vitest tests for the API client, store helpers, composables, slips and utils |
