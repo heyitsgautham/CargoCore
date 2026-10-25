@@ -302,6 +302,16 @@ export const useLogisticStore = defineStore('logistic', () => {
             relatedOrder: tx.related_order || null,
         }))
 
+        // ── Report history (Reports > Analytics & History) ──────────────────────
+        reports.value = asArray(payload.reports).map((report) => ({
+            id: asStringId(report.id),
+            hubId: asWarehouseId(report.hub_id),
+            title: report.title,
+            date: report.date,
+            icon: report.icon,
+            color: report.color,
+        }))
+
         financeCodRecords.value = asArray(payload.finance_cod_records).map((item) => ({ ...item, id: asStringId(item.id), hubId: asWarehouseId(item.hubId ?? item.hub_id ?? item.warehouse_id) }))
         financeStaffRecords.value = asArray(payload.finance_staff_records).map((item) => ({ ...item, id: asStringId(item.id), userId: asStringId(item.userId), hubId: asWarehouseId(item.hubId ?? item.hub_id ?? item.warehouse_id) }))
         financeDriverRecords.value = asArray(payload.finance_driver_records).map((item) => ({ ...item, id: asStringId(item.id), userId: asStringId(item.userId), hubId: asWarehouseId(item.hubId ?? item.hub_id ?? item.warehouse_id) }))

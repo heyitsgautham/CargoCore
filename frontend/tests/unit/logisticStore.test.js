@@ -52,6 +52,24 @@ const bootstrap = {
   tasks: [{ id: 'k1', text: 'Renew insurance', status: 'To Do' }],
   transactions: [{ id: 'x1', description: 'Diesel', amount: 100, type: 'expense' }],
   finance_summary: { balance: 5000 },
+  reports: [
+    {
+      id: 'report-1',
+      hub_id: 'wh-1',
+      title: 'North Hub Performance Report',
+      date: '1d ago',
+      icon: 'analytics',
+      color: 'blue',
+    },
+    {
+      id: 'report-2',
+      hub_id: 'wh-2',
+      title: 'South Hub Performance Report',
+      date: '2d ago',
+      icon: 'analytics',
+      color: 'green',
+    },
+  ],
 }
 
 let router
@@ -138,6 +156,17 @@ async function loadedStore() {
 }
 
 describe('logistic store bootstrap', () => {
+  it('loads the report history and filters it by the selected hub', async () => {
+    const store = await loadedStore()
+
+    expect(store.reports.map((r) => r.title)).toEqual([
+      'North Hub Performance Report',
+      'South Hub Performance Report',
+    ])
+    store.activeWarehouse = 'wh-2'
+    expect(store.filteredReports.map((r) => r.id)).toEqual(['report-2'])
+  })
+
   it('hydrates every dashboard list from one bootstrap call', async () => {
     const store = await loadedStore()
 
