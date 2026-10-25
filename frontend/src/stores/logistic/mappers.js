@@ -3,7 +3,8 @@
  * They turn backend payloads into the shapes the dashboard views render.
  */
 
-const CREDENTIAL_CACHE_KEY = 'logistic_manager_created_credentials'
+// Older builds kept every new account's password or PIN here in plain text.
+export const LEGACY_CREDENTIAL_CACHE_KEY = 'logistic_manager_created_credentials'
 
 export const asArray = (value) => Array.isArray(value) ? value : []
 export const asStringId = (value, fallback = 'all') => value == null ? fallback : String(value)
@@ -72,16 +73,13 @@ export function mapReturnRecord(item) {
     }
 }
 
-export function loadCredentialCache() {
+/** Delete the plain-text credential store an older build left in localStorage. */
+export function purgeLegacyCredentialCache() {
     try {
-        return JSON.parse(localStorage.getItem(CREDENTIAL_CACHE_KEY) || '{}')
+        localStorage.removeItem(LEGACY_CREDENTIAL_CACHE_KEY)
     } catch {
-        return {}
+        // Storage can be unavailable in private windows; there is nothing to clear then.
     }
-}
-
-export function persistCredentialCache(cache) {
-    localStorage.setItem(CREDENTIAL_CACHE_KEY, JSON.stringify(cache))
 }
 
 export function roleLabel(role) {

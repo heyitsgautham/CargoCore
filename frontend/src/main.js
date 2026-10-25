@@ -6,8 +6,10 @@ import App from './App.vue';
 import router from './router';
 import './styles/index.css';
 import { initializeTheme } from './utils/theme';
+import { purgeLegacyCredentialCache } from './stores/logistic/mappers';
 
 initializeTheme();
+purgeLegacyCredentialCache();
 
 const app = createApp(App);
 const pinia = createPinia();

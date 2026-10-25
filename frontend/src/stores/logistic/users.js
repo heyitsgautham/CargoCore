@@ -8,14 +8,19 @@ import {
     asWarehouseId,
     normalizeDriverLoginId,
     normalizeDriverPin,
-    persistCredentialCache,
     roleApiValue,
     roleLabel,
+    purgeLegacyCredentialCache,
 } from './mappers'
+import { ref } from 'vue'
 
-export function useLogisticUsers({ users, credentialCache, refresh }) {
+export function useLogisticUsers({ users, refresh }) {
+    purgeLegacyCredentialCache()
+    // The last new account's password or PIN, kept in memory so the manager sees it once.
+    const lastCreatedCredentials = ref(null)
+    const clearCreatedCredentials = () => { lastCreatedCredentials.value = null }
+
     function normalizeUserRecord(user) {
-        const cachedCredentials = credentialCache.value[String(user.email || '').toLowerCase()] || null
         return {
             id: asStringId(user.id),
             hubId: asWarehouseId(user.hub_id ?? user.warehouse_id),
@@ -25,7 +30,7 @@ export function useLogisticUsers({ users, credentialCache, refresh }) {
             status: user.status || (user.is_active ? 'Active' : 'Inactive'),
             lastLogin: user.last_login || '',
             username: user.username,
-            password: cachedCredentials?.password || '',
+            password: '',
             pending_payout: user.pending_payout ?? 0,
             mobile: user.mobile ?? user.phone,
             mobileVerified: user.mobile_verified ?? Boolean(user.phone || user.mobile),
@@ -84,12 +89,11 @@ export function useLogisticUsers({ users, credentialCache, refresh }) {
             }),
         })
 
-        if (userData.email && credentialValue) {
-            credentialCache.value[String(userData.email).toLowerCase()] = {
-                username: created?.username || (isDriver ? driverId : userData.username) || '',
-                password: credentialValue,
-            }
-            persistCredentialCache(credentialCache.value)
+        // Kept in memory only, so the manager sees the password or PIN once and it never reaches storage.
+        lastCreatedCredentials.value = {
+            email: userData.email,
+            username: created?.username || (isDriver ? driverId : userData.username) || '',
+            password: credentialValue,
         }
 
         await refresh()
@@ -118,8 +122,7 @@ export function useLogisticUsers({ users, credentialCache, refresh }) {
             method: 'DELETE',
             headers: authHeaders(),
         })
-        delete credentialCache.value[String(email).toLowerCase()]
-        persistCredentialCache(credentialCache.value)
+        if (lastCreatedCredentials.value?.email === email) lastCreatedCredentials.value = null
         await refresh()
     }
 
@@ -160,5 +163,5 @@ export function useLogisticUsers({ users, credentialCache, refresh }) {
         return upsertUserRecord(updated)
     }
 
-    return { normalizeUserRecord, addUser, updateUser, deleteUser, toggleUserStatus, approveVendor, rejectVendor }
+    return { lastCreatedCredentials, clearCreatedCredentials, normalizeUserRecord, addUser, updateUser, deleteUser, toggleUserStatus, approveVendor, rejectVendor }
 }

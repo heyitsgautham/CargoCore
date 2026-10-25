@@ -703,7 +703,7 @@
                                         class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Password</label>
                                     <div
                                         class="text-sm font-mono text-white bg-slate-800 px-3 py-1.5 rounded border border-white/10">
-                                        {{ isCredentialsVisible ? (viewingUserCreds.password || 'Only available on the device that created this account') : '********' }}
+                                        {{ isCredentialsVisible ? (viewingUserCreds.password || 'Shown only once, when the account was created') : '********' }}
                                     </div>
                                 </div>
                             </div>
@@ -1124,14 +1124,12 @@ const selectHub = (hubId) => {
 const viewingUserCreds = ref(null)
 const reviewingVendor = ref(null)
 
-const openCreds = (user) => {
+const openCreds = (user, reveal = false) => {
     viewingUserCreds.value = user
-    isCredentialsVisible.value = false // reset
+    isCredentialsVisible.value = reveal
 }
 
-const closeCreds = () => {
-    viewingUserCreds.value = null
-}
+const closeCreds = () => { viewingUserCreds.value = null; store.clearCreatedCredentials() }
 
 const openVendorReview = (user) => {
     reviewingVendor.value = user
@@ -1227,6 +1225,8 @@ const submitForm = async () => {
             toast.success('User details updated successfully.')
         }
         closeModal()
+        const fresh = store.lastCreatedCredentials // in memory only: shown once, cleared when the dialog closes
+        if (fresh) openCreds({ ...store.users.find((user) => user.email === fresh.email), ...fresh }, true)
     } catch (error) {
         toast.error(error.message || 'Unable to save the user right now.')
     }

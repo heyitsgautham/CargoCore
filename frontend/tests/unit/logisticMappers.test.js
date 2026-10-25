@@ -5,12 +5,11 @@ import {
   asWarehouseId,
   deriveReturnFlowType,
   financeScopeFor,
-  loadCredentialCache,
   mapReturnRecord,
   normalizeDriverLoginId,
   normalizeDriverPin,
   normalizeReturnStatus,
-  persistCredentialCache,
+  purgeLegacyCredentialCache,
   roleApiValue,
   roleLabel,
 } from '@/stores/logistic/mappers'
@@ -128,11 +127,16 @@ describe('driver credentials', () => {
     expect(normalizeDriverPin('abcd')).toBe('1234')
   })
 
-  it('round-trips the credential cache and survives corrupt storage', () => {
-    persistCredentialCache({ u1: { pin: '1111' } })
-    expect(loadCredentialCache()).toEqual({ u1: { pin: '1111' } })
+  it('deletes the plain-text credential store an older build left behind', () => {
+    localStorage.setItem(
+      'logistic_manager_created_credentials',
+      '{"a@x.com":{"password":"secret"}}',
+    )
+    localStorage.setItem('theme', 'dark')
 
-    localStorage.setItem('logistic_manager_created_credentials', 'nope')
-    expect(loadCredentialCache()).toEqual({})
+    purgeLegacyCredentialCache()
+
+    expect(localStorage.getItem('logistic_manager_created_credentials')).toBeNull()
+    expect(localStorage.getItem('theme')).toBe('dark')
   })
 })

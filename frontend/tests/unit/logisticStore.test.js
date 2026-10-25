@@ -228,7 +228,7 @@ describe('logistic store slices', () => {
     )
   })
 
-  it('creates staff, approves vendors and keeps driver credentials', async () => {
+  it('creates staff and approves vendors', async () => {
     const store = await loadedStore()
 
     await store.addUser({
@@ -287,5 +287,61 @@ describe('logistic store slices', () => {
 
     const methods = router.calls.filter((c) => c.url.includes('/warehouses')).map((c) => c.method)
     expect(methods).toEqual(['POST', 'PUT', 'PUT', 'PUT'])
+  })
+})
+
+describe('credentials of new accounts', () => {
+  const secretValues = ['StaffPass2026', '4321']
+
+  function storedText() {
+    return Object.keys(localStorage)
+      .filter((key) => !['auth_token', 'auth_refresh_token', 'auth_user'].includes(key))
+      .map((key) => `${key}=${localStorage.getItem(key)}`)
+      .join('\n')
+  }
+
+  it('keeps a new password or PIN in memory and never writes one to localStorage', async () => {
+    const store = await loadedStore()
+
+    await store.addUser({
+      name: 'Sita',
+      email: 'sita@example.com',
+      role: 'Warehouse Manager',
+      username: 'sita',
+      password: 'StaffPass2026',
+      hubId: 'wh-1',
+    })
+    expect(store.lastCreatedCredentials).toEqual({
+      email: 'sita@example.com',
+      username: 'drv.ravi',
+      password: 'StaffPass2026',
+    })
+    await store.addUser({
+      name: 'Ravi',
+      email: 'ravi@example.com',
+      role: 'Driver',
+      password: '4321',
+      hubId: 'wh-1',
+    })
+    expect(store.lastCreatedCredentials.password).toBe('4321')
+
+    const stored = storedText()
+    for (const secret of secretValues) expect(stored).not.toContain(secret)
+    expect(stored).not.toMatch(/password|pin|credential/i)
+    expect(store.users.every((user) => user.password === '')).toBe(true)
+
+    store.clearCreatedCredentials()
+    expect(store.lastCreatedCredentials).toBeNull()
+  })
+
+  it('clears credentials an older build saved', async () => {
+    localStorage.setItem(
+      'logistic_manager_created_credentials',
+      '{"wm@example.com":{"password":"Old1234"}}',
+    )
+
+    useLogisticStore()
+
+    expect(localStorage.getItem('logistic_manager_created_credentials')).toBeNull()
   })
 })

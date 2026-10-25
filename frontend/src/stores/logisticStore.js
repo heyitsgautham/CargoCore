@@ -8,7 +8,6 @@ import {
     asWarehouseId,
     financeScopeFor,
     mapReturnRecord,
-    loadCredentialCache,
 } from './logistic/mappers'
 import { useLogisticTasks } from './logistic/tasks'
 import { useLogisticChats } from './logistic/chats'
@@ -79,9 +78,8 @@ export const useLogisticStore = defineStore('logistic', () => {
     const reportMetrics = ref({})
     const equipmentLedger = ref([])
     const reportAiInsights = ref([])
-    const credentialCache = ref(loadCredentialCache())
 
-    const { normalizeUserRecord, addUser, updateUser, deleteUser, toggleUserStatus, approveVendor, rejectVendor } = useLogisticUsers({ users, credentialCache, refresh })
+    const { normalizeUserRecord, addUser, updateUser, deleteUser, toggleUserStatus, approveVendor, rejectVendor, lastCreatedCredentials, clearCreatedCredentials } = useLogisticUsers({ users, refresh })
 
     function hydrate(payload) {
         const stats = payload.dashboard_stats || {}
@@ -786,6 +784,8 @@ export const useLogisticStore = defineStore('logistic', () => {
         restoreHub,
         deleteHub,
         addUser,
+        lastCreatedCredentials,
+        clearCreatedCredentials,
         updateUser,
         deleteUser,
         toggleUserStatus,
