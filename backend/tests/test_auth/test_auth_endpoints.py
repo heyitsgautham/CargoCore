@@ -30,7 +30,7 @@ async def test_vendor_register_requires_approval(client: AsyncClient):
         "role": "VENDOR",
         "company_name": "Acme Supplies",
         "contact_person": "Vendor Contact",
-        "business_email": "ops@acme.test",
+        "business_email": "ops@acme.example",
         "business_phone": "9000000000",
         "tax_id": "GST12345",
     }
@@ -279,31 +279,43 @@ async def test_forgot_password_always_200(client: AsyncClient):
 # ── POST /reset-password ──────────────────────────────────────────────────────
 
 
-async def test_reset_password_invalid_token(client: AsyncClient):
+async def test_reset_password_invalid_token(client: AsyncClient, redis_mock):
+    """No OTP stored for the email means the reset is refused."""
+    redis_mock.get.return_value = None
     response = await client.post(
         "/api/v1/auth/reset-password",
-        json={"token": "deadbeefdeadbeef", "new_password": "ResetPass123"},
+        json={"email": REGISTER_PAYLOAD["email"], "token": "123456", "new_password": "ResetPass123"},
     )
     assert response.status_code == 400
 
 
-async def test_reset_password_success(client: AsyncClient, redis_mock):
-    """Simulate a valid reset token stored in Redis."""
-    import uuid
+async def test_reset_password_wrong_code(client: AsyncClient, redis_mock):
+    redis_mock.get.return_value = b"654321"
+    response = await client.post(
+        "/api/v1/auth/reset-password",
+        json={"email": REGISTER_PAYLOAD["email"], "token": "123456", "new_password": "ResetPass123"},
+    )
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Invalid verification code"
 
-    fake_user_id = str(uuid.uuid4())
-    fake_token = "a" * 64
 
-    # Simulate Redis returning a user id for the reset token
-    redis_mock.get.return_value = fake_user_id.encode()
+async def test_reset_password_success(client: AsyncClient, redis_mock, registered_user_tokens):
+    """A matching OTP replaces the password and is consumed."""
+    redis_mock.get.return_value = b"123456"
 
     response = await client.post(
         "/api/v1/auth/reset-password",
-        json={"token": fake_token, "new_password": "BrandNewPass789"},
+        json={"email": REGISTER_PAYLOAD["email"], "token": "123456", "new_password": "BrandNewPass789"},
     )
-    # User won't be found in test DB with random UUID → 404 is acceptable here
-    # (full E2E test would register user first, then use their real UUID)
-    assert response.status_code in (200, 404)
+
+    assert response.status_code == 200
+    redis_mock.delete.assert_awaited()
+    redis_mock.get.return_value = None
+    login = await client.post(
+        "/api/v1/auth/login",
+        json={"email": REGISTER_PAYLOAD["email"], "password": "BrandNewPass789"},
+    )
+    assert login.status_code == 200
 
 
 # ── GET /health ───────────────────────────────────────────────────────────────
