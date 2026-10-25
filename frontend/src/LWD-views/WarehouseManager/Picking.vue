@@ -98,33 +98,7 @@
         </div>
 
         <!-- Order Fulfillment Pipeline -->
-        <div class="glass-panel p-4 rounded-xl">
-            <div class="text-xs text-gray-600 dark:text-gray-400 uppercase font-semibold mb-3">Order Fulfillment
-                Pipeline</div>
-            <div v-if="pipelineLoading" class="flex items-center justify-center py-4">
-                <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
-            </div>
-            <div v-else class="flex items-center justify-between gap-2">
-                <div v-for="(step, idx) in pipelineSteps" :key="step.label"
-                    class="flex-1 flex flex-col items-center relative group">
-                    <div class="w-full flex items-center">
-                        <div class="flex-1 h-1 rounded-full"
-                            :class="idx === 0 ? 'bg-transparent' : step.active ? 'bg-primary' : 'bg-gray-200 dark:bg-gray-700'">
-                        </div>
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all"
-                            :class="step.active ? 'bg-primary text-background-dark shadow-lg shadow-primary/30' : 'bg-gray-50 dark:bg-white/5 text-gray-500 border border-gray-200 dark:border-white/10'">
-                            <span class="material-symbols-outlined text-[18px]">{{ step.icon }}</span>
-                        </div>
-                        <div class="flex-1 h-1 rounded-full"
-                            :class="idx === pipelineSteps.length - 1 ? 'bg-transparent' : pipelineSteps[idx + 1]?.active ? 'bg-primary' : 'bg-gray-200 dark:bg-gray-700'">
-                        </div>
-                    </div>
-                    <div class="text-[10px] mt-2 font-bold text-center"
-                        :class="step.active ? 'text-primary' : 'text-gray-500'">{{ step.label }}</div>
-                    <div class="text-[10px] text-gray-600 text-center">{{ step.count }} orders</div>
-                </div>
-            </div>
-        </div>
+        <PickingPipeline :pipeline-steps="pipelineSteps" :pipeline-loading="pipelineLoading" />
 
         <!-- Dispatcher-Assigned Direct Transport Notifications -->
         <TransitionGroup name="slide-up" tag="div" class="space-y-2">
@@ -386,80 +360,10 @@
 
             <!-- Packing Station View + Quality Check -->
             <div class="space-y-6">
-                <div class="glass-panel p-6 rounded-xl">
-                    <h3 class="font-bold text-gray-900 dark:text-white mb-4">Packing Stations</h3>
-                    <div v-if="stations.length === 0"
-                        class="rounded-lg border border-dashed border-gray-200 dark:border-white/10 p-4 text-center text-sm text-gray-500">
-                        No packing stations configured yet. A station will appear here once the warehouse starts packing orders.
-                    </div>
-                    <div v-else class="space-y-4">
-                        <div v-for="station in stations" :key="station.id"
-                            class="p-4 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-lg">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-bold text-gray-900 dark:text-white">{{ station.name }}</span>
-                                <span class="w-2 h-2 rounded-full"
-                                    :class="station.active ? 'bg-green-500 animate-pulse' : 'bg-gray-500'"></span>
-                            </div>
-                            <div class="text-xs text-gray-600 dark:text-gray-400 mb-2">{{ station.packer }}</div>
-                            <div class="flex justify-between items-end text-sm">
-                                <div>
-                                    <div class="text-gray-500 text-[10px] uppercase">Throughput</div>
-                                    <div class="text-gray-900 dark:text-white font-bold">{{ station.rate }} / hr</div>
-                                </div>
-                                <button @click="monitorStation(station)"
-                                    class="bg-gray-100 dark:bg-white/10 hover:bg-gray-300 dark:hover:bg-white/20 text-gray-900 dark:text-white px-2 py-1 rounded text-xs transition-colors"
-                                    :class="showStationMonitor && monitoredStation?.id === station.id ? 'ring-1 ring-primary bg-primary/20 text-primary' : ''">
-                                    {{ showStationMonitor && monitoredStation?.id === station.id ? '● Live' : 'Monitor' }}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <PackingStationsPanel :stations="stations" :show-station-monitor="showStationMonitor" :monitored-station="monitoredStation" @monitor="monitorStation" />
 
                 <!-- Quality Check Panel -->
-                <div class="glass-panel p-6 rounded-xl">
-                    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-green-600 dark:text-green-400">verified</span>
-                        Quality Verification
-                    </h3>
-                    <div class="space-y-3">
-                        <div v-for="check in qualityChecks" :key="check.orderId"
-                            class="p-3 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/5">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-mono text-primary text-xs font-bold">{{ check.orderId }}</span>
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold"
-                                    :class="check.isPassed ? 'bg-green-500/20 text-green-600 dark:text-green-400' : check.verified ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'bg-yellow-500/20 text-yellow-600 dark:text-yellow-400'">
-                                    {{ check.isPassed ? 'Passed' : check.verified ? 'Ready' : 'Pending' }}
-                                </span>
-                            </div>
-                            <div class="space-y-1 text-xs">
-                                <div v-for="(field, fIdx) in checkFields" :key="fIdx"
-                                    @click="toggleCheck(check, field.key)"
-                                    class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 dark:bg-white/5 rounded p-0.5 transition-colors">
-                                    <span class="material-symbols-outlined text-[14px]"
-                                        :class="check[field.key] ? 'text-green-600 dark:text-green-400' : 'text-gray-600'">{{
-                                            check[field.key] ? 'check_circle' : 'radio_button_unchecked' }}</span>
-                                    <span class="text-gray-600 dark:text-gray-300">{{ field.label }}</span>
-                                </div>
-                            </div>
-                            <button v-if="check.isPassed"
-                                class="mt-3 w-full py-2 bg-green-500/20 text-green-600 dark:text-green-400 rounded text-xs font-bold cursor-default opacity-70">
-                                Dispatch Queue Updated
-                            </button>
-                            <button v-else-if="check.verified" @click="triggerDispatch(check)"
-                                class="mt-3 w-full py-2 bg-green-500/20 hover:bg-green-500/30 text-green-600 dark:text-green-400 rounded text-xs font-bold transition-colors flex items-center justify-center gap-1">
-                                <span class="material-symbols-outlined text-[14px]">send</span> Ready for Dispatch
-                            </button>
-                            <button v-else
-                                class="mt-3 w-full py-2 bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 rounded text-xs font-bold cursor-not-allowed opacity-50">
-                                Complete all checks first
-                            </button>
-                        </div>
-                        <div v-if="qualityChecks.length === 0" class="text-center text-xs text-gray-500 py-4">
-                            No orders pending quality check
-                        </div>
-                    </div>
-                </div>
+                <QualityCheckPanel :quality-checks="qualityChecks" :check-fields="checkFields" @toggle-check="toggleCheck" @dispatch="triggerDispatch" />
             </div>
         </div>
 
@@ -842,11 +746,36 @@
 </template>
 
 <script setup>
+import PickingPipeline from './picking/PickingPipeline.vue'
+import PackingStationsPanel from './picking/PackingStationsPanel.vue'
+import QualityCheckPanel from './picking/QualityCheckPanel.vue'
 import { ref, computed, inject, onMounted, onUnmounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { getEffectiveWarehouseSubstatus, patchWarehouseOrderUiState } from '@/utils/warehouseOrderState'
 import { apiUrl } from '@/config/api'
 import { useSlipPrinter } from '@/composables/useSlipPrinter'
+import {
+    isHouseShift,
+    isDirectTransport,
+    isDirectTransportOrder,
+    getPriorityIcon,
+    getPriorityBadgeClass,
+    isOverdue,
+    formatCurrency,
+    formatDate,
+    formatLocation,
+    getStatusClass,
+    dedupeOrders,
+    getActionLabel,
+    hasAction,
+    getPickItemKey,
+    getItemRequiredQuantity,
+    getItemPickedQuantity,
+    getItemRemainingQuantity,
+    getPickActionLabel,
+    notifyOrdersUpdated,
+    readResponseError,
+} from './picking/pickingFormat'
 
 const { openSlipWithData } = useSlipPrinter()
 
@@ -1028,25 +957,6 @@ const activePickers = computed(() => {
     ).length
 })
 
-// INDIVIDUAL (house-shift) orders require customers to select packing materials,
-// so they need warehouse inventory stocked and a floor plan configured before picking.
-// Small package / parcel orders (VENDOR etc.) are pre-packaged — no packing materials,
-// no inventory tracking, no floor plan needed. Only a labourer is required for all types.
-function isHouseShift(wave) {
-    return wave.laborRequired > 0
-}
-
-// Direct transport orders have packing_amount == 0, meaning the customer did NOT request
-// packing services. The driver goes straight to the pickup location — no warehouse
-// picking, packing, or loading dock processing is needed.
-function isDirectTransport(wave) {
-    return wave.packingAmount === 0
-}
-
-function isDirectTransportOrder(order) {
-    return Number(order?.packing_amount ?? order?.packingAmount ?? 0) === 0
-}
-
 const prerequisiteWarnings = computed(() => {
     const warnings = []
     const hasHouseShiftOrders = waves.value.some(w => isHouseShift(w))
@@ -1106,30 +1016,6 @@ function clearFilters() {
 // ==================
 // Priority Helpers
 // ==================
-
-function getPriorityIcon(priority) {
-    const p = (priority || 'STANDARD').toUpperCase()
-    if (p === 'EXPRESS' || p === 'URGENT') return '🔥'
-    if (p === 'ECONOMY' || p === 'LOW') return '🐢'
-    return '📦'
-}
-
-function getPriorityBadgeClass(priority) {
-    const p = (priority || 'STANDARD').toUpperCase()
-    if (p === 'EXPRESS' || p === 'URGENT') return 'bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/30'
-    if (p === 'ECONOMY' || p === 'LOW') return 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30'
-    return 'bg-gray-500/20 text-gray-600 dark:text-gray-400 border border-gray-500/30'
-}
-
-function isOverdue(deadline) {
-    if (!deadline || deadline === 'N/A') return false
-    try {
-        const deadlineDate = new Date(deadline)
-        return deadlineDate < new Date()
-    } catch {
-        return false
-    }
-}
 
 // ==================
 // Auto-Refresh
@@ -1285,62 +1171,6 @@ async function undoWaveStatus(wave) {
     if (idx >= 0) undoHistory.value.splice(idx, 1)
 }
 
-function formatCurrency(value) {
-    if (!value) return '₹0'
-    return new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR',
-        maximumFractionDigits: 0
-    }).format(value)
-}
-
-function formatDate(dateString) {
-    if (!dateString) return 'N/A'
-    try {
-        return new Date(dateString).toLocaleDateString('en-IN', {
-            month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
-        })
-    } catch {
-        return 'N/A'
-    }
-}
-
-function formatLocation(item) {
-    const parts = []
-    if (item.zone) parts.push(item.zone)
-    if (item.aisle) parts.push(`A${item.aisle}`)
-    if (item.rack) parts.push(`R${item.rack}`)
-    if (item.shelf) parts.push(`S${item.shelf}`)
-    if (item.bin) parts.push(`B${item.bin}`)
-    return parts.length > 0 ? parts.join('-') : 'Location TBD'
-}
-
-function getStatusClass(status) {
-    const map = {
-        'ON_HOLD': 'bg-red-500/10 text-red-500 border-red-500/20',
-        'AWAITING_PICK': 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-        'PICKING': 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-        'PICKED': 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20',
-        'PACKING': 'bg-green-500/10 text-green-500 border-green-500/20',
-        'PACKED': 'bg-teal-500/10 text-teal-500 border-teal-500/20',
-        'QC_PASSED': 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20',
-        'READY_FOR_DISPATCH': 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
-        'ON_DOCK': 'bg-orange-500/10 text-orange-500 border-orange-500/20',
-        'CONFIRMED': 'bg-gray-500/10 text-gray-500 border-gray-500/20',
-    }
-    return map[status] || 'bg-gray-500/10 text-gray-500 border-gray-500/20'
-}
-
-function dedupeOrders(orders) {
-    const seen = new Set()
-    return orders.filter(order => {
-        const key = order.id || order.tracking_code
-        if (!key || seen.has(key)) return false
-        seen.add(key)
-        return true
-    })
-}
-
 function getWarehouseId() {
     return authStore.currentWarehouse?.id || authStore.currentUser?.warehouse_id
 }
@@ -1349,53 +1179,12 @@ function isWaveActionPending(wave) {
     return Boolean(wave?.rawId && waveActionPending.value[wave.rawId])
 }
 
-function getActionLabel(wave) {
-    if (wave.status === 'AWAITING_PICK' || wave.status === 'CONFIRMED') return 'Start Picking'
-    if (wave.status === 'PICKING') return 'Complete Picking'
-    if (wave.status === 'PICKED') return 'Start Packing'
-    if (wave.status === 'PACKING') return 'Complete Packing'
-    return ''
-}
-
-function hasAction(wave) {
-    return Boolean(getActionLabel(wave))
-}
-
 function hasCompletedPicking(status) {
     return PICK_CONFIRMED_STATUSES.includes(status)
 }
 
-function getPickItemKey(item) {
-    return [item.sku, item.location_path || formatLocation(item), item.required_quantity || item.quantity_required || item.quantity || 0].join('::')
-}
-
-function getItemRequiredQuantity(item) {
-    return Number(item.quantity_required ?? item.required_quantity ?? item.quantity ?? 0) || 0
-}
-
-function getItemPickedQuantity(item) {
-    return Math.max(0, Number(item.quantity_picked ?? 0) || 0)
-}
-
-function getItemRemainingQuantity(item) {
-    return Math.max(0, getItemRequiredQuantity(item) - getItemPickedQuantity(item))
-}
-
 function canConfirmPickItem(item) {
     return selectedWave.value?.status === 'PICKING' && !item.syncing && getItemRemainingQuantity(item) > 0
-}
-
-function getPickActionLabel(item) {
-    if (item.syncing) return 'Saving...'
-    if (item.is_complete) return 'Picked'
-    if (getItemPickedQuantity(item) > 0) return 'Mark Remaining Picked'
-    return 'Mark Picked'
-}
-
-function notifyOrdersUpdated() {
-    if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('warehouse-orders-updated'))
-    }
 }
 
 function dismissDispatcherOrder(rawId) {
@@ -1406,15 +1195,6 @@ function dismissDispatcherOrder(rawId) {
 // ==================
 // Backend Data Helpers
 // ==================
-
-async function readResponseError(response, fallbackMessage) {
-    try {
-        const errorData = await response.json()
-        return errorData.detail || errorData.message || fallbackMessage
-    } catch {
-        return fallbackMessage
-    }
-}
 
 function mergePickListWithProgress(items = [], progressItems = [], status = selectedWave.value?.status) {
     const progressBySku = new Map((progressItems || []).map(progressItem => [progressItem.sku, progressItem]))
