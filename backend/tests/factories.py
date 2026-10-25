@@ -8,6 +8,7 @@ loaded, because services read user.role outside an async greenlet.
 from __future__ import annotations
 
 import itertools
+import secrets
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 
@@ -27,7 +28,8 @@ from app.models.warehouse import LoadingDock, PackingStation, Warehouse
 from app.utils.hashing import hash_password
 from app.utils.jwt import create_access_token
 
-PASSWORD = "StrongPass123"
+# Fresh each run, so no fixture password is written down anywhere.
+PASSWORD = secrets.token_urlsafe(12)
 _counter = itertools.count(1)
 
 
