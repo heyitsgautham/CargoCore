@@ -32,7 +32,11 @@ from app.services.logistics.formatting import _now
 from app.services.logistics.lookups import _get_or_create_user, _get_role
 
 
-async def ensure_logistics_seed_data(db: AsyncSession, manager_user: User) -> None:
+async def ensure_logistics_seed_data(db: AsyncSession, manager_user: User, staff_password: str) -> None:
+    """Create demo hubs, staff, fleet and orders on an empty database.
+
+    Every demo staff account gets staff_password, so the caller decides how it is chosen.
+    """
     warehouse_count = (await db.execute(select(func.count(Warehouse.id)))).scalar_one()
     if warehouse_count:
         return
@@ -43,11 +47,11 @@ async def ensure_logistics_seed_data(db: AsyncSession, manager_user: User) -> No
     db.add_all([north, south, west])
     await db.flush()
 
-    wm_north = await _get_or_create_user(db, role_name="WAREHOUSE_MANAGER", email="ellen.r@cargocore.com", username="ellen_r", name="Ellen Ripley", warehouse_id=north.id, phone="+1 (555) 555-0101")
-    wm_south = await _get_or_create_user(db, role_name="WAREHOUSE_MANAGER", email="sarah.c@cargocore.com", username="sarah_c", name="Sarah Connor", warehouse_id=south.id, phone="+1 (555) 123-4567")
-    await _get_or_create_user(db, role_name="DISPATCHER", email="john.w@cargocore.com", username="john_w", name="John Wick", warehouse_id=north.id, phone="+1 (555) 987-6543")
-    driver_one = await _get_or_create_user(db, role_name="DRIVER", email="david.m@cargocore.com", username="david_m", name="David Miller", warehouse_id=north.id, phone="+1 (555) 123-4567")
-    driver_two = await _get_or_create_user(db, role_name="DRIVER", email="sarah.j@cargocore.com", username="sarah_j", name="Sarah Jenkins", warehouse_id=south.id, phone="+1 (555) 987-6543")
+    wm_north = await _get_or_create_user(db, role_name="WAREHOUSE_MANAGER", email="ellen.r@cargocore.com", username="ellen_r", name="Ellen Ripley", warehouse_id=north.id, phone="+1 (555) 555-0101", password=staff_password)
+    wm_south = await _get_or_create_user(db, role_name="WAREHOUSE_MANAGER", email="sarah.c@cargocore.com", username="sarah_c", name="Sarah Connor", warehouse_id=south.id, phone="+1 (555) 123-4567", password=staff_password)
+    await _get_or_create_user(db, role_name="DISPATCHER", email="john.w@cargocore.com", username="john_w", name="John Wick", warehouse_id=north.id, phone="+1 (555) 987-6543", password=staff_password)
+    driver_one = await _get_or_create_user(db, role_name="DRIVER", email="david.m@cargocore.com", username="david_m", name="David Miller", warehouse_id=north.id, phone="+1 (555) 123-4567", password=staff_password)
+    driver_two = await _get_or_create_user(db, role_name="DRIVER", email="sarah.j@cargocore.com", username="sarah_j", name="Sarah Jenkins", warehouse_id=south.id, phone="+1 (555) 987-6543", password=staff_password)
 
     north.manager_id = wm_north.id
     south.manager_id = wm_south.id

@@ -44,6 +44,7 @@ async def _get_or_create_user(
     username: str | None = None,
     warehouse_id: UUID | None = None,
     phone: str | None = None,
+    password: str,
 ) -> User:
     existing = (await db.execute(select(User).where(User.email == email))).scalar_one_or_none()
     role = await _get_role(db, role_name)
@@ -65,7 +66,7 @@ async def _get_or_create_user(
         email=email,
         phone=phone,
         address="",
-        password_hash=hash_password("12345678"),
+        password_hash=hash_password(password),
         role_id=role.id,
         warehouse_id=warehouse_id,
         is_active=True,

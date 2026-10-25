@@ -8,6 +8,7 @@ python -m scripts.export_api_docs
 
 | Script | What it does |
 |---|---|
+| `seed_demo_data.py` | Fills an empty database with demo hubs, staff, vehicles, orders and stock, with staff passwords from `DEMO_STAFF_PASSWORD` |
 | `export_api_docs.py` | Writes `docs/openapi.json` and `docs/API_ENDPOINT_CATALOG.md` from the running app's schema |
 | `seed_packing_materials.py` | Adds the PKG- packing material SKUs to every active hub that lacks them |
 | `backfill_order_geocodes.py` | Geocodes orders saved without pickup or delivery coordinates |
