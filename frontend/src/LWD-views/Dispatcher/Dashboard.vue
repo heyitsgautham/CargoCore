@@ -1487,10 +1487,17 @@ function fitMapBounds() {
                 })
             }
             
+            // Drop points with a missing coordinate; one bad point makes the
+            // whole bounds invalid and Leaflet throws "Bounds are not valid".
+            const validPoints = points.filter(([lat, lng]) => hasValidCoordinate(lat) && hasValidCoordinate(lng))
+            points.length = 0
+            points.push(...validPoints)
+
             // If we have multiple points, fit bounds
             if (points.length > 1) {
-                const bounds = L.latLngBounds(points)
-                leafletMap.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 })
+                // Pass plain [lat, lng] pairs: the map comes from @vue-leaflet's Leaflet
+                // build, which rejects a LatLngBounds made by the 'leaflet' import.
+                leafletMap.fitBounds(points, { padding: [50, 50], maxZoom: 14 })
             } else if (points.length === 1) {
                 // Single point - just center on it
                 leafletMap.setView(points[0], 13)

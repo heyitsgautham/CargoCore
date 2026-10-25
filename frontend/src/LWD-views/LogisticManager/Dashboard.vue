@@ -746,8 +746,9 @@ async function fetchLiveDrivers() {
         const data = await res.json()
         liveDrivers.value = data.filter(d => d.latitude != null && d.longitude != null)
         if (liveDrivers.value.length > 0 && fleetMap.value?.leafletObject) {
-            const bounds = L.latLngBounds(liveDrivers.value.map(d => [d.latitude, d.longitude]))
-            fleetMap.value.leafletObject.fitBounds(bounds, { padding: [40, 40], maxZoom: 13 })
+            // Plain [lat, lng] pairs: @vue-leaflet's Leaflet build rejects bounds made by the 'leaflet' import.
+            const points = liveDrivers.value.map(d => [d.latitude, d.longitude])
+            fleetMap.value.leafletObject.fitBounds(points, { padding: [40, 40], maxZoom: 13 })
         }
     } catch (e) { /* silent */ } finally {
         fleetLoading.value = false

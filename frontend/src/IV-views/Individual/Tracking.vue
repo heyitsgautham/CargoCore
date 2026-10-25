@@ -974,7 +974,10 @@ async function fitMapToRoute(coords, { animate = false } = {}) {
 
     const baseBounds = L.latLngBounds(coords)
     const { maxZoom, duration, padFactor } = getRouteFocusSettings(coords)
-    const bounds = baseBounds.pad(padFactor)
+    // Hand Leaflet plain corner pairs: the map comes from @vue-leaflet's Leaflet build,
+    // which rejects a LatLngBounds created by the 'leaflet' import as invalid.
+    const padded = baseBounds.pad(padFactor)
+    const bounds = [[padded.getSouth(), padded.getWest()], [padded.getNorth(), padded.getEast()]]
     if (animate && leaflet.flyToBounds) {
         leaflet.flyToBounds(bounds, {
             paddingTopLeft: MAP_FIT_PADDING_TOP_LEFT,
