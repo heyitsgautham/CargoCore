@@ -87,7 +87,7 @@ async def answer_ai_query(db: AsyncSession, query: str) -> LogisticsAiQueryRespo
                 "active": len(active_drivers),
                 "idle": len(idle_drivers),
                 "breakdown_deviation": len(issues),
-                "avg_efficiency": f"{sum(d.efficiency_score for d in bootstrap.drivers) / max(total, 1):.0f}%" if bootstrap.drivers else "N/A",
+                "avg_efficiency": f"{sum(d.efficiency for d in bootstrap.drivers) / max(total, 1):.0f}%" if bootstrap.drivers else "N/A",
             },
         )
 
@@ -110,7 +110,7 @@ async def answer_ai_query(db: AsyncSession, query: str) -> LogisticsAiQueryRespo
                 "active": len(active_vehicles),
                 "in_maintenance": len(in_shop),
                 "scheduled_service": len(scheduled),
-                "vehicle_types": list(set(v.vehicle_type for v in bootstrap.vehicles)) if bootstrap.vehicles else [],
+                "vehicle_types": list(set(v.type for v in bootstrap.vehicles)) if bootstrap.vehicles else [],
             },
         )
 
@@ -214,7 +214,7 @@ async def answer_ai_query(db: AsyncSession, query: str) -> LogisticsAiQueryRespo
             role = user.get("role", "Unknown")
             users_by_role[role] = users_by_role.get(role, 0) + 1
         total = len(bootstrap.users)
-        active = len([u for u in bootstrap.users if u.get("is_active", True)])
+        active = len([u for u in bootstrap.users if u.status == "Active"])
         if total == 0:
             text = "No team members registered yet. Time to build your dream team!"
         else:
@@ -285,7 +285,7 @@ async def answer_ai_query(db: AsyncSession, query: str) -> LogisticsAiQueryRespo
                 "total_zones": total,
                 "active": len(active_zones),
                 "alert_status": len(alert_zones),
-                "zone_types": list(set(z.zone_type for z in bootstrap.zones)) if bootstrap.zones else ["None configured"],
+                "zone_types": list(set(z.type for z in bootstrap.zones)) if bootstrap.zones else ["None configured"],
             },
         )
 
