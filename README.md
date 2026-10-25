@@ -129,6 +129,7 @@ Redis and Gemini are mocked.
 |---|---|---|---|
 | `APP_ENV` | backend | `development` | `production` turns off SQL echo and dev-only shortcuts |
 | `SECRET_KEY` | backend | `change-me` | signs JWTs, set 32 or more random characters |
+| `ADMIN_BOOTSTRAP_PASSWORD` | backend | empty | first password for the reserved `logisticmanager@gmail.com` admin, set only when the account is created; empty means a random one, logged outside production |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | backend | `1440` | access token lifetime |
 | `REFRESH_TOKEN_EXPIRE_DAYS` | backend | `7` | refresh token lifetime |
 | `DATABASE_URL` | backend | local `logistics_db` | async SQLAlchemy URL, `postgresql+asyncpg://...` |

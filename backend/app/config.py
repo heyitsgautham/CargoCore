@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     secret_key: str = "change-me"
     access_token_expire_minutes: int = 1440  # 24 hours — suits long driver shifts
     refresh_token_expire_days: int = 7
+    # First password for the reserved logisticmanager@gmail.com admin, used only when
+    # the account is created. Unset means a random password, logged outside production.
+    admin_bootstrap_password: str = ""
 
     # ── Database ─────────────────────────────────────────────────────────────
     database_url: str = "postgresql+asyncpg://logistics_user:logistics_pass@localhost:5432/logistics_db"
