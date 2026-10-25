@@ -5,6 +5,7 @@ useDefault = true
 [allowlist]
 description = "Fixture passwords in backend tests and placeholder tokens in curl examples"
 regexes = [
+  '''(New|BrandNew|Reset)?(Strong)?Pass(123|456|789)\w*''',
   '''(New)?StrongPass\w*''',
   '''YOUR_(ACCESS_)?TOKEN(_HERE)?''',
 ]
