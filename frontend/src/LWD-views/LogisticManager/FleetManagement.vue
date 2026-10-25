@@ -1014,6 +1014,7 @@ import { apiUrl, API_BASE_URL } from '@/config/api'
 import { LMap, LTileLayer, LMarker, LPopup } from '@vue-leaflet/vue-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
+import { validPoints } from '@/utils/mapBounds'
 
 // Fix Leaflet default icon paths
 delete L.Icon.Default.prototype._getIconUrl
@@ -1144,9 +1145,7 @@ async function fetchLiveDrivers() {
         const data = await res.json()
         liveDrivers.value = data.filter(d => d.latitude != null && d.longitude != null)
         if (liveDrivers.value.length > 0 && liveLocationsMap.value?.leafletObject) {
-            // Plain [lat, lng] pairs: @vue-leaflet's Leaflet build rejects bounds made by the 'leaflet' import.
-            const points = liveDrivers.value.map(d => [d.latitude, d.longitude])
-            liveLocationsMap.value.leafletObject.fitBounds(points, { padding: [40, 40], maxZoom: 13 })
+            liveLocationsMap.value.leafletObject.fitBounds(validPoints(liveDrivers.value.map(d => [d.latitude, d.longitude])), { padding: [40, 40], maxZoom: 13 })
         }
     } catch (e) { /* silent */ } finally {
         fleetLoading.value = false

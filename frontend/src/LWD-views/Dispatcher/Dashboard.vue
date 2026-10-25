@@ -711,6 +711,7 @@ import { apiUrl } from '@/config/api'
 import { LMap, LTileLayer, LMarker, LPopup, LCircle, LPolyline, LTooltip } from '@vue-leaflet/vue-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
+import { validPoints } from '@/utils/mapBounds'
 import {
     getDestinationIcon,
     getDriverIcon,
@@ -1487,21 +1488,10 @@ function fitMapBounds() {
                 })
             }
             
-            // Drop points with a missing coordinate; one bad point makes the
-            // whole bounds invalid and Leaflet throws "Bounds are not valid".
-            const validPoints = points.filter(([lat, lng]) => hasValidCoordinate(lat) && hasValidCoordinate(lng))
-            points.length = 0
-            points.push(...validPoints)
-
-            // If we have multiple points, fit bounds
-            if (points.length > 1) {
-                // Pass plain [lat, lng] pairs: the map comes from @vue-leaflet's Leaflet
-                // build, which rejects a LatLngBounds made by the 'leaflet' import.
-                leafletMap.fitBounds(points, { padding: [50, 50], maxZoom: 14 })
-            } else if (points.length === 1) {
-                // Single point - just center on it
-                leafletMap.setView(points[0], 13)
-            }
+            // Fit several points, or centre on a single one
+            const fitted = validPoints(points)
+            if (fitted.length > 1) leafletMap.fitBounds(fitted, { padding: [50, 50], maxZoom: 14 })
+            else if (fitted.length === 1) leafletMap.setView(fitted[0], 13)
         }, 600)
     })
 }
