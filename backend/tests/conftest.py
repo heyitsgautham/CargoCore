@@ -69,12 +69,23 @@ async def setup_db():
     await test_engine.dispose()
 
 
+_TRUNCATE_TABLES = ", ".join(
+    f'"{table.name}"' for table in Base.metadata.sorted_tables if table.name != "roles"
+)
+
+
 @pytest_asyncio.fixture()
 async def db_session(setup_db) -> AsyncGenerator[AsyncSession, None]:
-    """Yield an async session that rolls back after each test."""
+    """Yield an async session, then empty every table except roles.
+
+    Services commit their own transactions, so a rollback alone leaves rows behind
+    and a later test that registers the same email gets a 409.
+    """
     async with TestSessionLocal() as session:
         yield session
         await session.rollback()
+    async with test_engine.begin() as conn:
+        await conn.execute(text(f"TRUNCATE {_TRUNCATE_TABLES} RESTART IDENTITY CASCADE"))
 
 
 # ── Override app dependencies ─────────────────────────────────────────────────
