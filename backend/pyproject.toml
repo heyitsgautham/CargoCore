@@ -26,7 +26,7 @@ exclude = '''
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-testpaths = ["tests/unit", "tests/contract", "tests/integration", "tests/test_ai", "tests/test_auth", "tests/test_customer", "tests/test_orders"]
+testpaths = ["tests/unit", "tests/contract", "tests/integration", "tests/test_ai", "tests/test_auth", "tests/test_customer", "tests/test_orders", "tests/flows"]
 filterwarnings = [
     # starlette 0.37.x still uses `import multipart` internally; fixed in a later release
     "ignore:Please use.*python_multipart:PendingDeprecationWarning",
