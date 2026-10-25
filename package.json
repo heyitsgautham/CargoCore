@@ -16,7 +16,9 @@
     "test:coverage": "npm run test:coverage -w frontend",
     "lint": "npm run lint -w frontend",
     "format:check": "npm run format:check -w frontend",
-    "check:size": "python3 scripts/check_file_size.py"
+    "check:size": "python3 scripts/check_file_size.py",
+    "test:backend": "cd backend && uv run --frozen pytest --cov",
+    "lint:backend": "cd backend && uv run --frozen ruff check ."
   },
   "devDependencies": {
     "vitest": "4.1.12"

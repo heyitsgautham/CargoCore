@@ -15,9 +15,10 @@ A pull request with a red check does not merge.
 
 ```bash
 # backend/
-ruff check .
-pytest --cov
-pip-audit -r requirements.txt --no-deps --disable-pip
+uv run ruff check .
+uv run pytest --cov
+uv export --frozen --no-dev --no-hashes --package cargocore-api -o /tmp/req.txt
+uv run pip-audit -r /tmp/req.txt --no-deps --disable-pip
 
 # repo root (npm workspace)
 npm run lint
@@ -52,8 +53,8 @@ The backend suite needs Postgres with a `logistics_db_test` database, as `README
 
 ## Dependencies
 
-- Backend dependencies go in `backend/requirements.in`, or `requirements-dev.in` for test and lint tools.
-  Regenerate the pinned files with the `uv pip compile` commands in `backend/README.md` and commit both.
+- Backend dependencies go through `uv add <pkg>` in `backend/`, or `uv add --dev <pkg>` for test and lint tools.
+  uv updates `backend/pyproject.toml` and the root `uv.lock`, and both are committed with the change.
 - Frontend dependencies go through `npm install <pkg> -w frontend` from the repo root, and the root `package-lock.json` is committed with the change.
 - Dependabot opens weekly update pull requests, and each one must pass CI like any other change.
 

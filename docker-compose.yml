@@ -6,8 +6,9 @@
 services:
   app:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      # The uv workspace lockfile sits at the repo root, so the build starts there.
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: logistics_app
     ports:
       - "8000:8000"

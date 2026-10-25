@@ -1,0 +1,8 @@
+# uv workspace root. The API in backend/ is the only Python project,
+# and uv.lock next to this file pins its runtime and dev dependencies.
+#   uv sync --frozen            # install into .venv at the repo root
+#   cd backend && uv run pytest --cov
+
+[tool.uv.workspace]
+members = ["backend"]
+

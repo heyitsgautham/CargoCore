@@ -23,12 +23,13 @@ Alembic migrations run when the `app` container starts.
 ```bash
 # Requires: Python 3.12+, PostgreSQL 16, Redis 7
 
-# 1. Create virtual environment
+# 1. Install the locked dependencies (runtime plus test and lint tools)
+#    from the repo root, which holds the uv workspace and uv.lock
+uv sync --frozen
+source .venv/bin/activate
 cd backend
-python -m venv venv && source venv/bin/activate
 
-# 2. Install pinned dependencies (runtime plus test and lint tools)
-pip install -r requirements-dev.txt
+# 2. Commands below run inside that virtualenv, or prefix them with `uv run`
 
 # 3. Copy and configure environment variables
 cp .env.example .env
@@ -56,9 +57,10 @@ Redis is mocked.
 
 ```bash
 createdb logistics_db_test
-pytest --cov          # every backend suite, fails under 70% coverage
-ruff check .          # lint
-pip-audit -r requirements.txt --no-deps --disable-pip
+uv run pytest --cov   # every backend suite, fails under 70% coverage
+uv run ruff check .   # lint
+uv export --frozen --no-dev --no-hashes --package cargocore-api -o /tmp/req.txt
+uv run pip-audit -r /tmp/req.txt --no-deps --disable-pip
 ```
 
 `pytest` collects `tests/unit`, `tests/contract`, `tests/integration`, `tests/flows` and the `tests/test_*` suites by default.
@@ -66,11 +68,12 @@ pip-audit -r requirements.txt --no-deps --disable-pip
 
 ## Updating dependencies
 
-Edit `requirements.in` or `requirements-dev.in`, then regenerate the pinned files.
+Add or upgrade a package with uv from this directory, then commit `pyproject.toml` and the root `uv.lock`.
 
 ```bash
-uv pip compile requirements.in --universal --python-version 3.12 -o requirements.txt
-uv pip compile requirements-dev.in --universal --python-version 3.12 -o requirements-dev.txt
+uv add <package>             # runtime dependency
+uv add --dev <package>       # test or lint tool
+uv lock --upgrade-package <package>
 ```
 
 ---

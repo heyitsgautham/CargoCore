@@ -60,19 +60,19 @@ The `app` container runs `alembic upgrade head` before it starts Uvicorn.
 
 ## Running without Docker
 
-You need Python 3.12, Node.js 20 or newer, PostgreSQL 16 and Redis 7.
+You need Python 3.12, [uv](https://docs.astral.sh/uv/), Node.js 20 or newer, PostgreSQL 16 and Redis 7.
 
 ### Backend
 
+The repo root is also a uv workspace, and `uv.lock` there pins every Python dependency of `backend/`.
+
 ```bash
+uv sync --frozen                     # from the repo root, creates .venv with runtime and dev tools
 cd backend
-python3.12 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements-dev.txt
 cp .env.example .env                 # set DATABASE_URL, REDIS_URL and SECRET_KEY
 createdb logistics_db
-alembic upgrade head
-uvicorn app.main:app --reload --port 8000
+uv run alembic upgrade head
+uv run uvicorn app.main:app --reload --port 8000
 ```
 
 ### Web app
@@ -104,9 +104,9 @@ These are the commands CI runs in `.github/workflows/ci.yml`.
 
 | Where | Command | What it does |
 |---|---|---|
-| `backend/` | `pytest --cov` | 879 unit, contract, integration and flow tests, fails under 70% coverage |
-| `backend/` | `ruff check .` | lint |
-| `backend/` | `pip-audit -r requirements.txt --no-deps --disable-pip` | dependency audit |
+| `backend/` | `uv run pytest --cov` | 879 unit, contract, integration and flow tests, fails under 70% coverage |
+| `backend/` | `uv run ruff check .` | lint |
+| `backend/` | `uv export --frozen --no-dev --no-hashes --package cargocore-api -o /tmp/req.txt` then `uv run pip-audit -r /tmp/req.txt --no-deps --disable-pip` | dependency audit |
 | repo root | `npm test` | 241 Vitest tests for the API client, the Pinia stores, composables, slips and utils |
 | repo root | `npm run test:coverage` | the same tests with the coverage thresholds in `frontend/vitest.config.js` |
 | repo root | `npm run lint` | ESLint with the Vue plugin |
@@ -155,14 +155,14 @@ backend/
   alembic/       database migrations
   tests/         unit, contract and integration suites, plus API test reports
   scripts/       maintenance scripts, run as python -m scripts.<name>
-  requirements.in, requirements.txt          runtime dependencies, pinned
-  requirements-dev.in, requirements-dev.txt  test and lint tools, pinned
+  pyproject.toml   runtime dependencies and the dev group, with ruff, pytest and coverage settings
 frontend/
   src/           role views (IV, LWD, LWDDVI, Ai), Pinia stores, composables, API client
   tests/unit/    Vitest suites
   html-slips/    printable slip templates served at /html-slips
 driver-app/      Capacitor Android app and its Gradle project
 docs/            plans, meeting minutes, frontend and backend notes
+pyproject.toml, uv.lock            uv workspace root for the API, one lockfile
 package.json, package-lock.json    npm workspace root for the web app, one lockfile
 vitest.config.js                   runs every workspace's Vitest project from the root
 docker-compose.yml, .env.example   full stack for local use

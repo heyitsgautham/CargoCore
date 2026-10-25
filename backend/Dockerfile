@@ -1,10 +1,20 @@
-# ── Stage 1: builder ──────────────────────────────────────────────────────────
+# Build from the repo root, since the uv workspace lockfile lives there:
+#   docker build -f backend/Dockerfile .
+
+# ── Stage 1: install the locked dependencies into a virtualenv ───────────────
 FROM python:3.12-slim AS builder
 
-WORKDIR /install
+COPY --from=ghcr.io/astral-sh/uv:0.5.14 /uv /usr/local/bin/uv
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
+
+WORKDIR /src
+
+COPY pyproject.toml uv.lock ./
+COPY backend/pyproject.toml ./backend/
+RUN uv sync --frozen --no-dev --package cargocore-api --python /usr/local/bin/python3.12
 
 
 # ── Stage 2: runtime ──────────────────────────────────────────────────────────
@@ -15,15 +25,15 @@ RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
 WORKDIR /app
 
-# Copy installed packages from builder
-COPY --from=builder /install /usr/local
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy application source
-COPY app/ ./app/
-COPY alembic/ ./alembic/
-COPY alembic.ini ./alembic.ini
+COPY backend/app/ ./app/
+COPY backend/alembic/ ./alembic/
+COPY backend/alembic.ini ./alembic.ini
 # Rate card read by the rates router, inventory and return-charge services
-COPY rates_config.json ./rates_config.json
+COPY backend/rates_config.json ./rates_config.json
 
 # Ownership
 RUN chown -R appuser:appgroup /app

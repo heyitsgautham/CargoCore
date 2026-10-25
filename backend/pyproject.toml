@@ -1,3 +1,44 @@
+[project]
+name = "cargocore-api"
+version = "0.2.0"
+description = "CargoCore FastAPI backend: orders, warehouses, dispatch, finance and the AI assistant"
+requires-python = ">=3.12"
+dependencies = [
+    # Core
+    "fastapi",
+    "uvicorn[standard]",
+    "pydantic-settings",
+    "pydantic[email]",
+    "python-multipart",
+    "httpx",
+    # Database
+    "sqlalchemy[asyncio]",
+    "asyncpg",
+    "alembic",
+    # Auth
+    "pyjwt",
+    "bcrypt",
+    # Token blacklist and OTP storage
+    "redis",
+    # Background tasks
+    "celery",
+    # Logging
+    "loguru",
+    # AI assistant
+    "google-genai",
+    "sqlparse",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "pip-audit",
+    "ruff",
+    "black",
+]
+
 [tool.ruff]
 line-length = 88
 target-version = "py312"

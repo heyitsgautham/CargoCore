@@ -1,11 +1,23 @@
-# The web image builds from the repo root and needs only the root npm files and frontend/.
+# Both images build from the repo root.
+# The API image needs the root uv files and backend/, the web image the root npm files and frontend/.
 **/node_modules
 **/dist
 **/coverage
+**/.venv
+**/venv
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.ruff_cache
+**/.coverage
+**/coverage.xml
 **/.env
 **/.env.*
 !**/.env.example
 .git
 driver-app
 docs
+backend/tests
+backend/docs
+backend/uploads
 *.pdf
