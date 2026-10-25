@@ -35,7 +35,7 @@
   "frontend/src/components/HeaderMeetingScheduler.vue": 807,
   "frontend/src/pages/SignupWizard.vue": 836,
   "frontend/src/stores/dispatcherStore.js": 1028,
-  "frontend/src/stores/individualStore.js": 1747,
+  "frontend/src/stores/individualStore.js": 1378,
   "frontend/src/stores/logisticStore.js": 1495,
   "frontend/src/stores/vendorStore.js": 1252,
   "frontend/src/views/HubArchivedAccess.vue": 817
