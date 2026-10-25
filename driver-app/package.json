@@ -35,7 +35,7 @@
     "devDependencies": {
         "@capacitor/assets": "^3.0.5",
         "@capacitor/cli": "^7.6.0",
-        "@vitejs/plugin-basic-ssl": "^2.1.4",
+        "@vitejs/plugin-basic-ssl": "^2.3.0",
         "@vitejs/plugin-vue": "^5.0.4",
         "autoprefixer": "^10.4.19",
         "postcss": "^8.4.38",
