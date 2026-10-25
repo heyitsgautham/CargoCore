@@ -22,7 +22,7 @@ export default defineConfig({
       include: ['src/config/**', 'src/utils/**', 'src/composables/**', 'src/stores/**'],
       exclude: ['src/utils/dummyData.js'],
       // Floor for the logic layer; raise it as the large role stores gain tests.
-      thresholds: { statements: 16, branches: 14, functions: 17, lines: 17 },
+      thresholds: { statements: 53, branches: 50, functions: 47, lines: 57 },
     },
   },
 })
