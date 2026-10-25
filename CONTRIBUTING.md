@@ -19,7 +19,7 @@ ruff check .
 pytest --cov
 pip-audit -r requirements.txt --no-deps --disable-pip
 
-# frontend/
+# repo root (npm workspace)
 npm run lint
 npm run format:check
 npm run test:coverage
@@ -54,7 +54,7 @@ The backend suite needs Postgres with a `logistics_db_test` database, as `README
 
 - Backend dependencies go in `backend/requirements.in`, or `requirements-dev.in` for test and lint tools.
   Regenerate the pinned files with the `uv pip compile` commands in `backend/README.md` and commit both.
-- Frontend dependencies go through `npm install` in `frontend/`, and `package-lock.json` is committed with the change.
+- Frontend dependencies go through `npm install <pkg> -w frontend` from the repo root, and the root `package-lock.json` is committed with the change.
 - Dependabot opens weekly update pull requests, and each one must pass CI like any other change.
 
 ## Database changes

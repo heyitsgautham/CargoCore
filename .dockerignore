@@ -1,0 +1,11 @@
+# The web image builds from the repo root and needs only the root npm files and frontend/.
+**/node_modules
+**/dist
+**/coverage
+**/.env
+**/.env.*
+!**/.env.example
+.git
+driver-app
+docs
+*.pdf

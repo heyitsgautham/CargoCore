@@ -6,8 +6,9 @@ updates:
       interval: weekly
     open-pull-requests-limit: 5
 
+  # The root npm workspace holds the web app's lockfile.
   - package-ecosystem: npm
-    directory: /frontend
+    directory: /
     schedule:
       interval: weekly
     open-pull-requests-limit: 5

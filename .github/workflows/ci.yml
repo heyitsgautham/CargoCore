@@ -64,9 +64,7 @@ jobs:
   frontend:
     name: Frontend (lint, tests, build, audit)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
+    # The web app is the `frontend` workspace of the root npm project, so every step runs from the root.
     steps:
       - uses: actions/checkout@v4
 
@@ -74,7 +72,7 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -85,7 +83,7 @@ jobs:
       - name: Format check
         run: npm run format:check
 
-      - name: Tests with coverage
+      - name: Test
         run: npm run test:coverage
 
       - name: Build
@@ -93,6 +91,18 @@ jobs:
 
       - name: Dependency audit
         run: npm audit --audit-level=high
+
+  docker:
+    name: Docker images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate compose file
+        run: docker compose config --quiet
+
+      - name: Build images
+        run: docker compose build
 
   secret-scan:
     name: Secret scan

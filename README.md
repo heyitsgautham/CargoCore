@@ -77,10 +77,12 @@ uvicorn app.main:app --reload --port 8000
 
 ### Web app
 
+The repo root is an npm workspace, and the web app is its `frontend` workspace.
+Install from the root, where the lockfile lives.
+
 ```bash
-cd frontend
-npm ci
-cp .env.example .env                 # VITE_API_BASE_URL defaults to http://127.0.0.1:8000
+npm ci                               # from the repo root
+cp frontend/.env.example frontend/.env   # VITE_API_BASE_URL defaults to http://127.0.0.1:8000
 npm run dev                          # http://localhost:5173
 ```
 
@@ -105,12 +107,12 @@ These are the commands CI runs in `.github/workflows/ci.yml`.
 | `backend/` | `pytest --cov` | 879 unit, contract, integration and flow tests, fails under 70% coverage |
 | `backend/` | `ruff check .` | lint |
 | `backend/` | `pip-audit -r requirements.txt --no-deps --disable-pip` | dependency audit |
-| `frontend/` | `npm test` | 239 Vitest tests for the API client, the Pinia stores, composables, slips and utils |
-| `frontend/` | `npm run test:coverage` | the same tests with coverage thresholds |
-| `frontend/` | `npm run lint` | ESLint with the Vue plugin |
-| `frontend/` | `npm run format:check` | Prettier |
-| `frontend/` | `npm run build` | production bundle in `frontend/dist` |
-| `frontend/` | `npm audit --audit-level=high` | dependency audit |
+| repo root | `npm test` | 241 Vitest tests for the API client, the Pinia stores, composables, slips and utils |
+| repo root | `npm run test:coverage` | the same tests with the coverage thresholds in `frontend/vitest.config.js` |
+| repo root | `npm run lint` | ESLint with the Vue plugin |
+| repo root | `npm run format:check` | Prettier |
+| repo root | `npm run build` | production bundle in `frontend/dist` |
+| repo root | `npm audit --audit-level=high` | dependency audit |
 | repo root | `gitleaks git --config .gitleaks.toml .` | secret scan over the full history |
 | repo root | `python scripts/check_file_size.py` | fails when a source file passes 800 lines or a listed long file grows |
 
@@ -161,6 +163,8 @@ frontend/
   html-slips/    printable slip templates served at /html-slips
 driver-app/      Capacitor Android app and its Gradle project
 docs/            plans, meeting minutes, frontend and backend notes
+package.json, package-lock.json    npm workspace root for the web app, one lockfile
+vitest.config.js                   runs every workspace's Vitest project from the root
 docker-compose.yml, .env.example   full stack for local use
 ```
 

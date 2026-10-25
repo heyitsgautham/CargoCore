@@ -15,19 +15,17 @@ This is the frontend repository for the **Cargo-Core** logistics platform, a Sof
 ## 🛠️ Project Setup
 
 ### Prerequisites
-Ensure you have [Node.js](https://nodejs.org/) installed (version 18+ recommended).
+Ensure you have [Node.js](https://nodejs.org/) 20 or newer installed.
 
 ### Installation
+The web app is the `frontend` workspace of the npm project at the repo root, and the lockfile lives there.
+
 ```bash
-# Navigate to the frontend directory
-cd frontend
-
-# Install dependencies
-npm install
-
-# If you encounter peer dependency errors, use:
-# npm install --legacy-peer-deps
+# From the repo root
+npm ci
 ```
+
+The scripts below also work from inside `frontend/`.
 
 ### Development
 Start the local development server with Hot Module Replacement (HMR):

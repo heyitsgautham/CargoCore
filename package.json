@@ -1,0 +1,24 @@
+{
+  "name": "cargocore",
+  "private": true,
+  "type": "module",
+  "description": "Logistics and house-move management: FastAPI API, Vue web app and Capacitor driver app",
+  "workspaces": [
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "npm run dev -w frontend",
+    "build": "npm run build -w frontend",
+    "test": "vitest run",
+    "test:coverage": "npm run test:coverage -w frontend",
+    "lint": "npm run lint -w frontend",
+    "format:check": "npm run format:check -w frontend",
+    "check:size": "python3 scripts/check_file_size.py"
+  },
+  "devDependencies": {
+    "vitest": "4.1.12"
+  }
+}

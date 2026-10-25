@@ -38,8 +38,9 @@ services:
 
   web:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      # The npm workspace lockfile sits at the repo root, so the build starts there.
+      context: .
+      dockerfile: frontend/Dockerfile
       args:
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
         VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
