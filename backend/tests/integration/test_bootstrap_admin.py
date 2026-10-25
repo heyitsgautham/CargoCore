@@ -3,7 +3,7 @@
 import pytest
 
 from app.config import get_settings
-from app.services.auth_service import (
+from app.services.admin_bootstrap import (
     BOOTSTRAP_ADMIN_EMAIL,
     ensure_logistic_manager_account,
 )

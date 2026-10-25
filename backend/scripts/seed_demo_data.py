@@ -25,7 +25,7 @@ from app.database import AsyncSessionLocal
 from app.models.labour import Labourer
 from app.models.order import Order, OrderItem
 from app.models.warehouse import LoadingDock, PackingStation, Warehouse
-from app.services.auth_service import ensure_logistic_manager_account
+from app.services.admin_bootstrap import ensure_logistic_manager_account
 from app.services.logistics.lookups import _get_or_create_user
 from app.services.logistics.seed import ensure_logistics_seed_data
 

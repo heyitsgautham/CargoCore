@@ -5,7 +5,7 @@ from sqlalchemy import func, select
 from app.models.order import Order
 from app.models.user import User
 from app.models.warehouse import Warehouse
-from app.services.auth_service import ensure_logistic_manager_account
+from app.services.admin_bootstrap import ensure_logistic_manager_account
 from app.services.logistics.seed import ensure_logistics_seed_data
 from scripts.seed_demo_data import FLOOR_ORDERS, seed_floor_activity
 

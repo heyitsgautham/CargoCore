@@ -38,7 +38,7 @@ async def lifespan(app: FastAPI):
     from loguru import logger
 
     from app.services import vendor_service
-    from app.services.auth_service import ensure_logistic_manager_account
+    from app.services.admin_bootstrap import ensure_logistic_manager_account
 
     if not settings.gemini_api_key:
         logger.warning(
