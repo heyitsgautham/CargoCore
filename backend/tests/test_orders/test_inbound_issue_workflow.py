@@ -41,6 +41,7 @@ async def _build_inbound_context(db_session):
         email="vendor.contact@example.com",
         password_hash="hashed-password",
         role_id=vendor_role.id,
+        role=vendor_role,
         company_name="Vendor Goods Co",
         is_active=True,
     )
@@ -50,6 +51,7 @@ async def _build_inbound_context(db_session):
         email="warehouse.maya@example.com",
         password_hash="hashed-password",
         role_id=warehouse_manager_role.id,
+        role=warehouse_manager_role,
         warehouse_id=warehouse.id,
         is_active=True,
     )
@@ -59,6 +61,7 @@ async def _build_inbound_context(db_session):
         email="support.liam@example.com",
         password_hash="hashed-password",
         role_id=support_role.id,
+        role=support_role,
         is_active=True,
     )
     db_session.add_all([vendor, warehouse_manager, support_manager])

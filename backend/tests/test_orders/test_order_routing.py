@@ -103,6 +103,21 @@ async def test_create_order_prefers_less_loaded_warehouse_when_multiple_exist(
     db_session.add_all([busy_warehouse, available_warehouse])
     await db_session.flush()
 
+    # Both hubs must be operational, since auto-assignment skips hubs with no staff or orders.
+    dispatcher_role = (
+        await db_session.execute(select(Role).where(Role.name == "DISPATCHER"))
+    ).scalar_one()
+    db_session.add(
+        User(
+            name="Available Dispatcher",
+            username="available.dispatcher",
+            email="available.dispatcher@example.com",
+            password_hash=hash_password("StrongPass123"),
+            role_id=dispatcher_role.id,
+            warehouse_id=available_warehouse.id,
+            is_active=True,
+        )
+    )
     db_session.add(
         Order(
             tracking_code="QC-EXISTLOAD",

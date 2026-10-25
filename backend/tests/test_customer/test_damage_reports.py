@@ -66,8 +66,11 @@ async def test_damage_report_creates_pending_return_grading_for_warehouse_order(
             order_id=str(order.id),
             description="Outer box arrived crushed and the item is scratched.",
             photos=["photo-1.png"],
+            resolution_type="pickup_inspection",
         ),
     )
+    # Pickup inspections reach the warehouse queue when the queue is next read.
+    await get_return_gradings(db_session, warehouse.id, status_filter="pending")
 
     return_case = (
         await db_session.execute(
@@ -104,6 +107,7 @@ async def test_pending_return_case_is_backfilled_into_awaiting_grading_queue(db_
         reference_code="DMG-BACKFILL",
         customer_name="Pat Pending",
         reason="Customer reported transit damage.",
+        flow_type="pickup_inspection",
         condition="Reported",
         status="Pending",
         original_price=120.0,
@@ -628,3 +632,44 @@ async def test_next_order_carries_forward_pending_transport_charge_without_refun
 
     assert cancelled.wallet_refund_amount == 100.0
     assert await get_wallet_balance(db_session, customer.id) == 100.0
+
+
+@pytest.mark.asyncio
+async def test_photo_review_damage_report_stays_out_of_the_grading_queue(db_session):
+    individual_role = (
+        await db_session.execute(select(Role).where(Role.name == "INDIVIDUAL"))
+    ).scalar_one()
+    warehouse = Warehouse(name="Photo Review Hub", address="1 Review Road")
+    db_session.add(warehouse)
+    await db_session.flush()
+    customer = User(
+        name="Riya Reviewer",
+        username="riya.reviewer",
+        email="riya.reviewer@example.com",
+        password_hash="hashed-password",
+        role_id=individual_role.id,
+        role=individual_role,
+    )
+    db_session.add(customer)
+    await db_session.flush()
+    order = Order(
+        tracking_code="ORD-RET-2002",
+        order_type="INDIVIDUAL",
+        status="DELIVERED",
+        customer_id=customer.id,
+        warehouse_id=warehouse.id,
+        pickup_addr="1 Pickup Street",
+        delivery_addr="2 Delivery Street",
+        total_amount=250.0,
+    )
+    db_session.add(order)
+    await db_session.flush()
+
+    result = await create_customer_damage_report(
+        db_session,
+        customer,
+        CustomerDamageReportCreate(order_id=str(order.id), description="Dent on the lid.", photos=["p.png"]),
+    )
+    response = await get_return_gradings(db_session, warehouse.id, status_filter="pending")
+
+    assert all(item.rma_code != result.id for item in response.items)
