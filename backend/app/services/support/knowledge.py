@@ -168,4 +168,6 @@ async def like_knowledge_article(
         return None
     row.likes += 1
     await db.flush()
+    # updated_at is set by the database on update, so reload it before reading.
+    await db.refresh(row)
     return _article_to_schema(row)
