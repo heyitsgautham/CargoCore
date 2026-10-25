@@ -30,7 +30,7 @@
         "@capacitor/status-bar": "^6.0.0",
         "pinia": "^2.1.7",
         "vue": "^3.5.0",
-        "vue-router": "^4.3.0"
+        "vue-router": "^5.4.0"
     },
     "devDependencies": {
         "@capacitor/assets": "^3.0.5",
