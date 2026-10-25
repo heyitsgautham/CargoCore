@@ -334,6 +334,26 @@ describe('credentials of new accounts', () => {
     expect(store.lastCreatedCredentials).toBeNull()
   })
 
+  it('refuses to create office staff without a password of 8 or more characters', async () => {
+    const store = await loadedStore()
+
+    for (const password of [undefined, '', 'short']) {
+      await expect(
+        store.addUser({
+          name: 'Sita',
+          email: 'sita@example.com',
+          role: 'Warehouse Manager',
+          username: 'sita',
+          password,
+          hubId: 'wh-1',
+        }),
+      ).rejects.toThrow('at least 8 characters')
+    }
+    expect(router.calls.some((c) => c.method === 'POST' && c.url.endsWith('/api/v1/users'))).toBe(
+      false,
+    )
+  })
+
   it('clears credentials an older build saved', async () => {
     localStorage.setItem(
       'logistic_manager_created_credentials',

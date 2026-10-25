@@ -74,7 +74,10 @@ export function useLogisticUsers({ users, refresh }) {
         const driverId = normalizeDriverLoginId(userData.username, userData.email)
         const credentialValue = isDriver
             ? normalizeDriverPin(userData.password)
-            : (userData.password || '12345678')
+            : userData.password
+        if (!isDriver && (!credentialValue || credentialValue.length < 8)) {
+            throw new Error('Password must be at least 8 characters long.')
+        }
         const created = await apiRequest('/users', {
             method: 'POST',
             headers: authHeaders(),
