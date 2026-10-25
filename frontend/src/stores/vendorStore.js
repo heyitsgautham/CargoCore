@@ -296,7 +296,10 @@ export const useVendorStore = defineStore('vendor', () => {
             throw new Error(errData.detail || 'Failed to load team members.')
         }
 
-        companySettings.value.teamMembers = await response.json()
+        // Read the body first: companySettings.value is evaluated before an awaited
+        // right-hand side, and fetchSettings may swap the object in the meantime.
+        const teamMembers = await response.json()
+        companySettings.value.teamMembers = teamMembers
         return companySettings.value.teamMembers
     }
 
@@ -310,7 +313,8 @@ export const useVendorStore = defineStore('vendor', () => {
             throw new Error(errData.detail || 'Failed to load API keys.')
         }
 
-        companySettings.value.apiKeys = await response.json()
+        const apiKeys = await response.json()
+        companySettings.value.apiKeys = apiKeys
         return companySettings.value.apiKeys
     }
 
