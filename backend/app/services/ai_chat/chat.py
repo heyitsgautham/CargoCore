@@ -4,8 +4,10 @@ import uuid
 
 from google.genai import types
 from loguru import logger
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.ai_conversation import AIConversation
 from app.models.order import Order
 from app.models.user import User
 from app.schemas.ai import (
@@ -224,7 +226,7 @@ async def chat(
         chat_context=chat_context,
     )
     if shortcut is not None:
-        return shortcut
+        return await _attach_linked_order(db, shortcut, session_id, linked_order_meta)
 
     # Deterministic dashboard help shortcuts for general product guidance.
     help_shortcut = await _try_handle_dashboard_help_shortcuts(
@@ -235,7 +237,7 @@ async def chat(
         chat_context=chat_context,
     )
     if help_shortcut is not None:
-        return help_shortcut
+        return await _attach_linked_order(db, help_shortcut, session_id, linked_order_meta)
 
     # ── Step 1: Load conversation history ─────────────────────────────────
     history = await _load_conversation_history(db, session_id, user.id)
@@ -447,4 +449,35 @@ async def chat(
         human_handoff_reason=None,
         linked_order_id=linked_order.id if linked_order else None,
         linked_order_tracking_code=linked_order.tracking_code if linked_order else None,
+    )
+
+
+async def _attach_linked_order(
+    db: AsyncSession,
+    response: ChatResponse,
+    session_id: uuid.UUID,
+    linked_order_meta: dict[str, str] | None,
+) -> ChatResponse:
+    """Tag a shortcut answer with the order the support chat is about.
+
+    The shortcuts persist their messages without the linked order, and the
+    support desk only lists sessions whose messages carry one, so an
+    order-linked chat answered by a shortcut never reached an agent.
+    """
+    if not linked_order_meta:
+        return response
+    rows = (
+        await db.execute(select(AIConversation).where(AIConversation.session_id == session_id))
+    ).scalars().all()
+    for row in rows:
+        if row.query_result is None:
+            row.query_result = dict(linked_order_meta)
+        elif isinstance(row.query_result, dict) and not row.query_result.get("linked_order_id"):
+            row.query_result = {**linked_order_meta, **row.query_result}
+    await db.flush()
+    return response.model_copy(
+        update={
+            "linked_order_id": uuid.UUID(linked_order_meta["linked_order_id"]),
+            "linked_order_tracking_code": linked_order_meta["linked_order_tracking_code"],
+        }
     )
