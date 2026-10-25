@@ -106,3 +106,44 @@ export function getPriorityColor(priority) {
     if (priority === 'HIGH') return '#f97316'
     return '#3b82f6'
 }
+
+export function toCoordinatePair(lat, lng) {
+    if (!hasValidCoordinate(lat) || !hasValidCoordinate(lng)) return null
+    return [Number(lat), Number(lng)]
+}
+
+export function getDriverLocationLabel(driver) {
+    if (driver.location) return driver.location
+    if (hasValidCoordinate(driver.latitude) && hasValidCoordinate(driver.longitude)) {
+        return `${Number(driver.latitude).toFixed(5)}, ${Number(driver.longitude).toFixed(5)}`
+    }
+    return 'Live location unavailable'
+}
+
+// Hub / Warehouse marker — indigo square with warehouse SVG
+export const hubIcon = L.divIcon({
+    html: `<div style="background:#4f46e5;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;border:2.5px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,0.35);">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
+            <path d="M1 11v11h22V11L12 2 1 11zm20 9H3v-8.5l9-7 9 7V20zm-9-6H8v5h6v-5z"/>
+        </svg>
+    </div>`,
+    className: 'custom-hub-icon',
+    iconSize: [34, 34],
+    iconAnchor: [17, 34],
+    popupAnchor: [0, -34],
+})
+
+export function getPickupIcon(priority) {
+    const color = getPriorityColor(priority)
+    return L.divIcon({
+        html: `<div style="background:${color};width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2.5px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,0.35);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white">
+                <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2h1a3 3 0 0 0 6 0h4a3 3 0 0 0 6 0h1c1.1 0 2-.9 2-2v-3l-3-4zM6 18.5A1.5 1.5 0 1 1 6 15.5a1.5 1.5 0 0 1 0 3zm11 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM17 12V9.5h2.5l1.96 2.5H17z"/>
+            </svg>
+        </div>`,
+        className: 'custom-pickup-icon',
+        iconSize: [30, 30],
+        iconAnchor: [15, 30],
+        popupAnchor: [0, -30],
+    })
+}
