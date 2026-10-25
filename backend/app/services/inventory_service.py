@@ -250,6 +250,18 @@ async def update_item(db: AsyncSession, item_id: UUID, data: InventoryUpdate) ->
 
 async def delete_item(db: AsyncSession, item_id: UUID) -> None:
     item = await _get_item(db, item_id)
+    # Movements and restock requests keep a NOT NULL item_id, so deleting the
+    # item would fail at flush. Keep the stock history and refuse instead.
+    history = (
+        await db.execute(select(func.count()).select_from(InventoryMovement).where(InventoryMovement.item_id == item_id))
+    ).scalar_one() + (
+        await db.execute(select(func.count()).select_from(RestockRequest).where(RestockRequest.item_id == item_id))
+    ).scalar_one()
+    if history:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This item has stock movements or restock requests. Set its quantity to zero instead of deleting it.",
+        )
     await db.delete(item)
     await db.flush()
 
