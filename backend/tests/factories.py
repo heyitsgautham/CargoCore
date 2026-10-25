@@ -79,7 +79,7 @@ def auth_headers(user: User) -> dict[str, str]:
 
 async def make_order(db: AsyncSession, customer: User, **overrides) -> Order:
     n = _n()
-    items = overrides.pop("items", [("SKU-BOX", 2)])
+    items = overrides.pop("items", [("SKU-SOFA", 2)])
     order = Order(
         tracking_code=overrides.pop("tracking_code", f"QC-T{n:05d}"),
         order_type=overrides.pop("order_type", "INDIVIDUAL"),
@@ -108,7 +108,7 @@ async def make_inventory_item(db: AsyncSession, warehouse: Warehouse, **override
     item = InventoryItem(
         warehouse_id=warehouse.id,
         sku=overrides.pop("sku", f"SKU-{n}"),
-        name=overrides.pop("name", f"Carton {n}"),
+        name=overrides.pop("name", f"Product {n}"),
         quantity_on_hand=overrides.pop("quantity_on_hand", 50),
         selling_price=overrides.pop("selling_price", 40.0),
         **overrides,
@@ -182,7 +182,7 @@ async def build_world(db: AsyncSession) -> World:
     vendor_order = await make_order(
         db, users["VENDOR"], order_type="VENDOR", warehouse_id=warehouse.id, warehouse_substatus="AWAITING_PICK"
     )
-    inventory_item = await make_inventory_item(db, warehouse, sku="SKU-BOX")
+    inventory_item = await make_inventory_item(db, warehouse, sku="SKU-SOFA", name="Three-seat sofa")
     labourer = await make_labourer(db, warehouse)
     zone = LogisticsZone(warehouse_id=warehouse.id, name="Zone A")
     dock = LoadingDock(warehouse_id=warehouse.id, dock_number="D1")
