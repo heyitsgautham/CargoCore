@@ -26,10 +26,10 @@ from tests.conftest import REGISTER_PAYLOAD
 def _patch_gemini(**kwargs):
     """Patch the Gemini client everywhere the chat flow builds one."""
     with ExitStack() as stack:
-        mocks = [
-            stack.enter_context(patch(f"app.services.ai_chat.{module}.get_gemini_client", **kwargs))
-            for module in ("chat", "support_handoff")
-        ]
+        targets = [f"app.services.ai_chat.{module}.get_gemini_client" for module in ("chat", "support_handoff")]
+        # generate_with_fallback looks the client up in app.utils.gemini itself.
+        targets.append("app.utils.gemini.get_gemini_client")
+        mocks = [stack.enter_context(patch(target, **kwargs)) for target in targets]
         yield mocks[0]
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -265,9 +265,11 @@ class TestChatDatabaseQuery:
                 headers={"Authorization": f"Bearer {token}"},
             )
 
+        # The order-status shortcut answers from the database, so a Gemini outage does not matter.
         assert resp.status_code == 200
         data = resp.json()
-        assert data["intent"] == "error"
+        assert data["intent"] == "db_query"
+        assert "QC-TEST123" in data["message"]
         assert "QC-TEST123" in data["message"]
         assert "Warehouse Alpha" in data["message"]
         assert "Destination Beta" in data["message"]
@@ -681,9 +683,10 @@ class TestGeminiUnconfigured:
         with _patch_gemini(
             side_effect=GeminiConfigError("Gemini API key is not configured."),
         ):
+            # Greetings and order lookups are answered locally, so ask something only Gemini handles.
             resp = await client.post(
                 "/api/v1/ai/chat",
-                json={"message": "Hello"},
+                json={"message": "How many users are registered?"},
                 headers={"Authorization": f"Bearer {token}"},
             )
 
