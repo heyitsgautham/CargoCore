@@ -446,7 +446,7 @@ async def get_proof_of_delivery_html(
     )
 
     # Read HTML template
-    template_path = Path(__file__).parent.parent.parent.parent / "html-slips" / "ProofOfDelivery.html"
+    template_path = Path(__file__).resolve().parent.parent / "templates" / "ProofOfDelivery.html"
     with open(template_path, encoding="utf-8") as f:
         html_content = f.read()
 
