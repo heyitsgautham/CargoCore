@@ -8,7 +8,6 @@
   "frontend/src/IV-views/Individual/Tracking.vue": 1355,
   "frontend/src/IV-views/Vendor/CreateShipment.vue": 1439,
   "frontend/src/IV-views/Vendor/Support.vue": 905,
-  "frontend/src/IV-views/Vendor/Tracking.vue": 1461,
   "frontend/src/LWD-views/Dispatcher/ManifestCenter.vue": 917,
   "frontend/src/LWD-views/Dispatcher/OrderStatusControl.vue": 1140,
   "frontend/src/LWD-views/Dispatcher/PendingDispatchQueue.vue": 885,
@@ -29,6 +28,6 @@
   "frontend/src/pages/SignupWizard.vue": 836,
   "frontend/src/stores/dispatcherStore.js": 1028,
   "frontend/src/stores/individualStore.js": 1378,
-  "frontend/src/stores/logisticStore.js": 802,
+  "frontend/src/stores/logisticStore.js": 812,
   "frontend/src/stores/vendorStore.js": 1165
 }
