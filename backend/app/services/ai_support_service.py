@@ -12,9 +12,6 @@ from app.services.support.analytics import (
 from app.services.support.analytics import (
     get_support_analytics as get_support_analytics,
 )
-from app.services.support.analytics import (
-    get_support_dashboard as get_support_dashboard,
-)
 from app.services.support.contacts import (
     create_public_contact_submission as create_public_contact_submission,
 )
@@ -65,6 +62,9 @@ from app.services.support.damage_refunds import (
 )
 from app.services.support.damage_refunds import (
     update_damage_report_notes as update_damage_report_notes,
+)
+from app.services.support.dashboard import (
+    get_support_dashboard as get_support_dashboard,
 )
 from app.services.support.knowledge import (
     create_knowledge_article as create_knowledge_article,
