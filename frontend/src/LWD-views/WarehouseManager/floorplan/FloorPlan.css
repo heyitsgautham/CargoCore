@@ -1,0 +1,35 @@
+.canvas-grid {
+    background-color: #f9fafb;
+    background-image:
+        linear-gradient(rgba(156, 163, 175, 0.15) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(156, 163, 175, 0.15) 1px, transparent 1px),
+        linear-gradient(rgba(156, 163, 175, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(156, 163, 175, 0.3) 1px, transparent 1px);
+    background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+}
+
+:is(.dark) .canvas-grid {
+    background-color: #111827;
+    background-image:
+        linear-gradient(rgba(75, 85, 99, 0.15) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(75, 85, 99, 0.15) 1px, transparent 1px),
+        linear-gradient(rgba(75, 85, 99, 0.3) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(75, 85, 99, 0.3) 1px, transparent 1px);
+    background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+}
+
+.search-highlight {
+    animation: pulse-hl 1s ease-in-out infinite;
+}
+
+@keyframes pulse-hl {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(68, 233, 150, .4);
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px rgba(68, 233, 150, 0);
+    }
+}
