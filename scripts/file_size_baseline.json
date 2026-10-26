@@ -22,7 +22,6 @@
   "driver-app/src/stores/jobStore.js": 818,
   "driver-app/src/views/CommandCenter.vue": 510,
   "driver-app/src/views/VehicleInspection.vue": 533,
-  "frontend/src/Ai-views/ReverseLogistics.vue": 526,
   "frontend/src/IV-views/Individual/Orders.vue": 526,
   "frontend/src/LWD-views/LogisticManager/WarehouseManagement.vue": 558,
   "frontend/src/LWD-views/WarehouseManager/ComparativeViewers.vue": 579,
