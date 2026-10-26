@@ -25,6 +25,5 @@
   "frontend/src/LWD-views/WarehouseManager/ReturnsWarehouse.vue": 998,
   "frontend/src/components/HeaderMeetingScheduler.vue": 807,
   "frontend/src/pages/SignupWizard.vue": 836,
-  "frontend/src/stores/dispatcherStore.js": 1028,
   "frontend/src/stores/logisticStore.js": 812
 }
