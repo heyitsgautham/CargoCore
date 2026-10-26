@@ -26,7 +26,6 @@ from app.services.ai_chat.intents import (
     _is_support_question,
     _is_total_spend_question,
     _is_wallet_balance_question,
-    _is_warehouse_chat_context,
     _role_name,
 )
 from app.services.ai_chat.self_service import (
@@ -41,6 +40,7 @@ from app.services.ai_chat.self_service import (
     _vendor_support_message,
     _vendor_wallet_message,
 )
+from app.services.ai_chat.staff_intents import _is_warehouse_chat_context
 from app.services.ai_chat.support_handoff import (
     _answer_from_retrieved_knowledge,
     _answer_with_grounded_ai,

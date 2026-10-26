@@ -16,7 +16,7 @@ from app.schemas.ai import (
     ChatResponse,
 )
 from app.services.ai_chat.conversations import _persist_message
-from app.services.ai_chat.intents import _is_dispatcher_chat_context
+from app.services.ai_chat.staff_intents import _is_dispatcher_chat_context
 from app.services.ai_chat.support_handoff import _answer_with_grounded_ai
 
 

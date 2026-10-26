@@ -36,10 +36,7 @@ from app.services.ai_chat.function_calls import _handle_function_call
 from app.services.ai_chat.intents import (
     _has_legal_threat,
     _has_severe_negative_sentiment,
-    _is_dispatcher_chat_context,
     _is_human_handoff_request,
-    _is_logistic_manager_chat_context,
-    _is_warehouse_chat_context,
     _role_name,
     _safe_message_text,
 )
@@ -51,6 +48,11 @@ from app.services.ai_chat.prompts import _system_instruction_for_user
 from app.services.ai_chat.shortcuts import (
     _try_handle_dashboard_help_shortcuts,
     _try_handle_self_service_shortcuts,
+)
+from app.services.ai_chat.staff_intents import (
+    _is_dispatcher_chat_context,
+    _is_logistic_manager_chat_context,
+    _is_warehouse_chat_context,
 )
 from app.services.ai_chat.support_handoff import (
     _handoff_reason_for_message,
