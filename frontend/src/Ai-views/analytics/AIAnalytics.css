@@ -1,0 +1,21 @@
+.tooltip-trigger .tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background: rgb(17 24 39);
+    color: white;
+    font-size: 10px;
+    border-radius: 0.25rem;
+    opacity: 0;
+    white-space: nowrap;
+    pointer-events: none;
+    transition: opacity 150ms ease;
+    z-index: 50;
+}
+
+.tooltip-trigger:hover .tooltip {
+    opacity: 1;
+}

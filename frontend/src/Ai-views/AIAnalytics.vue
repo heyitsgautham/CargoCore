@@ -37,185 +37,30 @@
         </div>
 
         <template v-else-if="analytics">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-                <div
-                    v-for="metric in analytics.metrics"
-                    :key="metric.id"
-                    class="bg-white dark:bg-black/20 border border-gray-100 dark:border-white/5 p-4 md:p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow"
-                >
-                    <div class="flex items-center gap-2 mb-3">
-                        <span class="p-2 rounded-lg bg-gray-50 dark:bg-white/5 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-gray-600 dark:text-gray-300 text-[18px]">
-                                {{ metric.icon }}
-                            </span>
-                        </span>
-                        <div class="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">
-                            {{ metric.label }}
-                        </div>
-                    </div>
-                    <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ metric.formatted_value }}</div>
-                    <div
-                        class="text-xs mt-2 flex items-center gap-1 font-bold"
-                        :class="metricTrendClass(metric.trend_direction)"
-                    >
-                        <span class="material-symbols-outlined text-[14px]">{{ metricTrendIcon(metric.trend_direction) }}</span>
-                        {{ metric.trend }}
-                    </div>
-                </div>
-            </div>
+            <KpiCards />
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bg-white dark:bg-black/20 border border-gray-100 dark:border-white/5 p-6 rounded-xl shadow-sm">
-                    <div class="flex justify-between items-center mb-6 gap-4">
-                        <div>
-                            <h3 class="font-bold text-gray-900 dark:text-white">AI Resolution vs Human Escalation</h3>
-                            <p class="text-xs text-gray-500 mt-1">
-                                Period trend of AI-resolved conversations versus escalations
-                            </p>
-                        </div>
-                        <button
-                            @click="exportCsv"
-                            class="p-2 bg-gray-50 dark:bg-white/5 rounded-lg text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors tooltip-trigger relative"
-                            type="button"
-                        >
-                            <span class="material-symbols-outlined text-[18px]">download</span>
-                            <span class="tooltip">Export CSV</span>
-                        </button>
-                    </div>
-                    <div class="h-[500px] w-full relative">
-                        <canvas ref="resolutionCanvas"></canvas>
-                    </div>
-                </div>
-
-                <div class="bg-white dark:bg-black/20 border border-gray-100 dark:border-white/5 p-6 rounded-xl shadow-sm flex flex-col">
-                    <div class="mb-6">
-                        <h3 class="font-bold text-gray-900 dark:text-white">Top Escalation Drivers</h3>
-                        <p class="text-xs text-gray-500 mt-1">Most common reasons the AI flow needs staff intervention</p>
-                    </div>
-                    <div class="h-[220px] w-full relative flex-1">
-                        <canvas ref="escalationCanvas"></canvas>
-                    </div>
-
-                    <div class="mt-4 space-y-2">
-                        <div
-                            v-for="(reason, index) in analytics.escalation_reasons"
-                            :key="reason.label"
-                            class="flex items-center justify-between text-xs"
-                        >
-                            <div class="flex items-center gap-2">
-                                <span
-                                    class="w-3 h-3 rounded-full shadow-sm"
-                                    :style="{ backgroundColor: cssVarColors[index % cssVarColors.length] }"
-                                ></span>
-                                <span class="text-gray-700 dark:text-gray-300 font-medium">{{ reason.label }}</span>
-                            </div>
-                            <span class="font-bold text-gray-900 dark:text-white">{{ reason.pct }}%</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-3 bg-white dark:bg-black/20 border border-gray-100 dark:border-white/5 p-6 rounded-xl shadow-sm">
-                    <div class="mb-6">
-                        <h3 class="font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                            <span class="material-symbols-outlined text-purple-500">sentiment_satisfied</span>
-                            Conversation Sentiment Score
-                        </h3>
-                        <p class="text-xs text-gray-500 mt-1">Average sentiment score after conversation (Bot vs Human)</p>
-                    </div>
-                    <div class="h-[250px] w-full relative">
-                        <canvas ref="sentimentCanvas"></canvas>
-                    </div>
-                </div>
-            </div>
+            <AnalyticsCharts />
 
             <h3 class="font-bold text-gray-900 dark:text-white uppercase tracking-wider text-xs pt-4 mb-2 flex items-center gap-2">
                 <span class="material-symbols-outlined text-[16px] text-purple-500">auto_awesome</span>
                 Direct AI Insights
             </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div
-                    v-for="insight in analytics.insights"
-                    :key="insight.id"
-                    class="p-5 rounded-xl border flex gap-4 transition-all hover:shadow-md"
-                    :class="toneCardClass(insight.tone)"
-                >
-                    <span class="material-symbols-outlined text-3xl shrink-0 mt-0.5" :class="toneIconClass(insight.tone)">
-                        {{ insight.icon }}
-                    </span>
-                    <div>
-                        <h4 class="font-bold mb-1" :class="toneTitleClass(insight.tone)">{{ insight.title }}</h4>
-                        <p class="text-sm leading-relaxed" :class="toneTextClass(insight.tone)">{{ insight.text }}</p>
-                        <button
-                            v-if="!insight.executed"
-                            @click="openActionModal(insight)"
-                            class="mt-3 text-xs font-bold flex items-center gap-1 transition-colors"
-                            :class="toneTitleClass(insight.tone) + ' hover:opacity-80'"
-                            type="button"
-                        >
-                            {{ insight.action_label }}
-                            <span class="material-symbols-outlined text-[12px]">arrow_forward</span>
-                        </button>
-                        <div v-else class="mt-3 text-xs font-bold flex items-center gap-1 text-green-600 dark:text-green-400">
-                            <span class="material-symbols-outlined text-[14px]">check_circle</span>
-                            Follow-up Ticket Created
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <InsightCards />
         </template>
 
         <Teleport to="body">
-            <div
-                v-if="showActionModal"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-                @click.self="showActionModal = false"
-            >
-                <div class="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md shadow-2xl border border-gray-100 dark:border-white/10 overflow-hidden">
-                    <div class="p-6 border-b border-gray-100 dark:border-white/5 flex items-center gap-3 bg-gray-50 dark:bg-white/5">
-                        <span class="material-symbols-outlined text-2xl" :class="toneIconClass(selectedInsight?.tone || 'blue')">
-                            {{ selectedInsight?.icon }}
-                        </span>
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ selectedInsight?.title }}</h3>
-                    </div>
-                    <div class="p-6 space-y-4">
-                        <p class="text-sm text-gray-600 dark:text-gray-300">{{ selectedInsight?.text }}</p>
-
-                        <div class="bg-purple-50 dark:bg-purple-900/10 p-4 rounded-xl border border-purple-100 dark:border-purple-500/20">
-                            <div class="flex items-center gap-2 mb-2 font-bold text-purple-900 dark:text-purple-300 text-sm">
-                                <span class="material-symbols-outlined text-[18px]">assignment_add</span>
-                                Recommended Execution
-                            </div>
-                            <p class="text-xs text-purple-800 dark:text-purple-400">
-                                This action creates a backend follow-up ticket from the analytics insight so the support team can track it in the queue.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="p-6 border-t border-gray-100 dark:border-white/5 flex gap-3 bg-gray-50 dark:bg-white/5">
-                        <button
-                            @click="showActionModal = false"
-                            class="flex-1 py-2.5 bg-white dark:bg-black/20 hover:bg-gray-100 dark:hover:bg-white/10 text-gray-700 dark:text-white font-bold rounded-xl transition-colors border border-gray-200 dark:border-white/10 shadow-sm"
-                            type="button"
-                        >
-                            Close
-                        </button>
-                        <button
-                            @click="executeAction"
-                            class="flex-1 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-60"
-                            :disabled="!selectedInsight || store.executingInsightId === selectedInsight.id"
-                            type="button"
-                        >
-                            <span class="material-symbols-outlined text-[18px]">bolt</span>
-                            {{ store.executingInsightId === selectedInsight?.id ? 'Creating...' : 'Execute Now' }}
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <MetricDetailModal />
         </Teleport>
     </div>
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import KpiCards from './analytics/KpiCards.vue'
+import AnalyticsCharts from './analytics/AnalyticsCharts.vue'
+import InsightCards from './analytics/InsightCards.vue'
+import MetricDetailModal from './analytics/MetricDetailModal.vue'
+import { aiAnalyticsPageKey } from './analytics/aiAnalyticsPageContext'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, provide } from 'vue'
 import Chart from 'chart.js/auto'
 
 import { useToast } from '@/composables/useToast'
@@ -562,28 +407,26 @@ onBeforeUnmount(() => {
     themeObserver?.disconnect()
     destroyCharts()
 })
+
+provide(aiAnalyticsPageKey, {
+    analytics,
+    cssVarColors,
+    escalationCanvas,
+    executeAction,
+    exportCsv,
+    metricTrendClass,
+    metricTrendIcon,
+    openActionModal,
+    resolutionCanvas,
+    selectedInsight,
+    sentimentCanvas,
+    showActionModal,
+    store,
+    toneCardClass,
+    toneIconClass,
+    toneTextClass,
+    toneTitleClass,
+})
 </script>
 
-<style scoped>
-.tooltip-trigger .tooltip {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-bottom: 0.5rem;
-    padding: 0.25rem 0.5rem;
-    background: rgb(17 24 39);
-    color: white;
-    font-size: 10px;
-    border-radius: 0.25rem;
-    opacity: 0;
-    white-space: nowrap;
-    pointer-events: none;
-    transition: opacity 150ms ease;
-    z-index: 50;
-}
-
-.tooltip-trigger:hover .tooltip {
-    opacity: 1;
-}
-</style>
+<style scoped src="./analytics/AIAnalytics.css"></style>
