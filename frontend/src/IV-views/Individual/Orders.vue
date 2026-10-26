@@ -295,112 +295,17 @@
 
         <!-- Cancel Confirmation Modal -->
         <Teleport to="body">
-            <BaseModal :isOpen="cancelModal.show" @close="cancelModal.show = false">
-                <template #title>Cancel Order</template>
-                <div class="space-y-4">
-                    <div class="text-center py-3">
-                        <div
-                            class="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center text-red-500 mx-auto mb-3">
-                            <span class="material-symbols-outlined text-3xl">warning</span>
-                        </div>
-                        <p class="text-gray-700 dark:text-gray-300 text-sm">Are you sure you want to cancel <span
-                                class="font-bold text-gray-900 dark:text-white">{{ cancelModal.order?.id }}</span>?</p>
-                    </div>
-                    <div v-if="cancelModal.order" class="p-4 rounded-lg text-sm space-y-2"
-                        :class="cancelModal.order.status === 'pending' ? 'bg-green-50 dark:bg-green-500/5 border border-green-200 dark:border-green-500/20' : 'bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20'">
-                        <div v-if="cancelModal.order.status === 'pending'"
-                            class="text-green-700 dark:text-green-400 font-bold">
-                            ✅ No cancellation fee — order hasn't been dispatched yet.</div>
-                        <div v-else>
-                            <div class="text-amber-600 dark:text-amber-400 font-bold">⚠️ Cancellation fee applies</div>
-                            <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                                Status: <span class="font-bold">{{ cancelModal.order.status }}</span> · Progress: {{
-                                    cancelModal.order.progress }}%
-                            </div>
-                            <div class="text-base font-bold text-red-600 dark:text-red-400 mt-2">Fee: ₹{{
-                                estimatedCancelFee.toLocaleString() }}</div>
-                        </div>
-                        <!-- Wallet refund info (only if order was paid) -->
-                        <div v-if="cancelModal.order.paymentStatus === 'paid' || cancelModal.order.paymentStatus === 'partial'"
-                            class="mt-2 pt-2 border-t border-gray-200 dark:border-white/10">
-                            <div class="text-green-700 dark:text-green-400 font-semibold text-xs flex items-center gap-1">
-                                <span class="material-symbols-outlined text-sm">account_balance_wallet</span>
-                                ₹{{ estimatedWalletRefund.toLocaleString() }} will be refunded to your wallet
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <template #footer>
-                    <div class="flex gap-3 w-full">
-                        <button @click="doCancel"
-                            class="flex-1 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-bold">Confirm
-                            Cancel</button>
-                        <button @click="cancelModal.show = false"
-                            class="flex-1 py-2 bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-white rounded-lg text-sm">Keep
-                            Order</button>
-                    </div>
-                </template>
-            </BaseModal>
+            <CancelOrderModal />
         </Teleport>
 
         <!-- Reschedule Modal -->
         <Teleport to="body">
-            <BaseModal :isOpen="rescheduleModal.show" @close="rescheduleModal.show = false">
-                <template #title>Reschedule Move</template>
-                <div class="space-y-4">
-                    <div><label class="block text-sm text-gray-600 dark:text-gray-400 mb-1.5 font-medium">New
-                            Date</label>
-                        <input v-model="rescheduleModal.date" type="date"
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500/50 outline-none" />
-                    </div>
-                    <div><label class="block text-sm text-gray-600 dark:text-gray-400 mb-1.5 font-medium">New
-                            Time</label>
-                        <select v-model="rescheduleModal.time"
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-green-500/50 outline-none">
-                            <option class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">06:00 AM - 09:00 AM</option>
-                            <option class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">09:00 AM - 12:00 PM</option>
-                            <option class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">12:00 PM - 03:00 PM</option>
-                            <option class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">03:00 PM - 06:00 PM</option>
-                        </select>
-                    </div>
-                </div>
-                <template #footer>
-                    <div class="flex gap-3 w-full">
-                        <button @click="doReschedule"
-                            class="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-bold">Reschedule</button>
-                        <button @click="rescheduleModal.show = false"
-                            class="flex-1 py-2 bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-white rounded-lg text-sm">Cancel</button>
-                    </div>
-                </template>
-            </BaseModal>
+            <RescheduleModal />
         </Teleport>
 
         <!-- Driver Rating Modal -->
         <Teleport to="body">
-            <BaseModal :isOpen="ratingModal.show" @close="ratingModal.show = false">
-                <template #title>Rate Your Driver</template>
-                <div class="space-y-4 text-center">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">How was your experience? (optional)</p>
-                    <div class="flex justify-center gap-2">
-                        <span v-for="n in 5" :key="n"
-                            @click="ratingModal.selected = n"
-                            @mouseenter="ratingModal.hover = n"
-                            @mouseleave="ratingModal.hover = 0"
-                            class="text-4xl cursor-pointer transition-colors select-none"
-                            :class="(ratingModal.hover || ratingModal.selected) >= n ? 'text-amber-400' : 'text-gray-300 dark:text-gray-600'">★</span>
-                    </div>
-                    <textarea v-model="ratingModal.feedback" rows="2" placeholder="Leave a comment (optional)"
-                        class="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-amber-400/50 outline-none resize-none" />
-                </div>
-                <template #footer>
-                    <div class="flex gap-3 w-full">
-                        <button @click="submitRatingModal" :disabled="!ratingModal.selected"
-                            class="flex-1 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 text-sm font-bold disabled:opacity-40">Submit Rating</button>
-                        <button @click="ratingModal.show = false"
-                            class="flex-1 py-2 bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-white rounded-lg text-sm">Skip</button>
-                    </div>
-                </template>
-            </BaseModal>
+            <DriverRatingModal />
         </Teleport>
 
         <!-- Toast -->
@@ -421,11 +326,14 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive, onMounted, watch } from 'vue'
+import CancelOrderModal from './orders/CancelOrderModal.vue'
+import RescheduleModal from './orders/RescheduleModal.vue'
+import DriverRatingModal from './orders/DriverRatingModal.vue'
+import { individualOrdersPageKey } from './orders/individualOrdersPageContext'
+import { ref, computed, reactive, onMounted, watch, provide } from 'vue'
 import { useIndividualStore } from '@/stores/individualStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useSlipPrinter } from '@/composables/useSlipPrinter'
-import BaseModal from '@/components/BaseModal.vue'
 
 const store = useIndividualStore()
 const authStore = useAuthStore()
@@ -523,4 +431,15 @@ async function doReschedule() {
 
 const toast = reactive({ show: false, message: '', type: 'success' })
 function showToast(msg, type = 'success') { toast.show = true; toast.message = msg; toast.type = type; setTimeout(() => { toast.show = false }, 3000) }
+
+provide(individualOrdersPageKey, {
+    cancelModal,
+    doCancel,
+    doReschedule,
+    estimatedCancelFee,
+    estimatedWalletRefund,
+    ratingModal,
+    rescheduleModal,
+    submitRatingModal,
+})
 </script>
