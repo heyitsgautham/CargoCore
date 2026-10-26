@@ -141,7 +141,6 @@ Redis and Gemini are mocked.
 | `GOOGLE_CLIENT_ID` | backend | empty | Google sign-in token audience |
 | `GOOGLE_MAPS_API_KEY` | backend | empty | geocoding and distance lookups |
 | `GEMINI_API_KEY` | backend | empty | AI assistant and room photo estimates |
-| `DAILY_API_KEY` | backend | empty | Daily.co video rooms for meetings |
 | `UPLOAD_DIR`, `MAX_UPLOAD_SIZE_MB` | backend | `./uploads`, `10` | file uploads |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` | backend | empty, `587` | outgoing email |
 | `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | docker compose | `logistics_user`, `logistics_pass`, `logistics_db` | database container |

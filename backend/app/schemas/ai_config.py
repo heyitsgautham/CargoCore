@@ -1,46 +1,11 @@
 """
-ai_config.py — Pydantic schemas for AI settings and knowledge base CRUD.
+ai_config.py — Pydantic schemas for knowledge base CRUD.
 """
 from __future__ import annotations
 
-import uuid
 from datetime import datetime
 
 from pydantic import BaseModel, Field
-
-# ── AI System Settings ────────────────────────────────────────────────────────
-
-
-class AISettingsResponse(BaseModel):
-    id: uuid.UUID
-    tone: str
-    language_mode: str
-    sentiment_threshold: int
-    refund_limit_inr: int
-    system_prompt: str
-    autonomous_replies: bool
-    legal_threat_detection: bool
-    real_time_sentiment_analysis: bool
-    proactive_human_handover: bool
-    updated_at: datetime
-    updated_by_user_id: uuid.UUID | None = None
-
-    model_config = {"from_attributes": True}
-
-
-class AISettingsUpdate(BaseModel):
-    tone: str | None = None
-    language_mode: str | None = None
-    sentiment_threshold: int | None = Field(None, ge=0, le=100)
-    refund_limit_inr: int | None = Field(None, ge=0)
-    system_prompt: str | None = None
-    autonomous_replies: bool | None = None
-    legal_threat_detection: bool | None = None
-    real_time_sentiment_analysis: bool | None = None
-    proactive_human_handover: bool | None = None
-
-
-# ── Knowledge Articles ────────────────────────────────────────────────────────
 
 
 class KnowledgeArticleResponse(BaseModel):

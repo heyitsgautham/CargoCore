@@ -75,7 +75,6 @@ def test_order_job_type_and_status_helpers() -> None:
     assert logistics_formatting._order_job_type(pickup) == "PARCEL_PICKUP"
     assert logistics_formatting._order_job_type(delivery) == "PARCEL_DELIVERY"
 
-    assert logistics_formatting._is_terminal_order(_make_order(status="CLOSED")) is True
     assert logistics_formatting._is_completed_order(_make_order(status="DELIVERED")) is True
     assert logistics_formatting._is_active_order(_make_order(status="ASSIGNED")) is True
 
@@ -139,7 +138,6 @@ def test_notification_visibility_helpers() -> None:
     assert logistics_formatting._notification_visible_to_user(by_role, user) is True
     assert logistics_formatting._notification_visible_to_user(all_roles, user) is True
     assert logistics_formatting._notification_visible_to_user(direct, user) is True
-    assert logistics_formatting._notification_visible_to_role(direct, "DISPATCHER") is False
 
 
 def test_duration_and_crew_role_helpers() -> None:

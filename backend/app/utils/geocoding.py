@@ -85,37 +85,6 @@ async def geocode_address(address: str) -> tuple[float, float] | None:
         return None
 
 
-async def geocode_address_with_fallback(
-    address: str,
-    city: str = None,
-    country: str = "India"
-) -> tuple[float, float] | None:
-    """
-    Try geocoding with full address, fall back to city-level if it fails.
-    
-    Args:
-        address: Full address string
-        city: Optional city name for fallback
-        country: Country name for better accuracy
-        
-    Returns:
-        Tuple of (lat, lng) or None
-    """
-    # Try full address first
-    full_address = f"{address}, {country}" if country else address
-    result = await geocode_address(full_address)
-    
-    if result:
-        return result
-    
-    # Fallback: try with just city
-    if city:
-        city_address = f"{city}, {country}" if country else city
-        return await geocode_address(city_address)
-    
-    return None
-
-
 def geocode_address_sync(address: str) -> tuple[float, float] | None:
     """
     Synchronous version of geocode_address for use in non-async contexts.

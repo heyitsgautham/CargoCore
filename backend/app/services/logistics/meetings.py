@@ -1,17 +1,15 @@
-"""Manager meetings with optional Daily.co rooms."""
+"""Manager meetings with an optional video call link."""
 
 from __future__ import annotations
 
 import re
 from uuid import UUID
 
-import httpx
 from fastapi import HTTPException
 from sqlalchemy import and_, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.config import get_settings
 from app.models.logistics import (
     LogisticsMeeting,
 )
@@ -42,28 +40,6 @@ def _normalize_meeting_link(value: str | None) -> str:
     if re.match(r"^(meet\.google\.com|meet\.jit\.si|[\w-]+\.zoom\.(us|com)|zoom\.us|zoom\.com)", trimmed, re.IGNORECASE):
         return f"https://{trimmed}"
     return trimmed
-
-
-async def _create_daily_room(topic: str) -> str:
-    settings = get_settings()
-    if not settings.daily_api_key:
-        raise HTTPException(status_code=500, detail="Daily.co API key not configured")
-
-    slug = re.sub(r"[^a-z0-9-]", "", topic.lower().replace(" ", "-"))[:30].strip("-")
-    import secrets
-    room_name = f"logistics-{slug}-{secrets.token_hex(3)}"
-
-    async with httpx.AsyncClient(timeout=10) as client:
-        resp = await client.post(
-            "https://api.daily.co/v1/rooms",
-            headers={"Authorization": f"Bearer {settings.daily_api_key}"},
-            json={"name": room_name, "privacy": "public", "properties": {"enable_prejoin_ui": False}},
-        )
-
-    if resp.status_code not in (200, 201):
-        raise HTTPException(status_code=502, detail="Failed to create Daily.co room")
-
-    return resp.json()["url"]
 
 
 def _validate_meeting_time_range(start_time: str, end_time: str) -> None:

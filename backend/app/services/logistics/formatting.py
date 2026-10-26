@@ -207,10 +207,6 @@ def _order_job_type(order: Order) -> str:
     return "PARCEL_DELIVERY"
 
 
-def _is_terminal_order(order: Order) -> bool:
-    return order.status.upper() in {"CANCELLED", "CLOSED"}
-
-
 def _is_completed_order(order: Order) -> bool:
     return order.status.upper() in {"DELIVERED", "COMPLETED", "CLOSED"}
 
@@ -310,15 +306,6 @@ def _notification_visible_to_user(notification: LogisticsNotification, user: Use
 
 
 # Keep old name as alias for callers that only have role name
-def _notification_visible_to_role(notification: LogisticsNotification, role_name: str) -> bool:
-    if notification.target_user_id is not None:
-        return False  # per-user notifications are not visible by role alone
-    roles = _notification_role_set(notification)
-    if not roles or "ALL" in roles:
-        return True
-    return role_name.upper() in roles
-
-
 def _estimate_duration_minutes(distance_km: float, stop_count: int) -> int:
     drive_minutes = int((distance_km / 28.0) * 60)
     service_minutes = max(stop_count, 1) * 18

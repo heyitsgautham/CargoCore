@@ -624,14 +624,6 @@ class LogisticsManifestItem(BaseModel):
     created_at: datetime
 
 
-class LogisticsManifestPushRequest(BaseModel):
-    pass  # future fields if needed
-
-
-class LogisticsManifestStatusUpdate(BaseModel):
-    status: str
-
-
 class DriverManifestSummary(BaseModel):
     route_id: str | None = None
     date: str

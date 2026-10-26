@@ -36,8 +36,6 @@ class Settings(BaseSettings):
     google_maps_api_key: str = ""
     gemini_api_key: str = ""
 
-    # ── Daily.co Video Conferencing ───────────────────────────────────────────
-    daily_api_key: str = ""
 
     # ── File Storage ──────────────────────────────────────────────────────────
     upload_dir: str = "./uploads"

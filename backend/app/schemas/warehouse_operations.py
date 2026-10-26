@@ -146,10 +146,6 @@ class QualityCheckResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class QualityCheckCreate(BaseModel):
-    order_id: UUID
-
-
 class QualityCheckUpdate(BaseModel):
     goods_correct: bool | None = None
     count_correct: bool | None = None
