@@ -1,5 +1,4 @@
 {
-  "backend/app/routers/warehouse_operations.py": 511,
   "backend/app/services/ai_chat/intents.py": 566,
   "backend/app/services/ai_chat/warehouse_answers.py": 503,
   "backend/app/services/auth_service.py": 767,
