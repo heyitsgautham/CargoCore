@@ -7,11 +7,13 @@ import router from './router';
 import './styles/index.css';
 import { initializeTheme } from './utils/theme';
 import { purgeLegacyCredentialCache } from './stores/logistic/mappers';
+import { installErrorReporting } from './utils/errorReporter';
 
 initializeTheme();
 purgeLegacyCredentialCache();
 
 const app = createApp(App);
+installErrorReporting(app);
 const pinia = createPinia();
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
