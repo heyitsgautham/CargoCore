@@ -9,7 +9,6 @@
   "frontend/src/LWD-views/Dispatcher/ManifestCenter.vue": 917,
   "frontend/src/LWD-views/Dispatcher/OrderStatusControl.vue": 1140,
   "frontend/src/LWD-views/Dispatcher/PendingDispatchQueue.vue": 885,
-  "frontend/src/LWD-views/LogisticManager/Dashboard.vue": 1151,
   "frontend/src/LWD-views/LogisticManager/RateGovernance.vue": 917,
   "frontend/src/LWD-views/WarehouseManager/Dashboard.vue": 905,
   "frontend/src/LWD-views/WarehouseManager/FloorPlan.vue": 843,
