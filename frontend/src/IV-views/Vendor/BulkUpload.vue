@@ -43,308 +43,31 @@
         </div>
 
         <!-- Template Downloads -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <button @click="downloadTemplate('commercial')"
-                class="glass-panel p-5 rounded-xl flex items-center gap-4 hover:ring-1 hover:ring-blue-500/30 transition-all text-left group">
-                <div class="p-2.5 bg-blue-500/20 rounded-lg text-blue-500">
-                    <span class="material-symbols-outlined">business</span>
-                </div>
-                <div class="flex-1">
-                    <div
-                        class="font-bold text-gray-900 dark:text-white text-sm group-hover:text-blue-500 transition-colors">
-                        Commercial (B2B)</div>
-                    <div class="text-[10px] text-gray-500">Standard B2B shipments</div>
-                </div>
-                <span
-                    class="material-symbols-outlined text-gray-400 group-hover:text-blue-500 transition-colors">download</span>
-            </button>
-            <button @click="downloadTemplate('palletized')"
-                class="glass-panel p-5 rounded-xl flex items-center gap-4 hover:ring-1 hover:ring-green-500/30 transition-all text-left group">
-                <div class="p-2.5 bg-green-500/20 rounded-lg text-green-500">
-                    <span class="material-symbols-outlined">inventory_2</span>
-                </div>
-                <div class="flex-1">
-                    <div
-                        class="font-bold text-gray-900 dark:text-white text-sm group-hover:text-green-500 transition-colors">
-                        Palletized</div>
-                    <div class="text-[10px] text-gray-500">Pallet-based cargo</div>
-                </div>
-                <span
-                    class="material-symbols-outlined text-gray-400 group-hover:text-green-500 transition-colors">download</span>
-            </button>
-            <button @click="downloadTemplate('b2c')"
-                class="glass-panel p-5 rounded-xl flex items-center gap-4 hover:ring-1 hover:ring-orange-500/30 transition-all text-left group">
-                <div class="p-2.5 bg-orange-500/20 rounded-lg text-orange-500">
-                    <span class="material-symbols-outlined">person</span>
-                </div>
-                <div class="flex-1">
-                    <div
-                        class="font-bold text-gray-900 dark:text-white text-sm group-hover:text-orange-500 transition-colors">
-                        B2C Shipment</div>
-                    <div class="text-[10px] text-gray-500">Direct to customer</div>
-                </div>
-                <span
-                    class="material-symbols-outlined text-gray-400 group-hover:text-orange-500 transition-colors">download</span>
-            </button>
-            <router-link to="/vendor/api-docs"
-                class="glass-panel p-5 rounded-xl flex items-center gap-4 hover:ring-1 hover:ring-purple-500/30 transition-all group">
-                <div class="p-2.5 bg-purple-500/20 rounded-lg text-purple-500">
-                    <span class="material-symbols-outlined">code</span>
-                </div>
-                <div class="flex-1">
-                    <div
-                        class="font-bold text-gray-900 dark:text-white text-sm group-hover:text-purple-500 transition-colors">
-                        API Documentation</div>
-                    <div class="text-[10px] text-gray-500">Integrate with your ERP</div>
-                </div>
-                <span
-                    class="material-symbols-outlined text-gray-400 group-hover:text-purple-500 transition-colors">open_in_new</span>
-            </router-link>
-        </div>
+        <TemplateDownloads />
 
         <!-- Recent Uploads -->
-        <div class="glass-panel rounded-xl overflow-hidden">
-            <div class="p-4 border-b border-gray-100 dark:border-white/5 flex justify-between items-center">
-                <h3 class="font-bold text-gray-900 dark:text-white text-sm">Recent Uploads</h3>
-                <div class="flex items-center gap-3">
-                    <span class="text-xs text-gray-500">{{ store.bulkUploads.length }} upload(s)</span>
-                    <button @click="store.fetchBulkUploads()"
-                        class="text-xs text-blue-500 hover:text-blue-600 font-semibold flex items-center gap-1 transition-colors">
-                        <span class="material-symbols-outlined text-[14px]">refresh</span> Refresh
-                    </button>
-                </div>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm min-w-[600px]">
-                    <thead class="bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 uppercase text-[10px]">
-                        <tr>
-                            <th class="px-4 py-3">File</th>
-                            <th class="px-4 py-3">Date</th>
-                            <th class="px-4 py-3">Orders</th>
-                            <th class="px-4 py-3">Status</th>
-                            <th class="px-4 py-3 text-right">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-white/5">
-                        <tr v-if="store.bulkUploads.length === 0">
-                            <td colspan="5" class="px-4 py-8 text-center text-gray-400 text-sm">No uploads yet</td>
-                        </tr>
-                        <tr v-for="u in store.bulkUploads" :key="u.id"
-                            class="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-                            <td class="px-4 py-3">
-                                <div class="flex items-center gap-2">
-                                    <span class="material-symbols-outlined text-[16px]"
-                                        :class="u.status === 'Processed' ? 'text-green-500' : u.status === 'Failed' ? 'text-red-500' : u.status === 'Scheduled' ? 'text-purple-500' : 'text-yellow-500 animate-pulse'">{{
-                                            u.status === 'Processed' ? 'check_circle' : u.status === 'Failed' ? 'error' :
-                                        u.status === 'Scheduled' ? 'schedule' : 'pending' }}</span>
-                                    <span class="text-gray-900 dark:text-white text-xs font-medium">{{ u.filename }}</span>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 text-gray-500 text-xs">{{ u.date }}</td>
-                            <td class="px-4 py-3 text-gray-900 dark:text-white text-xs font-bold">{{ u.orders }}</td>
-                            <td class="px-4 py-3">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold"
-                                    :class="uploadStatusClass(u.status)">{{ u.status }}</span>
-                                <span v-if="u.errors" class="ml-1 text-[10px] text-red-400">({{ u.errors }}
-                                    errors)</span>
-                                <div v-if="u.status === 'Scheduled' && u.scheduled_for" class="text-[10px] text-purple-400 mt-0.5">{{ u.scheduled_for }}</div>
-                            </td>
-                            <td class="px-4 py-3 text-right">
-                                <button @click="viewUploadDetail(u)"
-                                    class="text-blue-500 hover:text-blue-600 text-xs font-bold transition-colors">{{
-                                        u.status === 'Failed' ? 'View Errors' : 'View Details' }}</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <RecentUploadsTable />
 
         <!-- Upload Detail Modal -->
         <Teleport to="body">
-            <BaseModal :isOpen="!!viewingUpload" @close="viewingUpload = null">
-                <template #title>Upload Details — {{ viewingUpload?.filename }}</template>
-                <div v-if="viewingUpload" class="space-y-4">
-                    <div class="grid grid-cols-3 gap-3">
-                        <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-lg text-center">
-                            <div class="text-xs text-gray-500 mb-1">Orders</div>
-                            <div class="text-lg font-bold text-gray-900 dark:text-white">{{ viewingUpload.orders }}</div>
-                        </div>
-                        <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-lg text-center">
-                            <div class="text-xs text-gray-500 mb-1">Status</div>
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold"
-                                :class="uploadStatusClass(viewingUpload.status)">{{ viewingUpload.status }}</span>
-                        </div>
-                        <div class="p-3 bg-gray-50 dark:bg-white/5 rounded-lg text-center">
-                            <div class="text-xs text-gray-500 mb-1">Errors</div>
-                            <div class="text-lg font-bold"
-                                :class="viewingUpload.errors ? 'text-red-500' : 'text-green-500'">{{
-                                viewingUpload.errors || 0 }}</div>
-                        </div>
-                    </div>
-                    <div v-if="viewingUpload.errors" class="space-y-2">
-                        <div class="text-xs font-bold text-red-500">Error Details:</div>
-                        <div class="p-3 bg-red-500/5 border border-red-500/20 rounded-lg text-xs text-red-400 flex items-start gap-2">
-                            <span class="material-symbols-outlined text-[14px] mt-0.5 flex-shrink-0">error</span>
-                            <span>{{ viewingUpload.errors }} row(s) failed validation. Review your file for missing required fields, invalid data formats, or duplicate reference IDs, then retry the upload.</span>
-                        </div>
-                    </div>
-                    <div v-if="viewingUpload.status === 'Processed'" class="p-3 bg-green-500/5 border border-green-500/20 rounded-lg text-xs text-green-600 dark:text-green-400 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[14px]">check_circle</span>
-                        All {{ viewingUpload.orders }} shipments were created and queued for dispatch.
-                    </div>
-                    <div class="text-xs text-gray-500">Uploaded on {{ viewingUpload.date }}</div>
-                    <div v-if="viewingUpload.scheduled_for" class="text-xs text-purple-400">Scheduled for {{ viewingUpload.scheduled_for }}</div>
-                </div>
-                <template #footer>
-                    <button @click="viewingUpload = null" class="px-4 py-2 text-gray-500 text-sm">Close</button>
-                    <button v-if="viewingUpload?.status === 'Failed'" @click="retryUpload(viewingUpload)"
-                        :disabled="saving"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2">
-                        <span v-if="saving" class="material-symbols-outlined text-[14px] animate-spin">progress_activity</span>
-                        {{ saving ? 'Retrying...' : 'Retry Upload' }}
-                    </button>
-                </template>
-            </BaseModal>
+            <UploadDetailModal />
         </Teleport>
 
         <!-- Post-Upload Confirmation Modal -->
         <Teleport to="body">
-            <BaseModal :isOpen="showConfirmModal" @close="cancelConfirmation">
-                <template #title>Confirm Upload</template>
-                <div class="space-y-5">
-                    <!-- File Summary -->
-                    <div
-                        class="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-4">
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="p-2 bg-green-500/20 rounded-lg text-green-500">
-                                <span class="material-symbols-outlined">description</span>
-                            </div>
-                            <div class="flex-1">
-                                <div class="font-bold text-gray-900 dark:text-white text-sm">{{ pendingUpload.filename }}</div>
-                                <div class="text-[10px] text-gray-500">{{ pendingUpload.fileSize }} KB • {{
-                                    pendingUpload.detectedRows }} shipments detected</div>
-                            </div>
-                            <span class="material-symbols-outlined text-green-500">verified</span>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2 text-center">
-                            <div class="p-2 bg-white/50 dark:bg-black/20 rounded-lg">
-                                <div class="text-lg font-bold text-gray-900 dark:text-white">{{ pendingUpload.detectedRows }}</div>
-                                <div class="text-[10px] text-gray-500">Detected</div>
-                            </div>
-                            <div class="p-2 bg-white/50 dark:bg-black/20 rounded-lg">
-                                <div class="text-lg font-bold text-green-500">{{ pendingUpload.validRows }}</div>
-                                <div class="text-[10px] text-gray-500">Valid</div>
-                            </div>
-                            <div class="p-2 bg-white/50 dark:bg-black/20 rounded-lg">
-                                <div class="text-lg font-bold"
-                                    :class="pendingUpload.warningRows > 0 ? 'text-yellow-500' : 'text-gray-400'">{{
-                                    pendingUpload.warningRows }}</div>
-                                <div class="text-[10px] text-gray-500">Warnings</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Live Quotation -->
-                    <div class="glass-panel rounded-xl p-4 border border-gray-200 dark:border-white/10">
-                        <div class="flex items-center gap-2 mb-3">
-                            <span class="material-symbols-outlined text-blue-500 text-[18px]">calculate</span>
-                            <h4 class="font-bold text-gray-900 dark:text-white text-sm">Live Quotation</h4>
-                        </div>
-                        <div class="space-y-2 mb-3">
-                            <div class="flex justify-between text-xs">
-                                <span class="text-gray-500">Base Transport ({{ pendingUpload.detectedRows }}
-                                    shipments)</span>
-                                <span class="text-gray-900 dark:text-white font-medium">₹{{
-                                    uploadQuote.baseTransport.toLocaleString() }}</span>
-                            </div>
-                            <div class="flex justify-between text-xs">
-                                <span class="text-gray-500">Handling & Packing</span>
-                                <span class="text-gray-900 dark:text-white font-medium">₹{{
-                                    uploadQuote.handling.toLocaleString() }}</span>
-                            </div>
-                            <div class="flex justify-between text-xs">
-                                <span class="text-gray-500">Insurance (estimated)</span>
-                                <span class="text-gray-900 dark:text-white font-medium">₹{{
-                                    uploadQuote.insurance.toLocaleString() }}</span>
-                            </div>
-                            <div class="flex justify-between text-xs">
-                                <span class="text-gray-500">GST (18%)</span>
-                                <span class="text-gray-900 dark:text-white font-medium">₹{{
-                                    uploadQuote.gst.toLocaleString() }}</span>
-                            </div>
-                            <div class="border-t border-gray-200 dark:border-white/10 pt-2 flex justify-between">
-                                <span class="text-sm font-bold text-gray-700 dark:text-gray-200">Total Estimate</span>
-                                <span class="text-lg font-bold text-blue-500">₹{{ uploadQuote.total.toLocaleString() }}</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 text-[10px] text-gray-400">
-                            <span class="material-symbols-outlined text-[12px]">info</span>
-                            Final amount may vary based on actual weight, distance, and service options.
-                        </div>
-                    </div>
-
-                    <!-- Confirmation Prompt -->
-                    <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 flex items-start gap-2">
-                        <span class="material-symbols-outlined text-yellow-500 text-[18px] mt-0.5">help</span>
-                        <div>
-                            <div class="text-sm font-bold text-gray-900 dark:text-white">Are you sure this file is
-                                correct?</div>
-                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">Review the summary above. Once
-                                confirmed, shipments will be created and assigned to drivers.</p>
-                        </div>
-                    </div>
-
-                    <!-- Schedule Picker (conditionally shown) -->
-                    <div v-if="showSchedulePicker" class="space-y-2">
-                        <label class="block text-xs text-gray-500 dark:text-gray-400 font-bold">Schedule for Later</label>
-                        <div class="flex gap-3">
-                            <input v-model="scheduleDate" type="date"
-                                class="flex-1 bg-white dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
-                            <input v-model="scheduleTime" type="time"
-                                class="w-32 bg-white dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:border-blue-500">
-                        </div>
-                        <div class="flex justify-end gap-2 mt-2">
-                            <button @click="showSchedulePicker = false"
-                                class="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">Cancel</button>
-                            <button @click="confirmScheduleLater" :disabled="saving"
-                                class="px-4 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-                                {{ saving ? 'Scheduling...' : 'Confirm Schedule' }}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <template #footer>
-                    <div class="flex flex-wrap gap-2 w-full justify-center">
-                        <button @click="cancelConfirmation" :disabled="saving"
-                            class="px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5
-                            text-gray-600 bg-gray-100 border border-gray-200 hover:text-gray-800 hover:bg-gray-200
-                            dark:text-gray-300 dark:bg-white/5 dark:border-white/10 dark:hover:bg-white/10 dark:hover:text-white
-                            disabled:opacity-50 disabled:cursor-not-allowed">
-                            <span class="material-symbols-outlined text-[14px]">refresh</span> Modify / Re-upload
-                        </button>
-                        <button @click="showSchedulePicker = true" :disabled="saving"
-                            class="px-4 py-2.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-lg text-sm font-bold hover:bg-purple-500/20 transition-colors flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed">
-                            <span class="material-symbols-outlined text-[14px]">schedule</span> Schedule Later
-                        </button>
-                        <button @click="confirmCreateNow" :disabled="saving"
-                            class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-bold transition-colors flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed">
-                            <span class="material-symbols-outlined text-[14px]" :class="saving ? 'animate-spin' : ''">
-                                {{ saving ? 'progress_activity' : 'rocket_launch' }}
-                            </span>
-                            {{ saving ? 'Creating...' : 'Create Shipments Now' }}
-                        </button>
-                    </div>
-                </template>
-            </BaseModal>
+            <UploadConfirmModal />
         </Teleport>
     </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import TemplateDownloads from './bulkUpload/TemplateDownloads.vue'
+import RecentUploadsTable from './bulkUpload/RecentUploadsTable.vue'
+import UploadDetailModal from './bulkUpload/UploadDetailModal.vue'
+import UploadConfirmModal from './bulkUpload/UploadConfirmModal.vue'
+import { bulkUploadPageKey } from './bulkUpload/bulkUploadPageContext'
+import { ref, computed, onMounted, provide } from 'vue'
 import { useVendorStore } from '@/stores/vendorStore'
-import BaseModal from '@/components/BaseModal.vue'
 
 const store = useVendorStore()
 const selectedFile = ref(null)
@@ -605,5 +328,24 @@ function showToast(msg) {
 
 onMounted(() => {
     store.fetchBulkUploads()
+})
+
+provide(bulkUploadPageKey, {
+    cancelConfirmation,
+    confirmCreateNow,
+    confirmScheduleLater,
+    downloadTemplate,
+    pendingUpload,
+    retryUpload,
+    saving,
+    scheduleDate,
+    scheduleTime,
+    showConfirmModal,
+    showSchedulePicker,
+    store,
+    uploadQuote,
+    uploadStatusClass,
+    viewUploadDetail,
+    viewingUpload,
 })
 </script>
