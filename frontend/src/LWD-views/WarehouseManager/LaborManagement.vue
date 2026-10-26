@@ -15,393 +15,17 @@
             </div>
         </div>
 
-        <!-- Live Status Board -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="glass-panel p-4 rounded-xl border-l-4 border-green-500 cursor-pointer hover:bg-gray-50 dark:bg-white/5 transition-colors"
-                @click="statusFilter = statusFilter === 'In Warehouse' ? '' : 'In Warehouse'">
-                <div class="text-xs text-gray-600 dark:text-gray-400 uppercase font-semibold tracking-wide">In Warehouse
-                </div>
-                <div class="text-3xl font-bold text-green-600 dark:text-green-400 mt-1">{{ statusCounts.inWarehouse }}</div>
-                <div class="flex items-center gap-1 mt-1">
-                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                    <span class="text-xs text-green-600/70 dark:text-green-400/70">Active on floor</span>
-                </div>
-            </div>
-            <div class="glass-panel p-4 rounded-xl border-l-4 border-blue-500 cursor-pointer hover:bg-gray-50 dark:bg-white/5 transition-colors"
-                @click="statusFilter = statusFilter === 'Warehouse Order' ? '' : 'Warehouse Order'">
-                <div class="text-xs text-gray-600 dark:text-gray-400 uppercase font-semibold tracking-wide">Warehouse
-                    Order</div>
-                <div class="text-3xl font-bold text-blue-600 dark:text-blue-400 mt-1">{{ statusCounts.warehouseOrder }}</div>
-                <div class="text-xs text-blue-600/70 dark:text-blue-400/70 mt-1">Pick, pack, loading tasks</div>
-            </div>
-            <div class="glass-panel p-4 rounded-xl border-l-4 border-purple-500 cursor-pointer hover:bg-gray-50 dark:bg-white/5 transition-colors"
-                @click="statusFilter = statusFilter === 'Customer Move' ? '' : 'Customer Move'">
-                <div class="text-xs text-gray-600 dark:text-gray-400 uppercase font-semibold tracking-wide">Customer
-                    Move</div>
-                <div class="text-3xl font-bold text-purple-600 dark:text-purple-400 mt-1">{{ statusCounts.customerMove }}</div>
-                <div class="text-xs text-purple-600/70 dark:text-purple-400/70 mt-1">Service move / with driver</div>
-            </div>
-            <div class="glass-panel p-4 rounded-xl border-l-4 border-gray-500 cursor-pointer hover:bg-gray-50 dark:bg-white/5 transition-colors"
-                @click="statusFilter = statusFilter === 'Off Duty' ? '' : 'Off Duty'">
-                <div class="text-xs text-gray-600 dark:text-gray-400 uppercase font-semibold tracking-wide">Off Duty
-                </div>
-                <div class="text-3xl font-bold text-gray-600 dark:text-gray-400 mt-1">{{ statusCounts.offDuty }}</div>
-                <div class="text-xs text-gray-500 mt-1">Shift ended / Break</div>
-            </div>
-        </div>
+        <LiveStatusBoard />
 
-        <!-- Performance Summary -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="glass-panel p-6 rounded-xl">
-                <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">Active Staff</div>
-                <div class="text-4xl font-bold text-gray-900 dark:text-white mt-2">{{ staffList.length }}</div>
-                <div class="text-green-600 dark:text-green-400 text-xs mt-1">Full Roster</div>
-            </div>
-            <div class="glass-panel p-6 rounded-xl">
-                <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">Avg. Productivity</div>
-                <div class="text-4xl font-bold text-primary mt-2">{{ avgProductivity }}%</div>
-                <div class="text-gray-500 text-xs mt-1">{{ avgProductivity >= 100 ? 'Above target' : 'Below target' }}</div>
-            </div>
-            <div class="glass-panel p-6 rounded-xl">
-                <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Hours Logged</div>
-                <div class="text-4xl font-bold text-yellow-600 dark:text-yellow-400 mt-2">{{ totalHours }}h</div>
-                <div class="text-gray-500 text-xs mt-1">Today</div>
-            </div>
-        </div>
+        <LaborPerformanceSummary />
 
-        <!-- Loading State -->
-        <div v-if="loading" class="glass-panel rounded-xl p-8 text-center">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <div class="mt-2 text-gray-600 dark:text-gray-400">Loading staff data...</div>
-        </div>
+        <StaffList />
 
-        <!-- Staff List -->
-        <div v-else class="glass-panel rounded-xl overflow-hidden">
-            <div
-                class="p-4 border-b border-gray-100 dark:border-white/5 flex gap-4 items-center bg-gray-100 dark:bg-black/20">
-                <input type="text" v-model="searchQuery" placeholder="Search staff..."
-                    class="flex-1 bg-gray-100 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-lg py-2 px-4 text-gray-900 dark:text-white focus:outline-none focus:border-primary/50">
-                <select v-model="deptFilter"
-                    class="bg-gray-100 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-2 text-gray-900 dark:text-white">
-                    <option value="" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">All Departments</option>
-                    <option value="Picking" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">Picking</option>
-                    <option value="Packing" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">Packing</option>
-                    <option value="Receiving" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">Receiving</option>
-                    <option value="Loading" class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">Loading</option>
-                </select>
-                <div v-if="statusFilter"
-                    class="flex items-center gap-2 bg-primary/20 text-primary px-3 py-1.5 rounded-lg text-xs font-bold">
-                    {{ statusFilter }}
-                    <button @click="statusFilter = ''" class="hover:text-gray-900 dark:text-white"><span
-                            class="material-symbols-outlined text-[14px]">close</span></button>
-                </div>
-            </div>
+        <AssignLabourerModal />
 
-            <div class="overflow-auto max-h-[500px]">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-gray-50 dark:bg-white/5 text-gray-600 dark:text-gray-400 uppercase sticky top-0">
-                        <tr>
-                            <th class="p-4">Name</th>
-                            <th class="p-4">Role</th>
-                            <th class="p-4">Current Task</th>
-                            <th class="p-4">Order ID</th>
-                            <th class="p-4">Time Log</th>
-                            <th class="p-4">Performance</th>
-                            <th class="p-4">Status</th>
-                            <th class="p-4">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 dark:divide-white/5">
-                        <tr v-for="staff in filteredStaff" :key="staff.id"
-                            class="hover:bg-gray-50 dark:bg-white/5 transition-colors">
-                            <td class="p-4 flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold">
-                                    {{ getInitials(staff.name) }}
-                                </div>
-                                <span class="font-bold text-gray-900 dark:text-white">{{ staff.name }}</span>
-                            </td>
-                            <td class="p-4 text-gray-600 dark:text-gray-300">{{ staff.role }}</td>
-                            <td class="p-4">
-                                <div class="text-gray-600 dark:text-gray-400">{{ staff.task }}</div>
-                                <div v-if="staff.assignmentHint" class="text-[10px] text-gray-500 dark:text-gray-500 mt-1">
-                                    {{ staff.assignmentHint }}
-                                </div>
-                            </td>
-                            <td class="p-4">
-                                <div v-if="staff.orderId" class="space-y-1">
-                                    <div class="font-mono text-primary text-xs">{{ staff.orderId }}</div>
-                                    <div v-if="staff.orderScope" class="text-[10px] text-gray-500 dark:text-gray-500">
-                                        {{ staff.orderScope }}
-                                    </div>
-                                </div>
-                                <span v-else class="text-gray-600">—</span>
-                            </td>
-                            <td class="p-4">
-                                <div class="text-xs space-y-0.5">
-                                    <div class="text-gray-600 dark:text-gray-400">In: <span
-                                            class="text-gray-900 dark:text-white font-mono">{{ staff.startTime
-                                            }}</span></div>
-                                    <div v-if="staff.fieldTime" class="text-purple-600 dark:text-purple-400">Field: <span
-                                            class="font-mono">{{ staff.fieldTime }}</span></div>
-                                    <div v-if="staff.returnTime" class="text-green-600 dark:text-green-400">Return: <span
-                                            class="font-mono">{{ staff.returnTime }}</span></div>
-                                </div>
-                            </td>
-                            <td class="p-4">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-16 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                        <div class="bg-green-500 h-full" :style="`width: ${staff.perf}%`"></div>
-                                    </div>
-                                    <span class="text-xs">{{ staff.perf }}%</span>
-                                </div>
-                            </td>
-                            <td class="p-4">
-                                <span class="px-2 py-1 rounded text-[10px] font-bold" :class="staff.statusClass">
-                                    {{ staff.status }}
-                                </span>
-                            </td>
-                            <td class="p-4">
-                                <div class="flex gap-1">
-                                    <button v-if="staff.status === 'In Warehouse'" @click="openAssign(staff)"
-                                        class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 px-2 py-1 rounded text-xs font-bold transition-colors"
-                                        title="Assign to Order">
-                                        <span class="material-symbols-outlined text-[14px]">link</span>
-                                    </button>
-                                    <button v-if="canPrintAssignmentSlip(staff)" @click="openAssignmentSlip(staff)"
-                                        class="bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-500 dark:text-indigo-300 px-2 py-1 rounded text-xs font-bold transition-colors"
-                                        title="Assignment Slip">
-                                        <span class="material-symbols-outlined text-[14px]">print</span>
-                                    </button>
-                                    <button @click="openStaffDetail(staff)"
-                                        class="text-gray-500 hover:text-gray-900 dark:text-white" title="More">
-                                        <span class="material-symbols-outlined text-[16px]">more_horiz</span>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr v-if="filteredStaff.length === 0 && !loading">
-                            <td colspan="8" class="p-8 text-center text-gray-500">
-                                <span class="material-symbols-outlined text-4xl mb-2 opacity-50">group_off</span>
-                                <p>{{ searchQuery || deptFilter || statusFilter ? 'No staff match the current filters' : 'No labour staff found for this warehouse' }}</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <StaffDetailModal />
 
-        <!-- Assign to Order Modal -->
-        <Teleport to="body">
-            <div v-if="showAssignModal"
-                class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-                @click.self="showAssignModal = false">
-                <div class="bg-white dark:bg-gray-900 shadow-2xl rounded-2xl w-full max-w-md border border-gray-200 dark:border-white/10">
-                    <div class="p-6 border-b border-gray-100 dark:border-white/5 flex justify-between items-center">
-                        <h3 class="font-bold text-gray-900 dark:text-white text-lg">Assign Labor to Order</h3>
-                        <button @click="showAssignModal = false"
-                            class="text-gray-500 hover:text-gray-900 dark:text-white"><span
-                                class="material-symbols-outlined">close</span></button>
-                    </div>
-                    <div class="p-6 space-y-4">
-                        <div v-if="assignTarget">
-                            <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">Selected Worker</div>
-                            <div
-                                class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-white/5 rounded-lg border border-gray-100 dark:border-white/5 mb-4">
-                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-blue-600 flex items-center justify-center text-white text-xs font-bold">
-                                    {{ getInitials(assignTarget.name) }}
-                                </div>
-                                <div class="flex-1">
-                                    <div class="text-sm font-bold text-gray-900 dark:text-white">{{ assignTarget.name }}
-                                    </div>
-                                    <div class="text-xs text-gray-500">{{ assignTarget.role }}</div>
-                                </div>
-                                <button @click="assignTarget = null" class="text-gray-400 hover:text-red-500 transition-colors">
-                                    <span class="material-symbols-outlined text-[16px]">close</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div v-else>
-                            <label class="text-xs text-gray-600 dark:text-gray-400 mb-1 block">Select Available Worker</label>
-                            <select v-model="assignTarget"
-                                class="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-lg p-3 mb-4 text-gray-900 dark:text-white focus:outline-none focus:border-primary/50">
-                                <option :value="null">Select a worker...</option>
-                                <option v-for="staff in availableStaffList" :key="staff.id" :value="staff">
-                                    {{ staff.name }} ({{ staff.role }})
-                                </option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-600 dark:text-gray-400 mb-1 block">Order ID</label>
-                            <input type="text" v-model="assignOrderId" placeholder="ORD-XXXXX"
-                                class="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:outline-none focus:border-primary/50 font-mono" />
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-600 dark:text-gray-400 mb-1 block">Assignment Type</label>
-                            <select v-model="assignType"
-                                class="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-lg p-3 text-gray-900 dark:text-white focus:outline-none focus:border-primary/50">
-                                <option class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">Picking</option>
-                                <option class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">Packing</option>
-                                <option class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">Loading</option>
-                                <option class="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">Field Duty (With Driver)</option>
-                            </select>
-                        </div>
-                        <div
-                            class="flex items-center gap-2 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20 text-xs text-blue-600 dark:text-blue-400">
-                            <span class="material-symbols-outlined text-[16px]">info</span>
-                            Seat compatibility will be verified by Dispatcher before dispatch.
-                        </div>
-                        <button @click="assignWorker" :disabled="isAssigning || !assignOrderId || !assignTarget"
-                            class="w-full bg-primary hover:bg-primary-dark text-background-dark font-bold py-3 rounded-lg transition-colors disabled:opacity-50">
-                            {{ isAssigning ? 'Assigning...' : 'Assign to Order' }}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </Teleport>
-
-        <!-- Staff Detail Modal -->
-        <Teleport to="body">
-            <div v-if="showStaffDetail && selectedStaff"
-                class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-                @click.self="showStaffDetail = false">
-                <div class="bg-white dark:bg-gray-900 shadow-2xl rounded-2xl w-full max-w-md border border-gray-200 dark:border-white/10">
-                    <div class="p-6 border-b border-gray-100 dark:border-white/5 flex justify-between items-center">
-                        <h3 class="font-bold text-gray-900 dark:text-white text-lg">Staff Details</h3>
-                        <button @click="showStaffDetail = false"
-                            class="text-gray-500 hover:text-gray-900 dark:text-white"><span
-                                class="material-symbols-outlined">close</span></button>
-                    </div>
-                    <div class="p-6 space-y-4">
-                        <div class="flex items-center gap-4">
-                            <div class="w-14 h-14 rounded-full bg-gradient-to-br from-teal-500 to-blue-600 flex items-center justify-center text-white text-lg font-bold">
-                                {{ getInitials(selectedStaff.name) }}
-                            </div>
-                            <div>
-                                <div class="font-bold text-gray-900 dark:text-white text-lg">{{ selectedStaff.name }}
-                                </div>
-                                <div class="text-sm text-gray-600 dark:text-gray-400">{{ selectedStaff.role }} • {{
-                                    selectedStaff.dept }}</div>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-gray-50 dark:bg-white/5 p-3 rounded-lg">
-                                <div class="text-xs text-gray-600 dark:text-gray-400">Status</div>
-                                <div class="text-gray-900 dark:text-white font-bold text-sm">{{ selectedStaff.status }}
-                                </div>
-                            </div>
-                            <div class="bg-gray-50 dark:bg-white/5 p-3 rounded-lg">
-                                <div class="text-xs text-gray-600 dark:text-gray-400">Performance</div>
-                                <div class="text-gray-900 dark:text-white font-bold text-sm">{{ selectedStaff.perf }}%
-                                </div>
-                            </div>
-                            <div class="bg-gray-50 dark:bg-white/5 p-3 rounded-lg">
-                                <div class="text-xs text-gray-600 dark:text-gray-400">Current Task</div>
-                                <div class="text-gray-900 dark:text-white font-bold text-sm">{{ selectedStaff.task }}
-                                </div>
-                            </div>
-                            <div class="bg-gray-50 dark:bg-white/5 p-3 rounded-lg">
-                                <div class="text-xs text-gray-600 dark:text-gray-400">Start Time</div>
-                                <div class="text-gray-900 dark:text-white font-bold text-sm font-mono">{{
-                                    selectedStaff.startTime }}</div>
-                            </div>
-                        </div>
-                        <div class="flex gap-2">
-                            <button v-if="canPrintAssignmentSlip(selectedStaff)" @click="openAssignmentSlip(selectedStaff)"
-                                class="bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-600 dark:text-indigo-300 py-2 px-4 rounded-lg text-sm font-bold transition-colors">
-                                Assignment Slip
-                            </button>
-                            <button v-if="selectedStaff.status !== 'Off Duty'" @click="setOffDuty(selectedStaff)"
-                                class="flex-1 bg-gray-500/20 hover:bg-gray-500/30 text-gray-600 dark:text-gray-400 py-2 rounded-lg text-sm font-bold transition-colors">Set
-                                Off Duty</button>
-                            <button v-if="selectedStaff.status === 'Off Duty'" @click="setOnDuty(selectedStaff)"
-                                class="flex-1 bg-green-500/20 hover:bg-green-500/30 text-green-600 dark:text-green-400 py-2 rounded-lg text-sm font-bold transition-colors">Set
-                                On Duty</button>
-                            <button @click="deleteLabourer(selectedStaff)"
-                                class="bg-red-500/20 hover:bg-red-500/30 text-red-600 dark:text-red-400 py-2 px-4 rounded-lg text-sm font-bold transition-colors">
-                                <span class="material-symbols-outlined text-[15px] align-middle">delete</span>
-                            </button>
-                            <button @click="showStaffDetail = false"
-                                class="flex-1 bg-gray-50 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-900 dark:text-white py-2 rounded-lg text-sm transition-colors">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </Teleport>
-
-        <!-- Create Labourer Modal -->
-        <Teleport to="body">
-            <div v-if="showCreateModal"
-                class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-                @click.self="closeCreateModal">
-                <div class="bg-white dark:bg-gray-900 shadow-2xl rounded-2xl w-full max-w-md border border-gray-200 dark:border-white/10 max-h-[90vh] flex flex-col">
-                    <div class="p-4 border-b border-gray-100 dark:border-white/5 flex justify-between items-center flex-shrink-0">
-                        <h3 class="font-bold text-gray-900 dark:text-white text-lg flex items-center gap-2">
-                            <span class="material-symbols-outlined text-green-500">person_add</span>
-                            Add New Labourer
-                        </h3>
-                        <button @click="closeCreateModal"
-                            class="text-gray-500 hover:text-gray-900 dark:text-white">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-                    <div class="p-4 space-y-3 overflow-y-auto flex-1">
-                        <div>
-                            <label class="text-xs text-gray-600 dark:text-gray-400 mb-1 block">Full Name *</label>
-                            <input type="text" v-model="newLabourer.name" placeholder="Enter full name" autocomplete="off"
-                                class="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-lg p-2.5 text-gray-900 dark:text-white focus:outline-none focus:border-primary/50" />
-                        </div>
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="text-xs text-gray-600 dark:text-gray-400 mb-1 block">Email</label>
-                                <input type="email" v-model="newLabourer.email" placeholder="email@example.com" autocomplete="off"
-                                    class="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-lg p-2.5 text-gray-900 dark:text-white focus:outline-none focus:border-primary/50 text-sm" />
-                            </div>
-                            <div>
-                                <label class="text-xs text-gray-600 dark:text-gray-400 mb-1 block">Phone</label>
-                                <input type="tel" v-model="newLabourer.phone" placeholder="+91 98765 43210" autocomplete="off"
-                                    class="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-lg p-2.5 text-gray-900 dark:text-white focus:outline-none focus:border-primary/50 text-sm" />
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-600 dark:text-gray-400 mb-1 block">Department / Role *</label>
-                            <select v-model="newLabourer.role"
-                                class="w-full bg-gray-50 dark:bg-black/40 border border-gray-200 dark:border-white/10 rounded-lg p-2.5 text-gray-900 dark:text-white focus:outline-none focus:border-primary/50">
-                                <option value="" class="bg-white dark:bg-gray-800">Select role...</option>
-                                <option value="Picking" class="bg-white dark:bg-gray-800">Picking</option>
-                                <option value="Packing" class="bg-white dark:bg-gray-800">Packing</option>
-                                <option value="Loading" class="bg-white dark:bg-gray-800">Loading</option>
-                                <option value="Receiving" class="bg-white dark:bg-gray-800">Receiving</option>
-                                <option value="General" class="bg-white dark:bg-gray-800">General Labour</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-xs text-gray-600 dark:text-gray-400 mb-1.5 block">Skills (select multiple)</label>
-                            <div class="flex flex-wrap gap-1.5">
-                                <button v-for="skill in availableSkills" :key="skill"
-                                    @click="toggleSkill(skill)"
-                                    class="px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
-                                    :class="newLabourer.skills.includes(skill)
-                                        ? 'bg-primary text-white'
-                                        : 'bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-white/20'">
-                                    {{ skill }}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-4 border-t border-gray-100 dark:border-white/5 flex-shrink-0 space-y-3">
-                        <div class="flex items-center gap-2 p-2.5 bg-green-500/10 rounded-lg border border-green-500/20 text-xs text-green-600 dark:text-green-400">
-                            <span class="material-symbols-outlined text-[14px]">info</span>
-                            Labourer will be created as "Available" and can be assigned immediately.
-                        </div>
-                        <button @click="createLabourer" :disabled="isCreating || !newLabourer.name || !newLabourer.role"
-                            class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 rounded-lg transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
-                            <span v-if="isCreating" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
-                            {{ isCreating ? 'Creating...' : 'Create Labourer' }}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </Teleport>
+        <CreateLabourerModal />
 
         <!-- Toast -->
         <div v-if="toastMsg"
@@ -414,7 +38,23 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import LiveStatusBoard from './labor/LiveStatusBoard.vue'
+import LaborPerformanceSummary from './labor/LaborPerformanceSummary.vue'
+import StaffList from './labor/StaffList.vue'
+import AssignLabourerModal from './labor/AssignLabourerModal.vue'
+import StaffDetailModal from './labor/StaffDetailModal.vue'
+import CreateLabourerModal from './labor/CreateLabourerModal.vue'
+import {
+    buildAssignmentMeta,
+    buildDisplayStatus,
+    buildLocalAssignmentState,
+    formatOrderDisplayId,
+    formatTime,
+    getInitials,
+    mapStatusClass,
+} from './labor/labourerStatus'
+import { laborPageKey } from './labor/laborPageContext'
+import { ref, computed, onMounted, provide } from 'vue'
 import { useAuthStore } from '@/stores/authStore'
 import { apiUrl } from '@/config/api'
 import { useSlipPrinter } from '@/composables/useSlipPrinter'
@@ -480,134 +120,6 @@ function closeCreateModal() {
 }
 
 const staffList = ref([])
-
-function mapStatusClass(displayStatus) {
-    const classMap = {
-        'In Warehouse': 'bg-green-500/10 text-green-500',
-        'Warehouse Order': 'bg-blue-500/10 text-blue-500',
-        'Service Move': 'bg-purple-500/10 text-purple-400',
-        'With Driver': 'bg-purple-500/10 text-purple-400',
-        'Off Duty': 'bg-gray-500/10 text-gray-500',
-    }
-    return classMap[displayStatus] || 'bg-gray-500/10 text-gray-500'
-}
-
-function getInitials(name) {
-    if (!name) return '?'
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-}
-
-function formatTime(dateString) {
-    if (!dateString) return '--'
-    try {
-        return new Date(dateString).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })
-    } catch {
-        return '--'
-    }
-}
-
-function formatOrderDisplayId(orderId, trackingCode = null) {
-    const preferredId = String(trackingCode || '').trim()
-    if (preferredId) return preferredId
-
-    const rawId = String(orderId || '').trim()
-    if (!rawId) return null
-
-    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-    return uuidPattern.test(rawId) ? rawId.slice(0, 8).toUpperCase() : rawId
-}
-
-function formatWarehouseSubstatus(substatus) {
-    const labelMap = {
-        AWAITING_INBOUND: 'Awaiting Inbound',
-        AWAITING_PICK: 'Awaiting Pick',
-        PICKING: 'Picking',
-        PICKED: 'Picked',
-        PACKING: 'Packing',
-        PACKED: 'Packed',
-        QC_PASSED: 'QC Passed',
-        READY_FOR_DISPATCH: 'Ready for Dispatch',
-        ON_DOCK: 'On Dock',
-        DISPATCHED: 'Dispatched',
-        ON_HOLD: 'On Hold',
-    }
-    return labelMap[substatus] || substatus || ''
-}
-
-function buildAssignmentMeta(labourer) {
-    if (!labourer.assigned_order_id) {
-        return {
-            task: labourer.current_task || 'Available',
-            assignmentHint: '',
-            orderScope: '',
-        }
-    }
-
-    if (labourer.assigned_order_substatus) {
-        return {
-            task: formatWarehouseSubstatus(labourer.assigned_order_substatus),
-            assignmentHint: 'Warehouse pick/pack assignment',
-            orderScope: 'WM order',
-        }
-    }
-
-    if (labourer.status === 'ON_FIELD') {
-        return {
-            task: 'With Driver',
-            assignmentHint: 'Customer move in progress',
-            orderScope: 'Service move order',
-        }
-    }
-
-    return {
-        task: 'Driver Move Assigned',
-        assignmentHint: 'Waiting to start customer move',
-        orderScope: 'Service move order',
-    }
-}
-
-function buildDisplayStatus(labourer) {
-    if (!labourer.is_active || ['OFF_DUTY', 'INACTIVE'].includes(labourer.status)) {
-        return 'Off Duty'
-    }
-
-    if (!labourer.assigned_order_id) {
-        return 'In Warehouse'
-    }
-
-    if (labourer.assigned_order_substatus) {
-        return 'Warehouse Order'
-    }
-
-    if (labourer.status === 'ON_FIELD') {
-        return 'With Driver'
-    }
-
-    return 'Service Move'
-}
-
-function buildLocalAssignmentState(type, orderId) {
-    const displayOrderId = formatOrderDisplayId(orderId)
-    if (type === 'Field Duty (With Driver)') {
-        return {
-            orderId: displayOrderId,
-            status: 'With Driver',
-            statusClass: mapStatusClass('With Driver'),
-            task: 'With Driver',
-            assignmentHint: 'Customer move in progress',
-            orderScope: 'Service move order',
-        }
-    }
-
-    return {
-        orderId: displayOrderId,
-        status: 'Warehouse Order',
-        statusClass: mapStatusClass('Warehouse Order'),
-        task: type || 'Warehouse Task',
-        assignmentHint: 'Warehouse pick/pack assignment',
-        orderScope: 'WM order',
-    }
-}
 
 // Fetch labourers from backend
 async function fetchLabourers() {
@@ -915,5 +427,41 @@ async function deleteLabourer(staff) {
 
 onMounted(() => {
     fetchLabourers()
+})
+
+provide(laborPageKey, {
+    assignOrderId,
+    assignTarget,
+    assignType,
+    assignWorker,
+    availableSkills,
+    availableStaffList,
+    avgProductivity,
+    canPrintAssignmentSlip,
+    closeCreateModal,
+    createLabourer,
+    deleteLabourer,
+    deptFilter,
+    filteredStaff,
+    getInitials,
+    isAssigning,
+    isCreating,
+    loading,
+    newLabourer,
+    openAssign,
+    openAssignmentSlip,
+    openStaffDetail,
+    searchQuery,
+    selectedStaff,
+    setOffDuty,
+    setOnDuty,
+    showAssignModal,
+    showCreateModal,
+    showStaffDetail,
+    staffList,
+    statusCounts,
+    statusFilter,
+    toggleSkill,
+    totalHours,
 })
 </script>
