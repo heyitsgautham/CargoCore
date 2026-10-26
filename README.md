@@ -105,11 +105,12 @@ These are the commands CI runs in `.github/workflows/ci.yml`.
 
 | Where | Command | What it does |
 |---|---|---|
-| `backend/` | `uv run pytest --cov` | 879 unit, contract, integration and flow tests, fails under 70% coverage |
+| `backend/` | `uv run pytest --cov` | 898 unit, contract, integration and flow tests, fails under 70% coverage |
 | `backend/` | `uv run ruff check .` | lint |
 | `backend/` | `uv export --frozen --no-dev --no-hashes --package cargocore-api -o /tmp/req.txt` then `uv run pip-audit -r /tmp/req.txt --no-deps --disable-pip` | dependency audit |
-| repo root | `npm test` | 241 Vitest tests for the API client, the Pinia stores, composables, slips and utils |
-| repo root | `npm run test:coverage` | the same tests with the coverage thresholds in `frontend/vitest.config.js` |
+| repo root | `npm test` | 490 Vitest tests: the web app's API client, stores, composables, view logic and utils, plus the driver app's job logic |
+| repo root | `npm run test:coverage` | the web app tests with the coverage thresholds in `frontend/vitest.config.js` |
+| repo root | `npm run test:driver` | the driver app's job state machine and order mapping tests |
 | repo root | `npm run lint` | ESLint with the Vue plugin |
 | repo root | `npm run format:check` | Prettier |
 | repo root | `npm run build` | production bundle in `frontend/dist` |
@@ -162,6 +163,7 @@ frontend/
   tests/unit/    Vitest suites
   html-slips/    printable slip templates served at /html-slips
 driver-app/      Capacitor Android app and its Gradle project
+  tests/         Vitest suites for the job state machine and order mapping
 docs/            plans, meeting minutes, frontend and backend notes
 pyproject.toml, uv.lock            uv workspace root for the API, one lockfile
 package.json, package-lock.json    npm workspace root for the web app, one lockfile

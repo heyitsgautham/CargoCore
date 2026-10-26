@@ -14,6 +14,7 @@
     "build": "npm run build -w frontend",
     "test": "vitest run",
     "test:coverage": "npm run test:coverage -w frontend",
+    "test:driver": "vitest run --project driver-app",
     "lint": "npm run lint -w frontend",
     "format:check": "npm run format:check -w frontend",
     "check:size": "python3 scripts/check_file_size.py",
