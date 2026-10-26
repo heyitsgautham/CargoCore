@@ -7,7 +7,11 @@ from uuid import uuid4
 
 import pytest
 
-from app.services import inventory_service, material_request_service
+from app.services import (
+    inventory_service,
+    material_request_service,
+    restock_request_service,
+)
 
 
 def test_split_zone_and_aisle_variants() -> None:
@@ -120,7 +124,7 @@ def test_to_restock_response_maps_requester_and_item() -> None:
     item = SimpleNamespace(sku="PKG-BUBBLE-WRAP", name="Bubble Wrap")
     requester = SimpleNamespace(name="WM User")
 
-    response = inventory_service._to_restock_response(req, item, requester)
+    response = restock_request_service._to_restock_response(req, item, requester)
 
     assert response.id == request_id
     assert response.requested_by_name == "WM User"
