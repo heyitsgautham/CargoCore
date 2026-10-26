@@ -1,6 +1,5 @@
 {
   "backend/app/routers/ai.py": 822,
-  "backend/app/routers/orders.py": 857,
   "backend/app/services/customer_service.py": 849,
   "driver-app/src/stores/jobStore.js": 818,
   "frontend/src/components/HeaderMeetingScheduler.vue": 807,
