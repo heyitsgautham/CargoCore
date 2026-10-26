@@ -17,6 +17,7 @@
                 :zoom="fleetMapZoom"
                 :center="fleetMapCenter"
                 :use-global-leaflet="false"
+                :options="{ zoomControl: false }"
                 style="height:100%;width:100%;z-index:1"
                 @ready="onMapReady"
             >
