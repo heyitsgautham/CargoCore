@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap');
+
+.font-display {
+    font-family: 'Space Grotesk', sans-serif;
+}
+
+.perspective-1000 {
+    perspective: 1000px;
+}
+
+/* Gradient Animation */
+.animate-gradient-x {
+    background-size: 200% auto;
+    animation: gradient-x 3s linear infinite;
+}
+
+@keyframes gradient-x {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Splash Effect */
+.splash-effect {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(34, 211, 238, 0.8) 0%, rgba(34, 211, 238, 0) 70%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    pointer-events: none;
+    mix-blend-mode: screen;
+}

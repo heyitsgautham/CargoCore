@@ -21,6 +21,5 @@
   "driver-app/src/services/api.js": 668,
   "driver-app/src/stores/jobStore.js": 818,
   "driver-app/src/views/CommandCenter.vue": 510,
-  "driver-app/src/views/VehicleInspection.vue": 533,
-  "frontend/src/LWDDVI-views/Home.vue": 568
+  "driver-app/src/views/VehicleInspection.vue": 533
 }
