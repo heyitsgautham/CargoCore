@@ -1,6 +1,7 @@
 """Answers for customers and vendors: orders, wallet, recurring runs, support, spend and refunds."""
 
 from datetime import UTC, datetime
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,6 +19,17 @@ from app.services.ai_chat.intents import (
     _normalize_text,
 )
 from app.services.wallet_service import get_wallet_balance
+
+IST = ZoneInfo("Asia/Kolkata")
+
+
+def _format_schedule(scheduled_at: datetime | None) -> str:
+    """A schedule as customers read it, for example 26 Oct 2026, 12:08 AM IST."""
+    if scheduled_at is None:
+        return "Not scheduled yet"
+    if scheduled_at.tzinfo is None:
+        scheduled_at = scheduled_at.replace(tzinfo=UTC)
+    return scheduled_at.astimezone(IST).strftime("%d %b %Y, %I:%M %p IST")
 
 
 async def _list_current_self_service_orders(
@@ -44,7 +56,7 @@ async def _list_current_self_service_orders(
     header = f"Here are your current {noun_plural}:"
     lines = [header]
     for order in rows:
-        schedule = order.scheduled_at.isoformat() if order.scheduled_at else "Not scheduled yet"
+        schedule = _format_schedule(order.scheduled_at)
         stage = order.warehouse_substatus or "N/A"
         lines.append(
             f"- {order.tracking_code}: {order.status} | Stage: {stage} | Scheduled: {schedule}"
@@ -77,7 +89,7 @@ async def _list_self_service_orders_by_status(
 
     lines = [f"Here are your {status_label} {noun_plural}:"]
     for order in rows:
-        schedule = order.scheduled_at.isoformat() if order.scheduled_at else "Not scheduled yet"
+        schedule = _format_schedule(order.scheduled_at)
         stage = order.warehouse_substatus or "N/A"
         lines.append(
             f"- {order.tracking_code}: {order.status} | Stage: {stage} | Scheduled: {schedule}"
@@ -113,7 +125,7 @@ def _format_self_service_order_message(
         if tracking_code
         else f"Your latest {noun}: **{order.tracking_code}**"
     )
-    eta = order.scheduled_at.isoformat() if order.scheduled_at else "Not scheduled yet"
+    eta = _format_schedule(order.scheduled_at)
     pickup_addr = order.pickup_addr or "N/A"
     delivery_addr = order.delivery_addr or "N/A"
     substatus = order.warehouse_substatus or "N/A"
