@@ -164,149 +164,21 @@
 
         <!-- Add / Edit Hub Modal -->
         <Teleport to="body">
-            <div v-if="isModalOpen"
-                class="fixed inset-0 w-screen h-screen z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-                <div class="bg-slate-950/98 rounded-2xl shadow-xl w-full max-w-lg overflow-hidden border border-white/10 backdrop-blur-xl"
-                    @click.stop>
-                    <div
-                        class="p-6 border-b border-white/10 flex justify-between items-center bg-slate-900/90">
-                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                            <span class="material-symbols-outlined text-primary">{{ isEditing ? 'edit' : 'add_business'
-                                }}</span>
-                            {{ isEditing ? 'Edit Hub' : 'Add New Hub' }}
-                        </h3>
-                        <button @click="closeModal"
-                            class="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-
-                    <div class="p-6 space-y-4 bg-slate-950/95">
-                        <div class="space-y-1">
-                            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Hub
-                                Code</label>
-                            <input type="text" v-model="draftHub.hubCode" placeholder="e.g. HUB-NY-01"
-                                class="w-full bg-slate-800 border border-white/10 rounded-lg py-2 px-3 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-primary/50 transition-colors">
-                        </div>
-
-                        <div class="space-y-1">
-                            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Hub
-                                Name</label>
-                            <input type="text" v-model="draftHub.name" placeholder="North-East Distribution Center"
-                                class="w-full bg-slate-800 border border-white/10 rounded-lg py-2 px-3 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-primary/50 transition-colors">
-                        </div>
-
-                        <div class="space-y-1">
-                            <label
-                                class="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Location</label>
-                            <input type="text" v-model="draftHub.location" placeholder="New York, NY"
-                                class="w-full bg-slate-800 border border-white/10 rounded-lg py-2 px-3 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-primary/50 transition-colors">
-                        </div>
-
-                        <div class="space-y-1">
-                            <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Operating
-                                Hours</label>
-                            <input type="text" v-model="draftHub.operatingHours" placeholder="09:00 AM - 09:00 PM"
-                                class="w-full bg-slate-800 border border-white/10 rounded-lg py-2 px-3 text-sm font-mono text-white placeholder:text-slate-400 focus:outline-none focus:border-primary/50 transition-colors">
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="space-y-1">
-                                <label
-                                    class="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Manager
-                                    Name</label>
-                                <input type="text" v-model="draftHub.manager" placeholder="Alex Chen"
-                                    class="w-full bg-slate-800 border border-white/10 rounded-lg py-2 px-3 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-primary/50 transition-colors">
-                            </div>
-                            <div class="space-y-1">
-                                <label
-                                    class="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Capacity
-                                    (%)</label>
-                                <input type="number" v-model="draftHub.capacity" min="0" max="100" placeholder="92"
-                                    class="w-full bg-slate-800 border border-white/10 rounded-lg py-2 px-3 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:border-primary/50 transition-colors">
-                            </div>
-                        </div>
-
-                        <div class="space-y-1">
-                            <label
-                                class="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Status</label>
-                            <select v-model="draftHub.status"
-                                class="w-full bg-slate-800 border border-white/10 rounded-lg py-2 px-3 text-sm text-white focus:outline-none focus:border-primary/50 transition-colors">
-                                <option value="Optimal" class="bg-slate-900 text-white">Optimal</option>
-                                <option value="Active" class="bg-slate-900 text-white">Active</option>
-                                <option value="Congested" class="bg-slate-900 text-white">Congested</option>
-                                <option value="Archived" class="bg-slate-900 text-white">Archived</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div
-                        class="p-6 border-t border-white/10 bg-slate-900/90 flex justify-end gap-3">
-                        <button @click="closeModal" :disabled="isSavingHub"
-                            class="px-5 py-2 rounded-lg text-sm font-medium text-white bg-slate-800 hover:bg-slate-700 border border-white/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-                            Cancel
-                        </button>
-                        <button @click="saveHub" :disabled="isSavingHub"
-                            class="px-5 py-2 rounded-lg text-sm font-medium bg-primary hover:bg-primary/90 text-white transition-colors shadow-sm border border-primary/30 disabled:opacity-60 disabled:cursor-not-allowed">
-                            {{ isSavingHub ? 'Saving...' : (isEditing ? 'Save Changes' : 'Create Hub') }}
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <HubFormModal />
         </Teleport>
 
-        <BaseModal :is-open="isHubActionModalOpen" @close="closeHubActionModal">
-            <template #title>
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-2xl flex items-center justify-center border"
-                        :class="hubActionModal.iconWrapClass">
-                        <span class="material-symbols-outlined text-[20px]" :class="hubActionModal.iconClass">
-                            {{ hubActionModal.icon }}
-                        </span>
-                    </div>
-                    <div>
-                        <div class="text-lg font-bold text-white">{{ hubActionModal.title }}</div>
-                        <div class="text-xs uppercase tracking-[0.25em] text-slate-400">{{ hubActionModal.hubName }}</div>
-                    </div>
-                </div>
-            </template>
-
-            <div class="space-y-4 text-sm">
-                <p class="leading-7 text-slate-200">
-                    {{ hubActionModal.message }}
-                </p>
-
-                <div class="rounded-2xl border p-4" :class="hubActionModal.panelClass">
-                    <div class="text-[11px] font-semibold uppercase tracking-[0.3em]" :class="hubActionModal.labelClass">
-                        What Happens Next
-                    </div>
-                    <p class="mt-2 leading-6" :class="hubActionModal.noteClass">
-                        {{ hubActionModal.note }}
-                    </p>
-                </div>
-            </div>
-
-            <template #footer>
-                <button @click="closeHubActionModal" :disabled="isHubActionPending"
-                    class="px-5 py-2 rounded-lg text-sm font-medium text-white bg-slate-800 hover:bg-slate-700 border border-white/10 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
-                    Cancel
-                </button>
-                <button @click="confirmHubAction" :disabled="isHubActionPending"
-                    class="px-5 py-2 rounded-lg text-sm font-medium text-white transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                    :class="hubActionModal.confirmButtonClass">
-                    {{ isHubActionPending ? hubActionModal.pendingLabel : hubActionModal.confirmLabel }}
-                </button>
-            </template>
-        </BaseModal>
+        <HubActionModal />
     </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import HubFormModal from './warehouseManagement/HubFormModal.vue'
+import HubActionModal from './warehouseManagement/HubActionModal.vue'
+import { warehouseManagementPageKey } from './warehouseManagement/warehouseManagementPageContext'
+import { ref, computed, provide } from 'vue'
 import { useLogisticStore } from '@/stores/logisticStore'
 import { storeToRefs } from 'pinia'
 import { useToast } from '@/composables/useToast'
-import BaseModal from '@/components/BaseModal.vue'
 
 const store = useLogisticStore()
 const { hubs } = storeToRefs(store)
@@ -555,4 +427,18 @@ const saveHub = async () => {
         isSavingHub.value = false
     }
 }
+
+provide(warehouseManagementPageKey, {
+    closeHubActionModal,
+    closeModal,
+    confirmHubAction,
+    draftHub,
+    hubActionModal,
+    isEditing,
+    isHubActionModalOpen,
+    isHubActionPending,
+    isModalOpen,
+    isSavingHub,
+    saveHub,
+})
 </script>
