@@ -286,6 +286,7 @@
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { sendChat, fetchConversation } from '@/utils/aiApi'
+import { formatChatText } from '@/utils/html'
 import { useIndividualStore } from '@/stores/individualStore'
 
 const store = useIndividualStore()
@@ -369,7 +370,7 @@ function mapHistoryToMessages(hist) {
             id: ++msgId, sender,
             intent: m.intent || null,
             text: m.message || m.text || '',
-            html: sender === 'user' ? '' : formatBotText(m.message || m.text || ''),
+            html: sender === 'user' ? '' : formatChatText(m.message || m.text || ''),
             time: nowTime(m.created_at),
         }
     })
@@ -435,14 +436,6 @@ function nowTime(dateLike) {
         : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
-function formatBotText(raw) {
-    return String(raw || '')
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-        .replace(/\*(.*?)\*/g, '<i>$1</i>')
-        .replace(/\n/g, '<br>')
-}
-
 async function scrollToBottom() {
     await nextTick()
     if (chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight
@@ -456,13 +449,13 @@ function createWelcomeMessages() {
         {
             id: ++msgId, sender: 'bot',
             text: intro.replace(/<[^>]+>/g, ''),
-            html: formatBotText(intro),
+            html: formatChatText(intro),
             time: nowTime(),
         },
         {
             id: ++msgId, sender: 'bot',
             text: 'You can ask about tracking, rescheduling, address changes, payments, or request human support.',
-            html: formatBotText('You can ask about tracking, rescheduling, address changes, payments, or request human support.'),
+            html: formatChatText('You can ask about tracking, rescheduling, address changes, payments, or request human support.'),
             time: nowTime(),
         },
     ]
@@ -501,7 +494,7 @@ async function pollMessages() {
             messages.value.push({
                 id: ++msgId, sender,
                 text: m.message || '',
-                html: formatBotText(m.message || m.text || ''),
+                html: formatChatText(m.message || m.text || ''),
                 time: nowTime(m.created_at),
             })
         }
@@ -577,7 +570,7 @@ async function sendMessage() {
                 id: ++msgId, sender,
                 intent: response?.intent || null,
                 text: msgText,
-                html: formatBotText(msgText),
+                html: formatChatText(msgText),
                 time: nowTime(),
             })
         }
@@ -585,7 +578,7 @@ async function sendMessage() {
         messages.value.push({
             id: ++msgId, sender: 'bot',
             text: error instanceof Error ? error.message : 'Support is temporarily unavailable. Please try again.',
-            html: formatBotText(error instanceof Error ? error.message : 'Support is temporarily unavailable. Please try again.'),
+            html: formatChatText(error instanceof Error ? error.message : 'Support is temporarily unavailable. Please try again.'),
             time: nowTime(),
         })
     } finally {

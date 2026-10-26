@@ -2,6 +2,7 @@
 // send messages, poll for agent replies and lock input once a human takes over.
 import { ref, computed, nextTick } from 'vue'
 import { sendChat, fetchConversation } from '@/utils/aiApi'
+import { escapeHtml, formatChatText } from '@/utils/html'
 
 export function useSupportChat({ SESSION_KEY, activeTab, store }) {
     // ── AI Chat ───────────────────────────────────────────────────────────────────
@@ -112,13 +113,6 @@ export function useSupportChat({ SESSION_KEY, activeTab, store }) {
 
     const SUPPORT_PREFIX_RE = /^\[Support — ([^\]]+)\]\s*/
 
-    function formatText(raw) {
-        return String(raw)
-            .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-            .replace(/\*(.*?)\*/g, '<i>$1</i>')
-            .replace(/\n/g, '<br>')
-    }
-
     function nowTime() {
         return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
@@ -130,7 +124,7 @@ export function useSupportChat({ SESSION_KEY, activeTab, store }) {
             return {
                 id: `h-${m.created_at}-${idx}`,
                 role: 'closed',
-                text: formatText(m.message || 'Human support session has been closed.'),
+                text: formatChatText(m.message || 'Human support session has been closed.'),
                 time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 createdAt: m.created_at,
             }
@@ -142,7 +136,7 @@ export function useSupportChat({ SESSION_KEY, activeTab, store }) {
                 id: `h-${m.created_at}-${idx}`,
                 role: 'support',
                 intent: m.intent,
-                text: formatText((m.message || '').replace(SUPPORT_PREFIX_RE, '')),
+                text: formatChatText((m.message || '').replace(SUPPORT_PREFIX_RE, '')),
                 time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 createdAt: m.created_at,
             }
@@ -151,7 +145,7 @@ export function useSupportChat({ SESSION_KEY, activeTab, store }) {
             id: `h-${m.created_at}-${idx}`,
             role: m.role === 'user' ? 'user' : 'ai',
             intent: m.intent || null,
-            text: formatText(m.message || ''),
+            text: formatChatText(m.message || ''),
             time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             createdAt: m.created_at,
         }
@@ -197,7 +191,7 @@ export function useSupportChat({ SESSION_KEY, activeTab, store }) {
         const text = userInput.value.trim()
         if (!text || isTyping.value) return
         userInput.value = ''
-        chatMessages.value.push({ id: `u-${Date.now()}`, role: 'user', text, time: nowTime() })
+        chatMessages.value.push({ id: `u-${Date.now()}`, role: 'user', text: formatChatText(text), time: nowTime() })
         isTyping.value = true
         await scrollToBottom()
         try {
@@ -223,7 +217,7 @@ export function useSupportChat({ SESSION_KEY, activeTab, store }) {
                 chatMessages.value.push({
                     id: `closed-${Date.now()}`,
                     role: 'closed',
-                    text: formatText(res.message || 'Human support session has been closed.'),
+                    text: formatChatText(res.message || 'Human support session has been closed.'),
                     time: nowTime(),
                 })
             } else if (res.intent === 'agent_waiting') {
@@ -231,7 +225,7 @@ export function useSupportChat({ SESSION_KEY, activeTab, store }) {
                 chatMessages.value.push({
                     id: `status-${Date.now()}`,
                     role: 'status',
-                    text: res.message || 'Your message has been sent to the support agent.',
+                    text: formatChatText(res.message || 'Your message has been sent to the support agent.'),
                     time: nowTime(),
                 })
             } else {
@@ -242,7 +236,7 @@ export function useSupportChat({ SESSION_KEY, activeTab, store }) {
                     id: `ai-${Date.now()}`,
                     role: ['agent_reply', 'support_message'].includes(res.intent) ? 'support' : 'ai',
                     intent: res.intent || null,
-                    text: formatText(msgText),
+                    text: formatChatText(msgText),
                     time: nowTime(),
                 })
             }
@@ -250,7 +244,7 @@ export function useSupportChat({ SESSION_KEY, activeTab, store }) {
             chatMessages.value.push({
                 id: `err-${Date.now()}`,
                 role: 'ai',
-                text: `<span class="text-red-400">⚠ ${err.message || 'Something went wrong. Please try again.'}</span>`,
+                text: `<span class="text-red-400">⚠ ${escapeHtml(err.message || 'Something went wrong. Please try again.')}</span>`,
                 time: nowTime(),
             })
         } finally {

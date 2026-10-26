@@ -274,6 +274,7 @@
 </template>
 
 <script setup>
+import { escapeHtml } from '@/utils/html'
 import { ref, computed, nextTick, onMounted } from 'vue'
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip } from 'chart.js'
@@ -310,14 +311,6 @@ const quickCommands = [
 const chatChips = ['Best driver?', 'Ready orders?', 'No driver available?', 'Why this driver?']
 
 
-function escapeHtml(value) {
-    return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-}
 
 function normalizeCommand(value) {
     return String(value || '').trim().toLowerCase()
