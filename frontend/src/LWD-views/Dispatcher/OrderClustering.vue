@@ -68,122 +68,21 @@
             <!-- Right Panel -->
             <div class="flex flex-col gap-3 overflow-y-auto" style="max-height: 560px">
 
-                <!-- AI Driver Suggestions -->
-                <div class="glass-panel rounded-xl p-4">
-                    <h3 class="font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-3">
-                        <span class="material-symbols-outlined text-purple-400 text-[18px]">auto_awesome</span>
-                        AI Driver Suggestions
-                        <span v-if="aiSuggestions.length" class="ml-auto bg-purple-500/20 text-purple-400 text-[10px] font-bold px-2 py-0.5 rounded-full">{{ aiSuggestions.length }}</span>
-                    </h3>
-
-                    <!-- Loading -->
-                    <div v-if="aiLoading" class="text-center py-6 text-gray-500 text-xs">
-                        <span class="material-symbols-outlined text-[28px] text-purple-400 block mb-2 animate-pulse">auto_awesome</span>
-                        Gemini is ranking drivers...
-                    </div>
-
-                    <div v-else-if="aiSuggestions.length === 0" class="text-center py-6 text-gray-500 text-xs">
-                        <span class="material-symbols-outlined text-[32px] text-gray-600 block mb-2">person_search</span>
-                        No unassigned orders or no drivers with live GPS right now.
-                    </div>
-
-                    <div v-for="s in aiSuggestions" :key="s.order_id"
-                        class="mb-2 p-3 rounded-lg border transition-all cursor-pointer"
-                        :class="selectedSuggestion?.order_id === s.order_id ? 'border-primary bg-primary/5' : 'border-gray-200 dark:border-white/10 hover:border-purple-500/40'"
-                        @click="highlightAiSuggestion(s)">
-
-                        <div class="flex items-start justify-between gap-2 mb-1.5">
-                            <div class="min-w-0">
-                                <div class="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1.5 truncate">
-                                    <span class="w-2 h-2 rounded-full bg-green-400 shrink-0 inline-block"></span>
-                                    {{ s.suggested_driver_name }}
-                                </div>
-                                <div class="text-[10px] text-gray-400 mt-0.5 truncate">
-                                    <span class="font-mono text-primary">{{ s.order_tracking_code }}</span>
-                                    <span v-if="s.distance_km != null"> · {{ s.distance_km }}km away</span>
-                                </div>
-                                <div v-if="vehicleLabelForSuggestion(s)" class="text-[10px] text-emerald-400 mt-1 truncate">
-                                    Vehicle: {{ vehicleLabelForSuggestion(s) }}
-                                </div>
-                            </div>
-                            <div class="flex flex-col items-end gap-1 shrink-0">
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                                    :class="priorityClass(s.priority)">{{ s.priority }}</span>
-                                <span class="text-[10px] font-bold text-gray-500">{{ s.confidence }}% match</span>
-                            </div>
-                        </div>
-
-                        <!-- AI reason -->
-                        <div class="mb-2 p-2 rounded-lg text-[10px] leading-relaxed"
-                            :class="s.ai_powered ? 'bg-purple-500/5 border border-purple-500/15 text-purple-300' : 'bg-gray-100 dark:bg-white/5 text-gray-500'">
-                            <span v-if="s.ai_powered" class="material-symbols-outlined text-[10px] mr-0.5 align-middle text-purple-400">auto_awesome</span>
-                            {{ s.reason }}
-                        </div>
-
-                        <div class="text-[10px] text-gray-500 truncate mb-2">
-                            <span class="material-symbols-outlined text-[10px] align-middle text-orange-400">trip_origin</span>
-                            {{ s.pickup_addr }}
-                        </div>
-
-                        <button @click.stop="assignAiSuggestion(s)"
-                            :disabled="assigningId === s.order_id || !canAssignSuggestion(s)"
-                            class="w-full py-1.5 bg-primary hover:bg-primary/80 disabled:opacity-50 text-black text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1">
-                            <span class="material-symbols-outlined text-[14px]">{{ assigningId === s.order_id ? 'progress_activity' : 'person_add' }}</span>
-                            {{ assigningId === s.order_id ? 'Assigning...' : aiSuggestionActionLabel(s) }}
-                        </button>
-                    </div>
-                </div>
-
+                <AiSuggestionsPanel />
                 <!-- Pending Orders (manual assignment) -->
-                <div class="glass-panel rounded-xl p-4">
-                    <h3 class="font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-3">
-                        <span class="material-symbols-outlined text-yellow-400 text-[18px]">pending_actions</span>
-                        Manual Assignment
-                    </h3>
-
-                    <div v-if="unassignedOrders.length === 0" class="text-center py-4 text-gray-500 text-xs">All orders assigned.</div>
-
-                    <div v-for="order in unassignedOrders" :key="order.id"
-                        class="mb-2 p-3 rounded-lg border border-gray-200 dark:border-white/10 hover:border-yellow-500/30 transition-all">
-                        <div class="flex items-center justify-between mb-1">
-                            <span class="text-xs font-mono font-bold text-gray-900 dark:text-white">{{ order.trackingCode || order.id.slice(0,8) }}</span>
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full" :class="priorityClass(order.priority)">{{ order.priority || 'NORMAL' }}</span>
-                        </div>
-                        <div class="text-[10px] text-gray-500 dark:text-gray-400 truncate mb-1">
-                            <span class="material-symbols-outlined text-[11px] align-middle text-orange-400">trip_origin</span>
-                            {{ order.pickupAddr || 'Pickup not set' }}
-                        </div>
-                        <div class="text-[10px] text-gray-500 dark:text-gray-400 truncate mb-2">
-                            <span class="material-symbols-outlined text-[11px] align-middle text-blue-400">place</span>
-                            {{ order.deliveryAddr || 'Delivery not set' }}
-                        </div>
-                        <div class="flex gap-2">
-                            <select v-if="needsDispatcherVehicle(order)" v-model="orderVehiclePick[order.id]"
-                                class="flex-1 text-[10px] bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-gray-900 dark:text-white outline-none">
-                                <option value="">AI vehicle: {{ recommendedVehicleLabel(order) || 'No vehicle available' }}</option>
-                                <option v-for="vehicle in availableVehicles" :key="vehicle.id" :value="vehicle.id">{{ vehicleLabel(vehicle) }}</option>
-                            </select>
-                            <select v-model="orderDriverPick[order.id]"
-                                class="flex-1 text-[10px] bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-lg px-2 py-1.5 text-gray-900 dark:text-white outline-none">
-                                <option value="">Select Driver</option>
-                                <option v-for="d in availableDrivers" :key="d.id" :value="d.id">{{ d.name }}</option>
-                            </select>
-                            <button @click="manualAssign(order)"
-                                :disabled="!orderDriverPick[order.id] || assigningId === order.id || !canAssignOrder(order)"
-                                class="px-3 py-1.5 bg-primary disabled:opacity-40 hover:bg-primary/80 text-black text-[10px] font-bold rounded-lg transition-colors">
-                                {{ assigningId === order.id ? '...' : needsDispatcherVehicle(order) ? 'Assign Both' : 'Assign' }}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
+                <PendingOrdersPanel />
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick, reactive } from 'vue'
+import AiSuggestionsPanel from './clustering/AiSuggestionsPanel.vue'
+import PendingOrdersPanel from './clustering/PendingOrdersPanel.vue'
+import { clusteringPageKey } from './clustering/clusteringPageContext'
+import { needsDispatcherVehicle, priorityClass, vehicleLabel } from './clustering/clusterRules'
+import { makeDeliveryIcon, makeDriverIcon, makeOrderIcon, parseLatLng } from './clustering/clusterMap'
+import { ref, computed, onMounted, onUnmounted, nextTick, reactive, provide } from 'vue'
 import { useDispatcherStore } from '@/stores/dispatcherStore'
 import {
     isVehicleDispatchableStatus,
@@ -219,32 +118,9 @@ const orderMarkers = {}
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function parseLatLng(locationStr) {
-    if (!locationStr || typeof locationStr !== 'string') return null
-    const parts = locationStr.split(',').map(s => parseFloat(s.trim()))
-    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) return { lat: parts[0], lng: parts[1] }
-    return null
-}
-
 function authHeaders() {
     const token = getStoredAccessToken()
     return token ? { Authorization: `Bearer ${token}` } : {}
-}
-
-function priorityClass(priority) {
-    const p = (priority || 'NORMAL').toUpperCase()
-    if (p === 'URGENT') return 'bg-red-500/20 text-red-400'
-    if (p === 'HIGH') return 'bg-orange-500/20 text-orange-400'
-    if (p === 'LOW') return 'bg-gray-500/20 text-gray-400'
-    return 'bg-blue-500/20 text-blue-400'
-}
-
-function needsDispatcherVehicle(order) {
-    return !!order && !order.vehicleId && orderAllowsDirectVehicleSelection(order)
-}
-
-function vehicleLabel(vehicle) {
-    return vehicle?.licensePlate || vehicle?.code || vehicle?.model || 'Vehicle'
 }
 
 const availableVehicles = computed(() =>
@@ -407,40 +283,6 @@ async function initMap() {
     }).addTo(map)
 
     renderMarkers(L)
-}
-
-function makeDriverIcon(L, status) {
-    const color = ['On Trip', 'IN_TRANSIT', 'Busy'].includes(status) ? '#facc15' : '#4ade80'
-    return L.divIcon({
-        className: '',
-        html: `<div style="width:32px;height:32px;border-radius:50%;background:${color};border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;">
-                 <span style="font-size:14px;">🚚</span>
-               </div>`,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16],
-    })
-}
-
-function makeOrderIcon(L) {
-    return L.divIcon({
-        className: '',
-        html: `<div style="width:28px;height:28px;border-radius:50%;background:#f97316;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;">
-                 <span style="font-size:12px;">📦</span>
-               </div>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 28],
-    })
-}
-
-function makeDeliveryIcon(L) {
-    return L.divIcon({
-        className: '',
-        html: `<div style="width:24px;height:24px;border-radius:50%;background:#60a5fa;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;">
-                 <span style="font-size:10px;">🏁</span>
-               </div>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 24],
-    })
 }
 
 async function renderMarkers(L) {
@@ -628,5 +470,28 @@ onUnmounted(() => {
     if (wsRetryTimeout) clearTimeout(wsRetryTimeout)
     if (map) { map.remove(); map = null }
     if (driverPollInterval) clearInterval(driverPollInterval)
+})
+
+provide(clusteringPageKey, {
+    aiLoading,
+    aiSuggestionActionLabel,
+    aiSuggestions,
+    assignAiSuggestion,
+    assigningId,
+    availableDrivers,
+    availableVehicles,
+    canAssignOrder,
+    canAssignSuggestion,
+    highlightAiSuggestion,
+    manualAssign,
+    needsDispatcherVehicle,
+    orderDriverPick,
+    orderVehiclePick,
+    priorityClass,
+    recommendedVehicleLabel,
+    selectedSuggestion,
+    unassignedOrders,
+    vehicleLabel,
+    vehicleLabelForSuggestion,
 })
 </script>
