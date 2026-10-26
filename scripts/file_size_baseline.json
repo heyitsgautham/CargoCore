@@ -4,7 +4,6 @@
   "backend/app/services/customer_service.py": 849,
   "backend/app/services/logistics/bootstrap.py": 1050,
   "driver-app/src/stores/jobStore.js": 818,
-  "frontend/src/IV-views/Individual/BookMove.vue": 1087,
   "frontend/src/IV-views/Vendor/Support.vue": 905,
   "frontend/src/LWD-views/Dispatcher/ManifestCenter.vue": 917,
   "frontend/src/LWD-views/Dispatcher/PendingDispatchQueue.vue": 885,
