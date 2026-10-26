@@ -468,6 +468,7 @@
 </template>
 
 <script setup>
+import { isValidEmail } from '@/utils/validators';
 import { ref, reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import {
@@ -682,8 +683,7 @@ const handleNext = async () => {
       toast.warning('Please enter your email address');
       return;
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
+    if (!isValidEmail(formData.email)) {
       toast.warning('Please enter a valid email address');
       return;
     }

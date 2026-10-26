@@ -283,6 +283,14 @@
 </template>
 
 <script setup>
+import {
+    confirmPasswordError,
+    emailError,
+    passwordStrength as scorePassword,
+    pincodeError,
+    requiredError,
+    strongPasswordError,
+} from '@/utils/validators'
 import { reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/authStore.js'
@@ -302,7 +310,7 @@ const form = reactive({
 const errors = reactive({})
 
 // Password strength
-const passwordStrength = computed(() => { const p = form.password; if (!p) return 0; let s = 0; if (p.length >= 8) s++; if (p.length >= 12) s++; if (/[a-z]/.test(p) && /[A-Z]/.test(p)) s++; if (/\d/.test(p)) s++; if (/[^a-zA-Z0-9]/.test(p)) s++; return s })
+const passwordStrength = computed(() => scorePassword(form.password))
 const strengthPercent = computed(() => (passwordStrength.value / 5) * 100)
 const strengthLabel = computed(() => ['', 'Very weak', 'Weak', 'Fair', 'Strong', 'Excellent'][passwordStrength.value])
 const strengthClass = computed(() => ['', 'strength-1', 'strength-2', 'strength-3', 'strength-4', 'strength-5'][passwordStrength.value])
@@ -313,11 +321,11 @@ function validateStep1() { clearErrors(); if (!form.role) errors.role = 'Select 
 
 function validateStep2() {
     clearErrors()
-    if (!form.fullName.trim()) errors.fullName = 'Required'
-    if (!form.email) errors.email = 'Required'; else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errors.email = 'Invalid email'
-    if (!form.phone.trim()) errors.phone = 'Required'
-    if (!form.password) errors.password = 'Required'; else if (form.password.length < 8) errors.password = 'Min 8 chars'; else if (!/[A-Z]/.test(form.password)) errors.password = 'Need uppercase'; else if (!/[a-z]/.test(form.password)) errors.password = 'Need lowercase'; else if (!/\d/.test(form.password)) errors.password = 'Need a number'
-    if (!form.confirmPassword) errors.confirmPassword = 'Required'; else if (form.confirmPassword !== form.password) errors.confirmPassword = 'Mismatch'
+    errors.fullName = requiredError(form.fullName)
+    errors.email = emailError(form.email)
+    errors.phone = requiredError(form.phone)
+    errors.password = strongPasswordError(form.password)
+    errors.confirmPassword = confirmPasswordError(form.password, form.confirmPassword)
     if (!form.acceptTerms) errors.acceptTerms = 'Must accept'
     return !Object.values(errors).some(Boolean)
 }
@@ -325,13 +333,17 @@ function validateStep2() {
 function validateStep3() {
     clearErrors()
     if (form.role === 'customer') {
-        if (!form.pickupAddress.trim()) errors.pickupAddress = 'Required'; if (!form.city.trim()) errors.city = 'Required'
-        if (!form.state.trim()) errors.state = 'Required'; if (!form.pincode.trim()) errors.pincode = 'Required'; else if (!/^\d{6}$/.test(form.pincode)) errors.pincode = 'Invalid'
+        errors.pickupAddress = requiredError(form.pickupAddress)
+        errors.city = requiredError(form.city)
+        errors.state = requiredError(form.state)
+        errors.pincode = pincodeError(form.pincode)
     } else {
-        if (!form.companyName.trim()) errors.companyName = 'Required'; if (!form.businessAddress.trim()) errors.businessAddress = 'Required'
-        if (!form.gstTaxId.trim()) errors.gstTaxId = 'Required'; if (!form.contactPerson.trim()) errors.contactPerson = 'Required'
-        if (!form.businessPhone.trim()) errors.businessPhone = 'Required'
-        if (!form.businessEmail) errors.businessEmail = 'Required'; else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.businessEmail)) errors.businessEmail = 'Invalid email'
+        errors.companyName = requiredError(form.companyName)
+        errors.businessAddress = requiredError(form.businessAddress)
+        errors.gstTaxId = requiredError(form.gstTaxId)
+        errors.contactPerson = requiredError(form.contactPerson)
+        errors.businessPhone = requiredError(form.businessPhone)
+        errors.businessEmail = emailError(form.businessEmail)
     }
     return !Object.values(errors).some(Boolean)
 }

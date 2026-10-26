@@ -154,6 +154,7 @@
 </template>
 
 <script setup>
+import { emailError, passwordStrength as scorePassword } from '@/utils/validators'
 import { reactive, ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { GoogleLogin } from 'vue3-google-login'
@@ -190,13 +191,7 @@ onMounted(() => { lockoutInterval = setInterval(updateLockoutTimer, 1000); updat
 onUnmounted(() => clearInterval(lockoutInterval))
 
 // Password strength
-const passwordStrength = computed(() => {
-    const p = form.password; if (!p) return 0; let s = 0
-    if (p.length >= 8) s++; if (p.length >= 12) s++
-    if (/[a-z]/.test(p) && /[A-Z]/.test(p)) s++
-    if (/\d/.test(p)) s++; if (/[^a-zA-Z0-9]/.test(p)) s++
-    return s
-})
+const passwordStrength = computed(() => scorePassword(form.password))
 
 const strengthPercent = computed(() => (passwordStrength.value / 5) * 100)
 const strengthLabel = computed(() => ['', 'Very weak', 'Weak', 'Fair', 'Strong', 'Excellent'][passwordStrength.value])
@@ -204,7 +199,7 @@ const strengthClass = computed(() => ['', 'strength-1', 'strength-2', 'strength-
 
 // Validation
 function validateEmail() {
-    errors.email = !form.email ? 'Email is required' : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email) ? 'Invalid email' : ''
+    errors.email = emailError(form.email, { required: 'Email is required' })
 }
 
 function validateForm() {
