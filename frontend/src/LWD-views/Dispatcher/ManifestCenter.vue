@@ -43,10 +43,10 @@
 </template>
 
 <script setup>
-import ManifestStatCards from './manifest/ManifestStatCards.vue'
-import TripBoardTable from './manifest/TripBoardTable.vue'
-import TripDetailPanel from './manifest/TripDetailPanel.vue'
-import EndOfDayReport from './manifest/EndOfDayReport.vue'
+import ManifestStatCards from './manifestCenter/ManifestStatCards.vue'
+import TripBoardTable from './manifestCenter/TripBoardTable.vue'
+import TripDetailPanel from './manifestCenter/TripDetailPanel.vue'
+import EndOfDayReport from './manifestCenter/EndOfDayReport.vue'
 import {
     buildLogFromOrderItems,
     fetchTripPackingItems,
@@ -54,8 +54,8 @@ import {
     formatTime,
     freshLog,
     getStatusClass,
-} from './manifest/manifestItems'
-import { manifestPageKey } from './manifest/manifestPageContext'
+} from './manifestCenter/manifestItems'
+import { manifestPageKey } from './manifestCenter/manifestPageContext'
 import { ref, computed, nextTick, onMounted, provide } from 'vue'
 import { useDispatcherStore } from '@/stores/dispatcherStore'
 import { useSlipPrinter } from '@/composables/useSlipPrinter'

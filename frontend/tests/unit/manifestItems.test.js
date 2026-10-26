@@ -7,7 +7,7 @@ import {
   freshLog,
   isPackingItem,
   resolveDisplay,
-} from '@/LWD-views/Dispatcher/manifest/manifestItems'
+} from '@/LWD-views/Dispatcher/manifestCenter/manifestItems'
 
 describe('manifest packing items', () => {
   it('recognises packing items by SKU prefix or name', () => {
