@@ -16,6 +16,7 @@ from app.schemas.warehouse import (
     WarehouseResponse,
     WarehouseUpdate,
 )
+from app.services import warehouse_dashboard as dashboard_service
 from app.services import warehouse_service
 
 router = APIRouter(prefix="/api/v1/warehouses", tags=["Warehouses"])
@@ -94,7 +95,7 @@ async def warehouse_dashboard(
     db: Annotated[AsyncSession, Depends(get_db)],
     _: Annotated[object, Depends(require_role("WAREHOUSE_MANAGER"))],
 ):
-    return await warehouse_service.get_warehouse_dashboard(db, warehouse_id)
+    return await dashboard_service.get_warehouse_dashboard(db, warehouse_id)
 
 
 @router.post("/{warehouse_id}/orders/{order_id}/complete", response_model=MessageResponse)
