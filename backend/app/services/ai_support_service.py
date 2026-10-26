@@ -66,6 +66,9 @@ from app.services.support.damage_refunds import (
 from app.services.support.dashboard import (
     get_support_dashboard as get_support_dashboard,
 )
+from app.services.support.escalation_center import (
+    list_enriched_escalations as list_enriched_escalations,
+)
 from app.services.support.knowledge import (
     create_knowledge_article as create_knowledge_article,
 )
@@ -89,9 +92,6 @@ from app.services.support.sessions import (
 )
 from app.services.support.sessions import (
     get_support_session_detail as get_support_session_detail,
-)
-from app.services.support.sessions import (
-    list_enriched_escalations as list_enriched_escalations,
 )
 from app.services.support.sessions import (
     list_support_sessions as list_support_sessions,
