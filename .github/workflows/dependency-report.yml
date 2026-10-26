@@ -1,0 +1,55 @@
+name: Dependency report
+
+# Weekly snapshot of outdated packages for the web app, the driver app and the API,
+# kept as a build artifact so dependency drift is visible between Dependabot PRs.
+on:
+  schedule:
+    - cron: '30 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  outdated:
+    name: Outdated packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.5.14'
+          python-version: '3.12'
+
+      - name: Install web app dependencies
+        run: npm ci
+
+      - name: Web app
+        # npm outdated exits 1 when anything is outdated, which is the normal case here.
+        run: npm outdated --workspace frontend --long > web-outdated.txt || true
+
+      - name: Driver app
+        working-directory: driver-app
+        run: |
+          npm ci --legacy-peer-deps
+          npm outdated --long > ../driver-app-outdated.txt || true
+
+      - name: API
+        run: uv tree --frozen --outdated --depth 1 --package cargocore-api > api-outdated.txt
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-report
+          path: |
+            web-outdated.txt
+            driver-app-outdated.txt
+            api-outdated.txt
+          retention-days: 30
