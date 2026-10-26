@@ -105,7 +105,7 @@ These are the commands CI runs in `.github/workflows/ci.yml`.
 
 | Where | Command | What it does |
 |---|---|---|
-| `backend/` | `uv run pytest --cov` | 898 unit, contract, integration and flow tests, fails under 70% coverage |
+| `backend/` | `uv run pytest --cov` | 928 unit, contract, integration and flow tests, fails under 70% coverage |
 | `backend/` | `uv run ruff check .` | lint |
 | `backend/` | `uv export --frozen --no-dev --no-hashes --package cargocore-api -o /tmp/req.txt` then `uv run pip-audit -r /tmp/req.txt --no-deps --disable-pip` | dependency audit |
 | repo root | `npm test` | 490 Vitest tests: the web app's API client, stores, composables, view logic and utils, plus the driver app's job logic |

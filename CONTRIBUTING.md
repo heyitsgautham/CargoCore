@@ -45,11 +45,10 @@ The backend suite needs Postgres with a `logistics_db_test` database, as `README
 - New frontend files follow `frontend/.prettierrc.json`.
   `frontend/.prettierignore` keeps the older `src/` tree out of the format check for now.
   Format a `src/` file with `npx prettier --write <file>` in its own commit when you next change it, so the reformat stays out of the behavior diff.
-- Keep new files under 500 lines.
+- Keep every source file under 500 lines.
   Split a view or service by feature before it grows past that.
-- CI runs `python scripts/check_file_size.py`, which fails when a source file passes 500 lines.
-  Files that were already longer are listed in `scripts/file_size_baseline.json` and may shrink but not grow.
-  After you split one, run the script with `--update` and commit the lower baseline.
+- CI runs `python scripts/check_file_size.py`, which fails when a file under `backend/app`, `frontend/src` or `driver-app/src` passes 500 lines.
+  `scripts/file_size_baseline.json` can grandfather a longer file, and it is empty now that none is left.
 
 ## Dependencies
 
