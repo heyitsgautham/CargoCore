@@ -24,259 +24,33 @@
         </div>
 
         <!-- Natural Language Command Input -->
-        <div class="glass-panel p-4 rounded-xl">
-            <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-primary">terminal</span>
-                <input v-model="nlCommand" type="text"
-                    class="flex-1 bg-gray-100 dark:bg-black/30 border border-gray-200 dark:border-white/10 rounded-lg px-4 py-3 text-gray-900 dark:text-white text-sm placeholder-gray-500 focus:border-primary/50 focus:outline-none"
-                    placeholder='Type a command e.g. "Show ready orders with assigned vehicles" or "Suggest best driver for released orders"'
-                    @keyup.enter="executeNLCommand" />
-                <button @click="executeNLCommand" :disabled="nlProcessing"
-                    class="bg-primary hover:bg-primary-dark text-black font-bold px-4 py-3 rounded-lg text-sm transition-colors flex items-center gap-1 disabled:opacity-50">
-                    <span v-if="nlProcessing"
-                        class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
-                    <span v-else class="material-symbols-outlined text-[18px]">send</span> {{ nlProcessing ?
-                        'Processing...' : 'Execute' }}
-                </button>
-            </div>
-            <div v-if="nlResponse" class="mt-3 p-3 bg-green-50 dark:bg-primary/5 border border-primary/20 rounded-lg">
-                <div class="text-[10px] text-primary uppercase font-bold tracking-wider mb-1">AI Response</div>
-                <div class="text-sm text-gray-700 dark:text-gray-300" v-html="nlResponse"></div>
-            </div>
-            <div class="mt-3 flex gap-2 overflow-x-auto no-scrollbar pb-1 max-w-full" @wheel.prevent="handleChipsScroll"
-                style="width: 75vw;">
-                <button v-for="q in quickCommands" :key="q" @click="nlCommand = q; executeNLCommand()"
-                    class="whitespace-nowrap flex-shrink-0 text-[11px] font-medium bg-white dark:bg-black/30 border border-gray-200 dark:border-white/10 hover:border-primary/50 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-1.5 rounded-full shadow-sm transition-all">{{
-                        q }}</button>
-            </div>
-        </div>
+        <CommandBar />
 
         <div class="grid gap-6" :class="showChat ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-1 lg:grid-cols-2'">
             <!-- AI Recommendations -->
-            <div class="glass-panel p-6 rounded-xl flex flex-col h-[540px]">
-                <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-primary">lightbulb</span>
-                    AI Dispatch Suggestions
-                </h3>
-                <div class="space-y-4 flex-1 overflow-y-auto no-scrollbar pr-2">
-                    <div v-if="suggestions.length === 0" class="text-center py-8 text-gray-500 text-sm">
-                        <span class="material-symbols-outlined text-green-400 text-[32px] block mb-2">check_circle</span>
-                        No dispatch exceptions right now. Released orders are covered.
-                    </div>
-                    <div v-for="suggestion in suggestions.filter(s => !ignoredSuggestions.has(s.id))" :key="suggestion.id"
-                        class="p-4 bg-gray-50 dark:bg-white/5 border rounded-xl transition-all cursor-pointer group"
-                        :class="appliedSuggestions.has(suggestion.id) ? 'border-green-300 dark:border-green-700 bg-green-50/50 dark:bg-green-900/10' : 'border-gray-200 dark:border-white/5 hover:border-primary/30'">
-                        <div class="flex justify-between items-start mb-2">
-                            <div :class="suggestion.color" class="font-bold text-sm">
-                                {{ appliedSuggestions.has(suggestion.id) ? '✓ ' : '' }}{{ suggestion.title }}
-                            </div>
-                            <div class="text-xs text-gray-600 dark:text-gray-400">
-                                Confidence: <span
-                                    :class="suggestion.confidence >= 90 ? 'text-green-600 dark:text-green-400' : 'text-yellow-600 dark:text-yellow-400'"
-                                    class="font-bold">{{ suggestion.confidence }}%</span>
-                            </div>
-                        </div>
-                        <div class="text-sm text-gray-700 dark:text-gray-300 mb-2" v-html="suggestion.message"></div>
-                        <div v-if="suggestion.explanation"
-                            class="mb-2 p-2 bg-blue-500/10 dark:bg-blue-500/5 border border-blue-500/30 dark:border-blue-500/10 rounded text-[11px] text-blue-700 dark:text-blue-300">
-                            <span class="font-bold">Why:</span> {{ suggestion.explanation }}
-                        </div>
-                        <div v-if="!appliedSuggestions.has(suggestion.id)" class="flex gap-2">
-                            <button v-for="action in suggestion.actions" :key="action.label"
-                                @click="applySuggestion(suggestion, action.label)" :class="action.class"
-                                class="px-3 py-1 rounded text-xs font-bold transition-colors">{{ action.label
-                                }}</button>
-                        </div>
-                        <div v-else
-                            class="text-[10px] text-green-600 dark:text-green-400 font-bold flex items-center gap-1">
-                            <span class="material-symbols-outlined text-[14px]">check_circle</span>
-                            Applied successfully
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <RecommendationsPanel />
 
             <!-- Dispatch Forecast + Controls -->
-            <div class="space-y-6 flex flex-col h-[540px] overflow-y-auto no-scrollbar pr-2">
-                <div class="glass-panel p-6 rounded-xl flex-1">
-                    <h3 class="font-bold text-gray-900 dark:text-white mb-4">Dispatch Readiness Forecast (Next 4 Hours)</h3>
-                    <div class="h-48">
-                        <Bar :data="demandChartData" :options="demandChartOptions" />
-                    </div>
-                    <div v-if="demandPeakHint" class="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                        {{ demandPeakHint }}
-                    </div>
-                    <div v-else class="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                        No demand forecast data yet. Will populate from live order volume.
-                    </div>
-                </div>
-
-                <!-- Dispatch Control Toggles -->
-                <div class="glass-panel p-6 rounded-xl flex-[0_0_auto]">
-                    <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-red-400">priority_high</span>
-                        Dispatch Control Toggles
-                    </h3>
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
-                            <div>
-                                <div class="text-sm text-gray-900 dark:text-white font-medium">Ready Order Prioritization</div>
-                                <div class="text-[10px] text-gray-500">Auto-rank released orders that are waiting for driver confirmation</div>
-                            </div>
-                            <button @click="togglePeak('reallocation')"
-                                :class="peakReallocation ? 'bg-primary' : 'bg-gray-600'"
-                                class="w-10 h-5 rounded-full relative transition-colors">
-                                <span class="absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all"
-                                    :class="peakReallocation ? 'left-5' : 'left-0.5'"></span>
-                            </button>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
-                            <div>
-                                <div class="text-sm text-gray-900 dark:text-white font-medium">Driver Availability Escalation</div>
-                                <div class="text-[10px] text-gray-500">Alert operations when vehicle-linked orders have no free driver</div>
-                            </div>
-                            <button @click="togglePeak('shift')" :class="shiftExtension ? 'bg-primary' : 'bg-gray-600'"
-                                class="w-10 h-5 rounded-full relative transition-colors">
-                                <span class="absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all"
-                                    :class="shiftExtension ? 'left-5' : 'left-0.5'"></span>
-                            </button>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-white/5 rounded-lg">
-                            <div>
-                                <div class="text-sm text-gray-900 dark:text-white font-medium">Critical Order Priority Lock</div>
-                                <div class="text-[10px] text-gray-500">Keep urgent released orders at the top of dispatcher review</div>
-                            </div>
-                            <button @click="togglePeak('vip')" :class="vipLock ? 'bg-primary' : 'bg-gray-600'"
-                                class="w-10 h-5 rounded-full relative transition-colors">
-                                <span class="absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all"
-                                    :class="vipLock ? 'left-5' : 'left-0.5'"></span>
-                            </button>
-                        </div>
-                        <div v-if="peakToast"
-                            class="p-2 bg-primary/10 border border-primary/20 rounded text-xs text-primary text-center transition-all">
-                            {{ peakToast }}
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <ForecastControls />
 
             <!-- AI Chat Interface -->
-            <div v-if="showChat" class="glass-panel rounded-xl flex flex-col h-[540px]">
-                <div
-                    class="p-4 border-b border-gray-200 dark:border-white/5 bg-gray-100 dark:bg-black/20 flex items-center gap-2">
-                    <div
-                        class="w-8 h-8 rounded-full bg-gradient-to-tr from-green-400 to-blue-500 flex items-center justify-center">
-                        <span class="material-symbols-outlined text-black text-[16px]">smart_toy</span>
-                    </div>
-                    <div>
-                        <div class="text-sm font-bold text-gray-900 dark:text-white">AI Dispatch Agent</div>
-                        <div class="text-[10px] text-green-400">Online • Reasoning</div>
-                    </div>
-                </div>
-
-                <div ref="chatContainer" class="flex-1 overflow-y-auto no-scrollbar p-4 space-y-3">
-                    <div v-for="msg in chatMessages" :key="msg.id"
-                        :class="msg.sender === 'ai' ? 'flex gap-2' : 'flex gap-2 flex-row-reverse'">
-                        <div v-if="msg.sender === 'ai'"
-                            class="w-7 h-7 flex-shrink-0 rounded-full bg-gradient-to-tr from-green-400 to-blue-500 flex items-center justify-center shadow-sm">
-                            <span class="material-symbols-outlined text-black text-[14px]">smart_toy</span>
-                        </div>
-                        <div v-else
-                            class="w-7 h-7 flex-shrink-0 rounded-full bg-primary flex items-center justify-center text-[9px] text-black font-bold shadow-sm">
-                            YOU
-                        </div>
-                        <div class="max-w-[85%] p-3 rounded-xl text-sm shadow-sm font-medium"
-                            :class="msg.sender === 'ai' ? 'bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-800 dark:text-gray-100 rounded-tl-none' : 'bg-primary/30 border border-primary/40 text-black dark:text-white rounded-tr-none'">
-                            <span v-if="msg.sender === 'ai'" v-html="msg.text"></span>
-                            <span v-else>{{ msg.text }}</span>
-                        </div>
-                    </div>
-                    <div v-if="chatTyping" class="flex gap-2">
-                        <div
-                            class="w-7 h-7 flex-shrink-0 rounded-full bg-gradient-to-tr from-green-400 to-blue-500 flex items-center justify-center">
-                            <span class="material-symbols-outlined text-black text-[14px]">smart_toy</span>
-                        </div>
-                        <div
-                            class="bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 p-3 rounded-xl rounded-tl-none text-gray-500 text-sm shadow-sm">
-                            <span class="inline-flex gap-1"><span
-                                    class="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"></span><span
-                                    class="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"
-                                    style="animation-delay:0.15s"></span><span
-                                    class="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce"
-                                    style="animation-delay:0.3s"></span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-4 border-t border-gray-200 dark:border-white/5 bg-gray-50 dark:bg-black/40">
-                    <div class="flex items-center gap-2 relative">
-                        <input v-model="chatInput" type="text" placeholder="Ask the AI agent..."
-                            class="flex-1 bg-white dark:bg-white/5 border border-gray-300 dark:border-white/20 shadow-sm rounded-full py-2.5 pl-4 pr-12 text-gray-900 dark:text-white text-sm font-medium focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
-                            @keyup.enter="sendChat" />
-                        <button @click="sendChat"
-                            class="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 bg-primary rounded-full text-black hover:scale-105 transition-transform flex items-center justify-center shadow-md">
-                            <span class="material-symbols-outlined text-[18px]">send</span>
-                        </button>
-                    </div>
-                    <div class="flex gap-2 mt-3 overflow-x-auto no-scrollbar pb-1 max-w-full"
-                        @wheel.prevent="handleChipsScroll" style="max-width: 75vw;">
-                        <button v-for="chip in chatChips" :key="chip" @click="chatInput = chip; sendChat()"
-                            class="whitespace-nowrap flex-shrink-0 text-[11px] font-medium bg-white dark:bg-black/30 border border-gray-200 dark:border-white/10 hover:border-primary/50 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-1 rounded-full shadow-sm transition-all">{{
-                                chip }}</button>
-                    </div>
-                </div>
-            </div>
+            <DispatchChatPanel />
         </div>
 
         <!-- AI Delay Prediction Panel -->
-        <div class="glass-panel p-6 rounded-xl">
-            <h3 class="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                <span class="material-symbols-outlined text-yellow-400">schedule</span>
-                AI Dispatch Risk Engine
-            </h3>
-            <div v-if="delayPredictions.length === 0" class="text-center py-8 text-gray-500 text-sm">
-                <span class="material-symbols-outlined text-green-400 text-[32px] block mb-2">check_circle</span>
-                No delay risks detected. Routes are running smoothly.
-            </div>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div v-for="pred in delayPredictions" :key="pred.key" class="p-4 rounded-xl border"
-                    :class="pred.risk === 'High' ? 'bg-red-500/5 border-red-500/20' : pred.risk === 'Medium' ? 'bg-yellow-500/5 border-yellow-500/20' : 'bg-green-500/5 border-green-500/20'">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-gray-900 dark:text-white font-bold text-sm">{{ pred.route }}</span>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full font-bold"
-                            :class="pred.risk === 'High' ? 'bg-red-500/20 text-red-400' : pred.risk === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-green-500/20 text-green-400'">
-                            {{ pred.risk }} Risk
-                        </span>
-                    </div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ pred.reason }}</div>
-                    <div class="flex items-center gap-2 mt-2">
-                        <div class="flex-1 h-2 bg-gray-100 dark:bg-black/30 rounded-full overflow-hidden">
-                            <div class="h-full rounded-full transition-all"
-                                :class="pred.risk === 'High' ? 'bg-red-500' : pred.risk === 'Medium' ? 'bg-yellow-500' : 'bg-green-500'"
-                                :style="{ width: pred.probability + '%' }"></div>
-                        </div>
-                        <span class="text-xs font-bold"
-                            :class="pred.risk === 'High' ? 'text-red-400' : pred.risk === 'Medium' ? 'text-yellow-400' : 'text-green-400'">
-                            {{ pred.probability }}%
-                        </span>
-                    </div>
-                    <div class="flex items-center justify-between mt-2">
-                        <div class="text-[10px] text-gray-500">Est. delay: {{ pred.delay }}</div>
-                        <button @click="mitigateDelay(pred)" class="text-[10px] font-bold transition-colors"
-                            :class="pred.mitigated ? 'text-green-400' : 'text-blue-400 hover:text-gray-900 dark:text-white'">
-                            {{ pred.mitigated ? '✓ Mitigated' : 'Mitigate' }}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <DelayPredictions />
     </div>
 </template>
 
 <script setup>
+import CommandBar from './smartDispatcher/CommandBar.vue'
+import RecommendationsPanel from './smartDispatcher/RecommendationsPanel.vue'
+import ForecastControls from './smartDispatcher/ForecastControls.vue'
+import DispatchChatPanel from './smartDispatcher/DispatchChatPanel.vue'
+import DelayPredictions from './smartDispatcher/DelayPredictions.vue'
+import { smartDispatcherPageKey } from './smartDispatcher/smartDispatcherPageContext'
 import { escapeHtml } from '@/utils/html'
-import { ref, computed, nextTick, onMounted } from 'vue'
-import { Bar } from 'vue-chartjs'
+import { ref, computed, nextTick, onMounted, provide } from 'vue'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip } from 'chart.js'
 import { useDispatcherStore } from '@/stores/dispatcherStore'
 
@@ -691,4 +465,34 @@ const delayPredictions = computed(() => {
 function mitigateDelay(pred) {
     mitigatedRoutes.value = new Set([...mitigatedRoutes.value, pred.key])
 }
+
+provide(smartDispatcherPageKey, {
+    appliedSuggestions,
+    applySuggestion,
+    chatChips,
+    chatContainer,
+    chatInput,
+    chatMessages,
+    chatTyping,
+    delayPredictions,
+    demandChartData,
+    demandChartOptions,
+    demandPeakHint,
+    executeNLCommand,
+    handleChipsScroll,
+    ignoredSuggestions,
+    mitigateDelay,
+    nlCommand,
+    nlProcessing,
+    nlResponse,
+    peakReallocation,
+    peakToast,
+    quickCommands,
+    sendChat,
+    shiftExtension,
+    showChat,
+    suggestions,
+    togglePeak,
+    vipLock,
+})
 </script>
