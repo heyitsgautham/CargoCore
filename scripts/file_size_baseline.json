@@ -1,5 +1,4 @@
 {
-  "backend/app/routers/ai.py": 822,
   "backend/app/routers/logistics.py": 692,
   "backend/app/routers/warehouse_operations.py": 511,
   "backend/app/schemas/ai.py": 562,

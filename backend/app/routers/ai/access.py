@@ -1,0 +1,4 @@
+"""Roles allowed on the support desk endpoints."""
+
+SUPPORT_ROLES = ("LOGISTIC_MANAGER", "AI_AGENT", "AI_SUPPORT", "CUSTOMER_SUPPORT")
+SUPPORT_MANAGER_ROLES = ("LOGISTIC_MANAGER",)
