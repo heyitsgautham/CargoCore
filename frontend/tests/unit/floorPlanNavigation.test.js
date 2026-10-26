@@ -11,15 +11,22 @@ vi.mock('gsap', () => ({
   },
 }))
 
-const { useZoomStateMachine } = await import('@/LWD-views/WarehouseManager/floorplan/composables/useZoomStateMachine')
-const { useFloorSearch } = await import('@/LWD-views/WarehouseManager/floorplan/composables/useFloorSearch')
+const { useZoomStateMachine } =
+  await import('@/LWD-views/WarehouseManager/floorplan/composables/useZoomStateMachine')
+const { useFloorSearch } =
+  await import('@/LWD-views/WarehouseManager/floorplan/composables/useFloorSearch')
 
 describe('floor plan zoom state machine', () => {
   it('drills floor to section to rack and steps back one level at a time', async () => {
     const zoom = useZoomStateMachine()
 
     await zoom.zoomToSection('s1')
-    expect(zoom.state).toMatchObject({ level: 'SECTION', activeSectionId: 's1', activeRackId: null, isTransitioning: false })
+    expect(zoom.state).toMatchObject({
+      level: 'SECTION',
+      activeSectionId: 's1',
+      activeRackId: null,
+      isTransitioning: false,
+    })
 
     await zoom.zoomToRack('r1')
     expect(zoom.state).toMatchObject({ level: 'RACK', activeSectionId: 's1', activeRackId: 'r1' })
@@ -89,10 +96,17 @@ describe('floor plan search', () => {
     return reactive({
       products: [
         { name: 'Frozen Peas', sku: 'FZ-100', orderId: 'ORD-1', rackId: 'r1', cell: 3 },
-        { name: 'Cement Bags', sku: 'CM-200', orderId: 'ORD-2', rackId: 'r2', cell: 0, rma: 'RMA-9' },
+        {
+          name: 'Cement Bags',
+          sku: 'CM-200',
+          orderId: 'ORD-2',
+          rackId: 'r2',
+          cell: 0,
+          rma: 'RMA-9',
+        },
       ],
-      rackMap: new Map(racks.map(r => [r.id, r])),
-      sectionMap: new Map(sections.map(s => [s.id, s])),
+      rackMap: new Map(racks.map((r) => [r.id, r])),
+      sectionMap: new Map(sections.map((s) => [s.id, s])),
     })
   }
 
@@ -106,9 +120,13 @@ describe('floor plan search', () => {
   it('matches name, SKU, order, RMA and section label, with the location attached', async () => {
     const s = useFloorSearch(makeStore(), useZoomStateMachine())
 
-    expect((await search(s, 'peas')).map(r => r.product.sku)).toEqual(['FZ-100'])
-    expect((await search(s, 'rma-9'))[0]).toMatchObject({ sectionLabel: 'Bulk', rackLabel: 'R-02', floorId: 2 })
-    expect((await search(s, 'cold')).map(r => r.product.sku)).toEqual(['FZ-100'])
+    expect((await search(s, 'peas')).map((r) => r.product.sku)).toEqual(['FZ-100'])
+    expect((await search(s, 'rma-9'))[0]).toMatchObject({
+      sectionLabel: 'Bulk',
+      rackLabel: 'R-02',
+      floorId: 2,
+    })
+    expect((await search(s, 'cold')).map((r) => r.product.sku)).toEqual(['FZ-100'])
     expect((await search(s, 'ord')).length).toBe(2)
     expect(await search(s, 'nothing-like-this')).toEqual([])
 

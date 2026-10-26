@@ -13,7 +13,10 @@ import {
 
 describe('floor plan canvas sizing', () => {
   it('measures the furthest section, rack or cell grid at each zoom level', () => {
-    const sections = [{ x: 0, y: 0, w: 300, h: 200 }, { x: 900, y: 50, w: 400, h: 1500 }]
+    const sections = [
+      { x: 0, y: 0, w: 300, h: 200 },
+      { x: 900, y: 50, w: 400, h: 1500 },
+    ]
     expect(contentExtent('FLOOR', sections, [], null)).toEqual({ right: 1470, bottom: 1800 })
 
     const racks = [{ x: 10, y: 20, w: 100, h: 60 }]
@@ -66,25 +69,39 @@ describe('floor plan inventory sync', () => {
       addGroup: vi.fn(),
       syncInventoryToFloorPlan: vi.fn(async () => {}),
     }
-    const authStore = { authToken: 'tok', currentWarehouse: warehouseId ? { id: warehouseId } : null, currentUser: null }
+    const authStore = {
+      authToken: 'tok',
+      currentWarehouse: warehouseId ? { id: warehouseId } : null,
+      currentUser: null,
+    }
     let sync
-    const wrapper = mount(defineComponent({
-      setup() {
-        sync = useInventorySync({ store, authStore, activeFloor: ref(1) })
-        return () => null
-      },
-    }))
+    const wrapper = mount(
+      defineComponent({
+        setup() {
+          sync = useInventorySync({ store, authStore, activeFloor: ref(1) })
+          return () => null
+        },
+      }),
+    )
     return { store, sync, wrapper }
   }
 
   it('adds custom inventory categories as floor groups, skipping names already on the floor', () => {
-    window.localStorage.setItem(categoriesStorageKey('wh-1'), JSON.stringify(['Cold Storage', ' Bulk ', '', 7]))
+    window.localStorage.setItem(
+      categoriesStorageKey('wh-1'),
+      JSON.stringify(['Cold Storage', ' Bulk ', '', 7]),
+    )
     const { store, sync } = setup({ groups: [{ name: 'bulk' }] })
 
     sync.syncInventoryCategoriesToFloor()
 
     expect(store.addGroup).toHaveBeenCalledTimes(1)
-    expect(store.addGroup).toHaveBeenCalledWith(1, { name: 'Cold Storage', color: '#111111', internalGap: 2, externalGap: 10 })
+    expect(store.addGroup).toHaveBeenCalledWith(1, {
+      name: 'Cold Storage',
+      color: '#111111',
+      internalGap: 2,
+      externalGap: 10,
+    })
   })
 
   it('ignores a corrupt category list', () => {
@@ -97,16 +114,22 @@ describe('floor plan inventory sync', () => {
   it('re-syncs on inventory events for this warehouse only, and stops listening on unmount', async () => {
     const { store, wrapper } = setup()
 
-    window.dispatchEvent(new CustomEvent('warehouse-inventory-updated', { detail: { warehouseId: 'wh-2' } }))
+    window.dispatchEvent(
+      new CustomEvent('warehouse-inventory-updated', { detail: { warehouseId: 'wh-2' } }),
+    )
     await Promise.resolve()
     expect(store.syncInventoryToFloorPlan).not.toHaveBeenCalled()
 
-    window.dispatchEvent(new CustomEvent('warehouse-inventory-updated', { detail: { warehouseId: 'wh-1' } }))
+    window.dispatchEvent(
+      new CustomEvent('warehouse-inventory-updated', { detail: { warehouseId: 'wh-1' } }),
+    )
     await Promise.resolve()
     expect(store.syncInventoryToFloorPlan).toHaveBeenCalledWith('tok', 'wh-1')
 
     wrapper.unmount()
-    window.dispatchEvent(new CustomEvent('warehouse-inventory-updated', { detail: { warehouseId: 'wh-1' } }))
+    window.dispatchEvent(
+      new CustomEvent('warehouse-inventory-updated', { detail: { warehouseId: 'wh-1' } }),
+    )
     await Promise.resolve()
     expect(store.syncInventoryToFloorPlan).toHaveBeenCalledTimes(1)
   })
