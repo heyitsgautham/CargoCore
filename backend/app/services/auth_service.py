@@ -65,6 +65,11 @@ _APPROVAL_REJECTED = "REJECTED"
 # ── helpers ───────────────────────────────────────────────────────────────────
 
 
+def _new_otp() -> str:
+    """A six-digit one-time code from the secrets module, which is safe for authentication."""
+    return f"{secrets.randbelow(1_000_000):06d}"
+
+
 def _token_payload(user: User) -> dict:
     return {"sub": str(user.id), "role": user.role.name}
 
@@ -430,8 +435,6 @@ async def forgot_password(db: AsyncSession, redis: Redis | None, data: ForgotPas
     Generate a 6-digit OTP for password reset and send via email.
     The OTP is stored in Redis with a 10-minute TTL.
     """
-    import random
-
     from app.utils.email import password_reset_email_html, send_email
 
     user = await _get_user_by_email(db, data.email.lower())
@@ -441,14 +444,15 @@ async def forgot_password(db: AsyncSession, redis: Redis | None, data: ForgotPas
         return
 
     # Generate 6-digit OTP
-    otp = f"{random.randint(0, 999999):06d}"
+    otp = _new_otp()
     reset_key = f"{_RESET_OTP_PREFIX}{data.email.lower()}"
     if redis is not None:
         await redis.setex(reset_key, _OTP_TTL_SECONDS, otp)
     else:
         _reset_otp_memory[data.email.lower()] = otp
 
-    logger.info(f"[DEV] Password reset OTP for {user.email}: {otp}")
+    if not settings.is_production:
+        logger.info(f"[DEV] Password reset OTP for {user.email}: {otp}")
 
     # Send email with OTP
     await send_email(
@@ -505,8 +509,6 @@ async def reset_password(
 
 async def send_signup_otp(db: AsyncSession, redis: Redis | None, data: SendOTPRequest) -> SignupOtpSendResponse:
     """Generate a 6-digit OTP, store it, and send via email."""
-    import random
-
     from app.utils.email import otp_email_html, send_email
 
     # Check if email already exists to provide early feedback
@@ -518,14 +520,15 @@ async def send_signup_otp(db: AsyncSession, redis: Redis | None, data: SendOTPRe
             detail="A user with this email already exists",
         )
 
-    otp = f"{random.randint(0, 999999):06d}"
+    otp = _new_otp()
     key = f"{_OTP_PREFIX}{email}"
     sent_at = datetime.now(UTC)
     if redis is not None:
         await redis.setex(key, _OTP_TTL_SECONDS, otp)
     else:
         _otp_memory[email] = otp
-    logger.info(f"[DEV] Signup OTP for {email}: {otp}")
+    if not settings.is_production:
+        logger.info(f"[DEV] Signup OTP for {email}: {otp}")
 
     sent = await send_email(
         to=email,
@@ -592,8 +595,6 @@ _OTP_LOGIN_ALLOWED_ROLES = frozenset({"INDIVIDUAL", "VENDOR"})
 
 async def send_login_otp(db: AsyncSession, redis: Redis | None, data: SendOTPRequest) -> SignupOtpSendResponse:
     """Send a login OTP to an existing INDIVIDUAL or VENDOR user's email."""
-    import random
-
     from app.utils.email import otp_email_html, send_email
 
     email = data.email.lower()
@@ -615,14 +616,15 @@ async def send_login_otp(db: AsyncSession, redis: Redis | None, data: SendOTPReq
 
     _ensure_user_can_authenticate(user)
 
-    otp = f"{random.randint(0, 999999):06d}"
+    otp = _new_otp()
     key = f"{_LOGIN_OTP_PREFIX}{email}"
     sent_at = datetime.now(UTC)
     if redis is not None:
         await redis.setex(key, _OTP_TTL_SECONDS, otp)
     else:
         _login_otp_memory[email] = otp
-    logger.info(f"[DEV] Login OTP for {email}: {otp}")
+    if not settings.is_production:
+        logger.info(f"[DEV] Login OTP for {email}: {otp}")
 
     sent = await send_email(
         to=email,
