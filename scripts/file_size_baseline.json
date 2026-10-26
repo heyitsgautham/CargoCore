@@ -6,7 +6,6 @@
   "driver-app/src/stores/jobStore.js": 818,
   "frontend/src/IV-views/Vendor/Support.vue": 905,
   "frontend/src/LWD-views/Dispatcher/PendingDispatchQueue.vue": 885,
-  "frontend/src/LWD-views/WarehouseManager/Dashboard.vue": 905,
   "frontend/src/LWD-views/WarehouseManager/FloorPlan.vue": 843,
   "frontend/src/components/HeaderMeetingScheduler.vue": 807,
   "frontend/src/pages/SignupWizard.vue": 836,
