@@ -554,40 +554,6 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   /**
-   * Google login — backward-compat for existing role-based pages that pass credential directly
-   */
-  async function googleLogin(credential, role = 'INDIVIDUAL') {
-    loading.value = true
-    error.value = ''
-    try {
-      const response = await fetch(apiUrl('api/v1/auth/google-login'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ credential, role }),
-      })
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}))
-        error.value = errData.detail || 'Google login failed.'
-        return { success: false, message: error.value, status: response.status }
-      }
-      const data = await response.json()
-      setAuthState(data.user, data.access_token, data.refresh_token)
-      if (data.user.role === 'WAREHOUSE_MANAGER' && data.user.warehouse_is_active !== false) await ensureWarehouseContext()
-      return {
-        success: true,
-        message: `Welcome back, ${data.user.name}!`,
-        status: response.status,
-        redirect: resolveRoleHome(data.user),
-      }
-    } catch {
-      error.value = 'Unable to connect.'
-      return { success: false, message: error.value, status: 0 }
-    } finally {
-      loading.value = false
-    }
-  }
-
-  /**
    * Warehouse context — fetch and cache assigned warehouse for WAREHOUSE_MANAGER
    */
   async function ensureWarehouseContext() {
@@ -737,7 +703,6 @@ export const useAuthStore = defineStore('auth', () => {
     resetPassword,
 
     // ── Backward-compat (used by existing role dashboards) ─────
-    googleLogin,
     ensureHubOperationalAccess,
     ensureWarehouseContext,
     logout,

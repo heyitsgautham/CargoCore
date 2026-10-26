@@ -28,7 +28,6 @@ export default defineConfig({
         'src/*-views/**/*.js',
         'src/views/**/*.js',
       ],
-      exclude: ['src/utils/dummyData.js'],
       // Floor for the logic layer; raise it as the large role stores gain tests.
       thresholds: { statements: 55, branches: 52, functions: 55, lines: 58 },
     },
