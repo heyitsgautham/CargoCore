@@ -51,6 +51,34 @@ info:
     name: Proprietary
     url: https://quadcoredevs.com/license
 paths:
+  /api/v1/client-errors:
+    post:
+      tags:
+      - Client errors
+      summary: Record an error raised in the web or driver app
+      description: Writes the report to the API's structured log at error or warning level, tagged with source=client, its scope and context fields. Each client address may send 30 reports a minute; more get 429.
+      operationId: report_client_error_api_v1_client_errors_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientErrorReport'
+        required: true
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Report Client Error Api V1 Client Errors Post
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /api/v1/auth/register:
     post:
       tags:
@@ -11871,6 +11899,64 @@ paths:
       - OAuth2PasswordBearer: []
 components:
   schemas:
+    ClientErrorReport:
+      properties:
+        level:
+          type: string
+          enum:
+          - error
+          - warning
+          title: Level
+          default: error
+        message:
+          type: string
+          maxLength: 2000
+          minLength: 1
+          title: Message
+        scope:
+          type: string
+          maxLength: 80
+          pattern: ^[A-Za-z0-9_.:/-]+$
+          title: Scope
+          default: app
+        stack:
+          anyOf:
+          - type: string
+            maxLength: 8000
+          - type: 'null'
+          title: Stack
+        url:
+          anyOf:
+          - type: string
+            maxLength: 2000
+          - type: 'null'
+          title: Url
+        user_agent:
+          anyOf:
+          - type: string
+            maxLength: 500
+          - type: 'null'
+          title: User Agent
+        release:
+          anyOf:
+          - type: string
+            maxLength: 80
+          - type: 'null'
+          title: Release
+        context:
+          additionalProperties:
+            anyOf:
+            - type: string
+            - type: integer
+            - type: number
+            - type: boolean
+            - type: 'null'
+          type: object
+          title: Context
+      type: object
+      required:
+      - message
+      title: ClientErrorReport
     AgentReplyRequest:
       properties:
         message:

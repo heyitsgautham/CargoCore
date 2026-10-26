@@ -35,6 +35,7 @@ Drivers use the Android app for manifests, GPS tracking and proof of delivery.
 - `app/logging_config.py` writes one JSON object per line when `LOG_JSON` is on, which is the default in production.
 - `GET /health` returns `{"status": "ok"}` and backs the container health check.
 - `GET /health/ready` also checks Postgres and Redis, and returns 503 when the database is unreachable.
+- The web app reports uncaught Vue, window and promise errors to `POST /api/v1/client-errors`, which writes them to the same structured log with `source=client`, 30 reports a minute per client at most.
 - Auth issues HS256 access and refresh tokens, and Redis holds the logout blacklist and password-reset OTPs.
 - The AI assistant calls Google Gemini when `GEMINI_API_KEY` is set and answers from rules and database lookups when it is not.
 

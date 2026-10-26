@@ -10,6 +10,7 @@ from app.logging_config import configure_logging
 from app.middleware.logging_middleware import LoggingMiddleware
 from app.routers import ai as ai_router
 from app.routers import auth as auth_router
+from app.routers import client_errors as client_errors_router
 from app.routers import customer as customer_router
 from app.routers import damage_reports as damage_reports_router
 from app.routers import dev_seed as dev_seed_router
@@ -135,6 +136,7 @@ def create_app() -> FastAPI:
     app.include_router(tracking_router.router)
     app.include_router(finance_router.router)
     app.include_router(ws_fleet_router.router)
+    app.include_router(client_errors_router.router)
 
     # Dev seed: GPS coordinate injection for testing AI dispatch features.
     # Role-gated (LOGISTIC_MANAGER / DISPATCHER) — safe to include in all envs.
