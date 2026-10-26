@@ -1,6 +1,7 @@
 // Logging an offline capital investment from the finances tab.
 import { ref } from 'vue'
 import { apiUrl } from '@/config/api'
+import { localDateISO } from '@/utils/date'
 
 export function useCapitalInvestment({ store, authStore, showNotification }) {
     const investmentModalOpen = ref(false)
@@ -9,7 +10,7 @@ export function useCapitalInvestment({ store, authStore, showNotification }) {
         amount: '',
         description: '',
         funding_source: 'OFFLINE_CAPITAL',
-        investment_date: new Date().toISOString().slice(0, 10),
+        investment_date: localDateISO(),
     })
 
     const submitInvestment = async () => {
@@ -30,7 +31,7 @@ export function useCapitalInvestment({ store, authStore, showNotification }) {
             if (res.ok) {
                 showNotification(`Capital Investment of ₹${investmentForm.value.amount.toLocaleString()} logged!`, 'success')
                 investmentModalOpen.value = false
-                investmentForm.value = { amount: '', description: '', funding_source: 'OFFLINE_CAPITAL', investment_date: new Date().toISOString().slice(0, 10) }
+                investmentForm.value = { amount: '', description: '', funding_source: 'OFFLINE_CAPITAL', investment_date: localDateISO() }
                 store.refresh()
             } else {
                 showNotification('Failed to log investment', 'error')

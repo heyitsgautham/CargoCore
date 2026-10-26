@@ -206,6 +206,7 @@
 </template>
 
 <script setup>
+import { localDateISO } from '@/utils/date'
 import { ref, computed, onMounted } from 'vue'
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js'
@@ -349,7 +350,7 @@ function exportReport() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `performance_${timeRange.value}_${new Date().toISOString().slice(0, 10)}.csv`
+    a.download = `performance_${timeRange.value}_${localDateISO()}.csv`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)

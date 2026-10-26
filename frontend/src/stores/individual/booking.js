@@ -1,6 +1,7 @@
 // Booking a move: the quote, packing material SKUs, order creation and saved quotes.
 import { apiUrl } from '@/config/api'
 import { mapQuote, fallbackPackingSku } from './orderMapping'
+import { localDateISO } from '@/utils/date'
 
 export function useCustomerBooking({
     MATERIAL_SKU_MAP,
@@ -227,7 +228,7 @@ export function useCustomerBooking({
     }
 
     function addQuote(data) {
-        const q = { id: `QT-${500 + quotes.value.length + 1}`, ...data, date: new Date().toISOString().split('T')[0], status: 'active' }
+        const q = { id: `QT-${500 + quotes.value.length + 1}`, ...data, date: localDateISO(), status: 'active' }
         quotes.value.unshift(q)
         return q
     }
@@ -240,7 +241,7 @@ export function useCustomerBooking({
             cargoType: q.cargoType, pickup: q.from, destination: q.to,
             laborCount: q.laborCount, packingRequired: q.packing,
             materials: {}, cost: { base: Math.round(q.total * 0.45), labor: Math.round(q.total * 0.2), materials: Math.round(q.total * 0.1), packing: Math.round(q.total * 0.1), vehicle: Math.round(q.total * 0.15), total: q.total },
-            date: new Date().toISOString().split('T')[0], timeWindow: '10:00 AM - 12:00 PM',
+            date: localDateISO(), timeWindow: '10:00 AM - 12:00 PM',
             paymentMode: 'Full Payment', vehicleType: 'tempo',
         })
     }

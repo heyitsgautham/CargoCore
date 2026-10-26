@@ -1,3 +1,4 @@
+import { localDateISO } from '@/utils/date'
 // Pure helpers for the header meeting scheduler: meeting platforms, links, API record
 // normalisation and the date labels shown on meeting cards.
 
@@ -89,7 +90,7 @@ export const getPlatformConfig = (type) => {
 
 export const getMeetingPlatform = (meeting) => meeting.meetingType || detectPlatform(meeting.link)
 
-export const todayDate = () => new Date().toISOString().split('T')[0]
+export const todayDate = () => localDateISO()
 export const normalizeId = (value) => value == null ? '' : String(value)
 export const titleCase = (value) => String(value || 'User')
     .toLowerCase()

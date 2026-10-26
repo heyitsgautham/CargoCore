@@ -49,6 +49,7 @@
 </template>
 
 <script setup>
+import { localDateISO } from '@/utils/date'
 import FinanceStatsCards from './finance/FinanceStatsCards.vue'
 import FinanceTabs from './finance/FinanceTabs.vue'
 import FinanceLedger from './finance/FinanceLedger.vue'
@@ -218,7 +219,7 @@ const applyBulkAction = async () => {
         // Use EXPENSE_BONUS so the backend's finance_service correctly debits revenue
         const txType = isBonus ? 'EXPENSE_BONUS' : 'REVENUE_ONLINE'
         const amountSign = isBonus ? -1 : 1
-        const date = new Date().toISOString().split('T')[0]
+        const date = localDateISO()
 
         // Use allSettled so all users are processed independently
         // (one failure doesn't block the rest)

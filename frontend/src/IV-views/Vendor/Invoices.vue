@@ -156,6 +156,7 @@
 </template>
 
 <script setup>
+import { localDateISO } from '@/utils/date'
 import { ref, computed } from 'vue'
 import { useVendorStore } from '@/stores/vendorStore'
 import { useAuthStore } from '@/stores/authStore'
@@ -228,7 +229,7 @@ function exportReport() {
             inv.status,
         ])
     ]
-    downloadCsv(`invoices_${new Date().toISOString().slice(0, 10)}.csv`, rows)
+    downloadCsv(`invoices_${localDateISO()}.csv`, rows)
 }
 
 function downloadCsv(filename, rows) {

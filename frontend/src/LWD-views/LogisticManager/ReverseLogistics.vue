@@ -20,6 +20,7 @@
 </template>
 
 <script setup>
+import { localDateISO } from '@/utils/date'
 import ReturnStatsCards from './reverseLogistics/ReturnStatsCards.vue'
 import ReturnFilterBar from './reverseLogistics/ReturnFilterBar.vue'
 import ReturnClaimsList from './reverseLogistics/ReturnClaimsList.vue'
@@ -199,7 +200,7 @@ const submitDecision = async () => {
         if (['Full Refund', 'Partial Refund'].includes(action) && decisionForm.value.amount > 0) {
             await store.addTransaction({
                 id: Date.now(),
-                date: new Date().toISOString().split('T')[0],
+                date: localDateISO(),
                 desc: `Refund for ${rma.id}`,
                 amount: -decisionForm.value.amount,
                 type: 'Expense',

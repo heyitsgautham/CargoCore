@@ -98,6 +98,7 @@
 </template>
 
 <script setup>
+import { localDateISO } from '@/utils/date'
 import ControlTowerTab from './reports/ControlTowerTab.vue'
 import FinancialsTab from './reports/FinancialsTab.vue'
 import AttendanceTab from './reports/AttendanceTab.vue'
@@ -207,7 +208,7 @@ const showNotification = (msg, type = 'success') => {
     setTimeout(() => notification.value = null, 3000)
 }
 
-const today = () => new Date().toISOString().slice(0, 10)
+const today = () => localDateISO()
 
 const downloadReport = (id) => {
     const report = store.filteredReports.find(r => r.id === id)

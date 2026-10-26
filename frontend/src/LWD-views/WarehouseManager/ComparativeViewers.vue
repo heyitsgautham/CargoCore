@@ -262,6 +262,7 @@
 </template>
 
 <script setup>
+import { localDateISO } from '@/utils/date'
 import { API_BASE_URL } from '@/config/api'
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useWarehouseFloorStore } from '@/stores/warehouseFloorStore'
@@ -341,7 +342,7 @@ async function fetchZoneMetrics(zoneId) {
             dateFrom = new Date(today.getFullYear(), 0, 1) // Jan 1st of current year
         }
 
-        const formatDate = (d) => d.toISOString().split('T')[0]
+        const formatDate = (d) => localDateISO(d)
         const params = new URLSearchParams({
             date_from: formatDate(dateFrom),
             date_to: formatDate(today)

@@ -100,6 +100,7 @@
 </template>
 
 <script setup>
+import { localDateISO } from '@/utils/date'
 import FleetDriversTab from './fleet/FleetDriversTab.vue'
 import FleetVehiclesTab from './fleet/FleetVehiclesTab.vue'
 import FleetLogsTab from './fleet/FleetLogsTab.vue'
@@ -231,7 +232,7 @@ const generateMaintenanceReport = () => {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `fleet_maintenance_report_${new Date().toISOString().slice(0, 10)}.csv`
+    a.download = `fleet_maintenance_report_${localDateISO()}.csv`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)

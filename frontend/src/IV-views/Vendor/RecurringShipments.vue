@@ -395,6 +395,7 @@
 </template>
 
 <script setup>
+import { localDateISO } from '@/utils/date'
 import { computed, defineAsyncComponent, ref, watch } from 'vue'
 import { useVendorStore } from '@/stores/vendorStore'
 import BaseModal from '@/components/BaseModal.vue'
@@ -444,7 +445,7 @@ const defaultForm = {
 const form = ref({ ...defaultForm })
 
 // Today's date for the date picker minimum
-const todayISO = new Date().toISOString().split('T')[0]
+const todayISO = localDateISO()
 
 const activeCount = computed(() => store.recurringRules.filter(r => r.active).length)
 const availableHubs = computed(() => (store.warehouses || []).map((hub) => ({
@@ -601,7 +602,7 @@ function openEditModal(rule) {
     let nextRun = rule.nextRun || ''
     if (nextRun && !/^\d{4}-\d{2}-\d{2}/.test(nextRun)) {
         const parsed = new Date(nextRun)
-        if (!isNaN(parsed)) nextRun = parsed.toISOString().split('T')[0]
+        if (!isNaN(parsed)) nextRun = localDateISO(parsed)
     }
     const destinationAddress = parsedDetails.destinationAddress || inferDestinationFromRoute(rule.route) || ''
     form.value = {

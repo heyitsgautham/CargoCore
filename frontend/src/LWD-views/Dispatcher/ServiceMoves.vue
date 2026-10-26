@@ -35,6 +35,7 @@
 </template>
 
 <script setup>
+import { localDateISO } from '@/utils/date'
 import ServiceMoveStats from './serviceMoves/ServiceMoveStats.vue'
 import ActiveServiceMoves from './serviceMoves/ActiveServiceMoves.vue'
 import ScheduleConflictWarning from './serviceMoves/ScheduleConflictWarning.vue'
@@ -119,7 +120,7 @@ function primeNewMoveDefaults() {
         newMove.driverId = availableDrivers.value[0].id
     }
     if (!newMove.scheduledDate) {
-        newMove.scheduledDate = new Date().toISOString().split('T')[0]
+        newMove.scheduledDate = localDateISO()
     }
     if (!newMove.scheduledTime) {
         newMove.scheduledTime = '10:00'
@@ -342,9 +343,9 @@ async function fetchServiceMoves() {
         serviceMoves.value = activeMoves.map(mapServiceMoveFor)
 
         // Count completed today
-        const today = new Date().toISOString().split('T')[0]
+        const today = localDateISO()
         completedToday.value = delivered.filter(o =>
-            o.delivered_at?.startsWith(today) && isServiceMoveOrder(o)
+            o.delivered_at && localDateISO(new Date(o.delivered_at)) === today && isServiceMoveOrder(o)
         ).length
     } catch (err) {
         console.error('Failed to fetch service moves:', err)
