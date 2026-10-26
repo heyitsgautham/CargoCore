@@ -11,11 +11,10 @@ from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
 from loguru import logger
 from redis.asyncio import Redis
-from sqlalchemy import or_, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
-from app.models.logistics import LogisticsNotification
 from app.models.user import Role, User
 from app.schemas.auth import (
     SELF_SERVICE_ROLES,
@@ -37,9 +36,24 @@ from app.schemas.auth import (
     VerifyOTPRequest,
 )
 from app.services.auth_codes import OneTimeCodes
+from app.services.auth_users import (
+    _APPROVAL_APPROVED,
+    _APPROVAL_PENDING,
+    _build_login_response,
+    _build_registration_response,
+    _build_token_response,
+    _ensure_user_can_authenticate,
+    _ensure_user_session_valid,
+    _get_role_by_name,
+    _get_user_by_email,
+    _get_user_by_id,
+    _get_user_by_identifier,
+    _queue_vendor_registration_notification,
+    _to_profile,
+)
 from app.utils.hashing import hash_password, verify_password
-from app.utils.jwt import create_access_token, create_refresh_token, decode_token
-from app.utils.username import generate_unique_username, normalize_username
+from app.utils.jwt import decode_token
+from app.utils.username import generate_unique_username
 
 # Redis key prefixes
 _BLACKLIST_PREFIX = "blacklist:"
@@ -54,161 +68,7 @@ settings = get_settings()
 
 # Roles allowed through the public /register endpoint (kept in sync with schema).
 _SELF_SERVICE_ROLE_NAMES: frozenset[str] = frozenset(SELF_SERVICE_ROLES.__args__)  # type: ignore[union-attr]
-_APPROVAL_PENDING = "PENDING"
-_APPROVAL_APPROVED = "APPROVED"
-_APPROVAL_REJECTED = "REJECTED"
 
-
-# ── helpers ───────────────────────────────────────────────────────────────────
-
-
-def _token_payload(user: User) -> dict:
-    return {"sub": str(user.id), "role": user.role.name}
-
-
-def _build_token_response(user: User) -> TokenResponse:
-    payload = _token_payload(user)
-    return TokenResponse(
-        access_token=create_access_token(payload),
-        refresh_token=create_refresh_token(payload),
-    )
-
-
-def _build_login_response(user: User) -> LoginResponse:
-    """Build login response with tokens and user profile."""
-    payload = _token_payload(user)
-    return LoginResponse(
-        access_token=create_access_token(payload),
-        refresh_token=create_refresh_token(payload),
-        user=_to_profile(user),
-    )
-
-
-def _build_registration_response(user: User) -> RegistrationResponse:
-    if (user.approval_status or _APPROVAL_APPROVED).upper() == _APPROVAL_PENDING:
-        return RegistrationResponse(
-            user=_to_profile(user),
-            pending_approval=True,
-            message="Vendor registration submitted successfully. A Logistics Manager must approve it before login.",
-        )
-
-    payload = _token_payload(user)
-    return RegistrationResponse(
-        access_token=create_access_token(payload),
-        refresh_token=create_refresh_token(payload),
-        user=_to_profile(user),
-    )
-
-
-def _to_profile(user: User) -> UserProfile:
-    warehouse = getattr(user, "warehouse", None)
-    warehouse_is_active = None if warehouse is None else warehouse.is_active
-    warehouse_status = None
-    if warehouse is not None:
-        warehouse_status = "Archived" if warehouse.is_active is False else "Active"
-
-    return UserProfile(
-        id=user.id,
-        name=user.name,
-        username=user.username,
-        email=user.email,
-        phone=user.phone,
-        address=user.address,
-        role=user.role.name,
-        warehouse_id=user.warehouse_id,
-        warehouse_name=getattr(warehouse, "name", None),
-        warehouse_address=getattr(warehouse, "address", None),
-        warehouse_is_active=warehouse_is_active,
-        warehouse_status=warehouse_status,
-        is_active=user.is_active,
-        approval_status=user.approval_status or _APPROVAL_APPROVED,
-        company_name=user.company_name,
-        tax_id=user.tax_id,
-        contact_person=user.contact_person,
-        business_email=user.business_email,
-        business_phone=user.business_phone,
-        created_at=user.created_at,
-    )
-
-
-def _approval_message(user: User) -> str | None:
-    status_value = (user.approval_status or _APPROVAL_APPROVED).upper()
-    if status_value == _APPROVAL_PENDING:
-        return "Your vendor account is waiting for Logistics Manager approval."
-    if status_value == _APPROVAL_REJECTED:
-        return "Your vendor registration was rejected. Please contact the Logistics Manager or register again with updated details."
-    return None
-
-
-def _ensure_user_can_authenticate(user: User) -> None:
-    approval_message = _approval_message(user)
-    if approval_message:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=approval_message,
-        )
-
-
-def _ensure_user_session_valid(user: User) -> None:
-    approval_message = _approval_message(user)
-    if approval_message:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=approval_message,
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-
-def _queue_vendor_registration_notification(db: AsyncSession, user: User) -> None:
-    company_name = user.company_name or user.name
-    contact_name = user.contact_person or user.name
-    db.add(
-        LogisticsNotification(
-            title="New vendor registration",
-            message=f"{company_name} registered with contact {contact_name}. Review the request in User & Roles.",
-            type="system",
-            audience_roles="LOGISTIC_MANAGER",
-        )
-    )
-
-
-async def _get_user_by_email(db: AsyncSession, email: str) -> User | None:
-    result = await db.execute(select(User).where(User.email == email))
-    return result.scalar_one_or_none()
-
-
-async def _get_user_by_identifier(db: AsyncSession, identifier: str) -> User | None:
-    normalized = identifier.strip().lower()
-    result = await db.execute(
-        select(User).where(
-            or_(
-                User.email == normalized,
-                User.username == normalize_username(normalized),
-            )
-        )
-    )
-    return result.scalar_one_or_none()
-
-
-async def _get_role_by_name(db: AsyncSession, name: str) -> Role | None:
-    result = await db.execute(select(Role).where(Role.name == name))
-    return result.scalar_one_or_none()
-
-
-async def _get_user_by_id(db: AsyncSession, user_id: str) -> User | None:
-    from uuid import UUID
-
-    try:
-        uid = UUID(user_id)
-    except ValueError:
-        return None
-    result = await db.execute(
-        select(User).where(User.id == uid)
-    )
-    return result.scalar_one_or_none()
-
-
-# ── public service functions ──────────────────────────────────────────────────
 
 
 async def register_user(db: AsyncSession, data: UserRegister) -> RegistrationResponse:
@@ -634,8 +494,6 @@ async def verify_login_otp(db: AsyncSession, redis: Redis | None, data: VerifyOT
     _ensure_user_can_authenticate(user)
     logger.info(f"Login via OTP for user: {email}")
     return _build_login_response(user)
-
-
 
 
 async def google_login_or_register(db: AsyncSession, redis: Redis, data: GoogleLoginRequest) -> LoginResponse:
