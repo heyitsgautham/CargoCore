@@ -185,6 +185,13 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick, reactive } from 'vue'
 import { useDispatcherStore } from '@/stores/dispatcherStore'
+import {
+    isVehicleDispatchableStatus,
+    orderAllowsDirectVehicleSelection,
+    recurringRuleId,
+    vehicleFitScore,
+    vehicleHasOpenAssignments,
+} from './dispatchRules'
 import { getStoredAccessToken, API_BASE_URL } from '@/config/api'
 
 const store = useDispatcherStore()
@@ -232,68 +239,18 @@ function priorityClass(priority) {
     return 'bg-blue-500/20 text-blue-400'
 }
 
-function orderAllowsDirectVehicleSelection(order) {
-    const type = String(order?.type || '').toUpperCase()
-    return type === 'PARCEL_PICKUP' || type === 'SERVICE_MOVE' || type === 'VENDOR'
-}
-
-function recurringRuleId(order) {
-    const notes = String(order?.deliveryNotes || '')
-    const match = notes.match(/RECURRING_RULE:([^|\n]+)/i)
-    return match?.[1] || null
-}
-
 function needsDispatcherVehicle(order) {
     return !!order && !order.vehicleId && orderAllowsDirectVehicleSelection(order)
-}
-
-function normalizeVehicleAvailabilityStatus(status) {
-    return String(status || '')
-        .trim()
-        .toLowerCase()
-        .replace(/[_\s]+/g, '-')
-}
-
-function isVehicleDispatchableStatus(status) {
-    const normalized = normalizeVehicleAvailabilityStatus(status)
-    return ['active', 'idle', 'available', 'standby', 'ready'].includes(normalized)
-}
-
-function hasVehicleOpenAssignments(vehicleId) {
-    if (!vehicleId) return false
-    return (store.activeOrders || []).some((order) => {
-        const status = String(order?.status || '').toUpperCase()
-        return String(order?.vehicleId || '') === String(vehicleId)
-            && ['ASSIGNED', 'IN_TRANSIT'].includes(status)
-    })
 }
 
 function vehicleLabel(vehicle) {
     return vehicle?.licensePlate || vehicle?.code || vehicle?.model || 'Vehicle'
 }
 
-function scoreVehicle(vehicle, order) {
-    let score = 30
-    const vehicleType = String(vehicle?.type || '').trim().toLowerCase()
-    const orderVehicleType = String(order?.vehicleType || '').trim().toLowerCase()
-
-    if (vehicleType && orderVehicleType && vehicleType === orderVehicleType) score += 35
-    else if (!orderVehicleType) score += 10
-
-    const orderWeightTons = Number(order?.weight || 0) / 1000
-    const capacityTons = Number(vehicle?.cargoCapacityTons || 0)
-    if (capacityTons > 0 && orderWeightTons > 0) {
-        if (capacityTons >= orderWeightTons) score += 18
-        else score -= 25
-    }
-
-    return score
-}
-
 const availableVehicles = computed(() =>
     (store.filteredVehicles || []).filter((vehicle) =>
         isVehicleDispatchableStatus(vehicle.status)
-        && !hasVehicleOpenAssignments(vehicle.id)
+        && !vehicleHasOpenAssignments(vehicle.id, store.activeOrders)
     )
 )
 
@@ -308,7 +265,7 @@ const ordersById = computed(() => {
 function getRecommendedVehicle(order) {
     if (!needsDispatcherVehicle(order) || !availableVehicles.value.length) return null
     return [...availableVehicles.value]
-        .map((vehicle) => ({ vehicle, score: scoreVehicle(vehicle, order) }))
+        .map((vehicle) => ({ vehicle, score: vehicleFitScore(vehicle, order) }))
         .sort((a, b) => b.score - a.score)[0]?.vehicle || null
 }
 

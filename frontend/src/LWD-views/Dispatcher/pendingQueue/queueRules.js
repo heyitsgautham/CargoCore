@@ -1,5 +1,8 @@
 // Pending dispatch queue rules: whether an order can be dispatched now, its labels,
 // and how long until its deadline.
+import { orderAllowsDirectVehicleSelection } from '../dispatchRules'
+
+export { orderAllowsDirectVehicleSelection }
 
 export function formatMetric(value, hasValue, unit) {
     return hasValue ? `${value} ${unit}` : '—'
@@ -15,13 +18,6 @@ export function formatOrderVolume(order) {
 
 export function formatCapacityValue(value, hasValue, capacity, unit) {
     return hasValue ? `${value} / ${capacity} ${unit}` : `— / ${capacity} ${unit}`
-}
-
-export function orderAllowsDirectVehicleSelection(order) {
-    const type = String(order?.type || '').toUpperCase()
-    // VENDOR (hub-based recurring inbound), SERVICE_MOVE, and PARCEL_PICKUP skip the
-    // warehouse loading-dock vehicle assignment step — dispatcher assigns vehicle directly.
-    return type === 'PARCEL_PICKUP' || type === 'SERVICE_MOVE' || type === 'VENDOR'
 }
 
 export function getPriorityClass(priority) {

@@ -54,202 +54,15 @@
 
         <div class="grid grid-cols-1 gap-6 xl:grid-cols-3">
             <div class="xl:col-span-2">
-                <div class="glass-panel rounded-xl p-5">
-                    <div class="mb-4 flex items-center justify-between">
-                        <div>
-                            <h3 class="font-bold text-gray-900 dark:text-white">Dispatch Readiness Queue</h3>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Ready orders waiting for dispatcher AI review, including direct-dispatch recurring/vendor jobs.</p>
-                        </div>
-                        <div class="rounded-full bg-gray-100 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:bg-white/5 dark:text-gray-300">
-                            {{ dispatchQueue.length }} items
-                        </div>
-                    </div>
-
-                    <div v-if="dispatchQueue.length === 0" class="rounded-xl border border-dashed border-green-200 bg-green-50 p-8 text-center dark:border-green-500/20 dark:bg-green-500/10">
-                        <span class="material-symbols-outlined mb-2 block text-[32px] text-green-600 dark:text-green-400">check_circle</span>
-                        <div class="text-sm font-bold text-green-800 dark:text-green-300">No ready orders are waiting for AI assignment review</div>
-                        <div class="mt-1 text-xs text-green-700 dark:text-green-200">Released warehouse jobs and direct recurring/vendor non-packing jobs will appear here when they are ready.</div>
-                    </div>
-
-                    <div v-else class="overflow-x-auto">
-                        <table class="w-full min-w-[920px] text-left text-sm">
-                            <thead class="bg-gray-50 text-[10px] uppercase tracking-wider text-gray-500 dark:bg-white/5 dark:text-gray-400">
-                                <tr>
-                                    <th class="p-3">Order</th>
-                                    <th class="p-3">Warehouse Flow</th>
-                                    <th class="p-3">Vehicle</th>
-                                    <th class="p-3">AI Driver Match</th>
-                                    <th class="p-3">Risk</th>
-                                    <th class="p-3">Why AI Chose This</th>
-                                    <th class="p-3">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 dark:divide-white/5">
-                                <tr v-for="item in dispatchQueue" :key="item.id" class="transition-colors hover:bg-gray-50 dark:hover:bg-white/5">
-                                    <td class="p-3 align-top">
-                                        <div class="font-bold text-gray-900 dark:text-white">{{ item.trackingCode || item.id }}</div>
-                                        <div class="mt-1 flex items-center gap-2">
-                                            <span class="rounded-full px-2 py-0.5 text-[9px] font-bold" :class="priorityBadgeClass(item.priority)">
-                                                {{ item.priority || 'NORMAL' }}
-                                            </span>
-                                            <span class="text-[10px] text-gray-500 dark:text-gray-400">{{ item.type || 'Standard Move' }}</span>
-                                        </div>
-                                        <div class="mt-2 text-[11px] text-gray-500 dark:text-gray-400">
-                                            <div>Customer: <span class="text-gray-700 dark:text-gray-200">{{ item.customerName || 'Pending confirmation' }}</span></div>
-                                            <div>Deadline: <span class="text-gray-700 dark:text-gray-200">{{ formatDeadline(item.deadline) }}</span></div>
-                                        </div>
-                                    </td>
-                                    <td class="p-3 align-top">
-                                        <div class="text-xs font-medium text-gray-900 dark:text-white">{{ item.warehouse || 'Warehouse' }}</div>
-                                        <div class="mt-1 text-[11px] text-gray-500 dark:text-gray-400">
-                                            <div>{{ isDirectDispatchAiCandidate(item) && !item.readyForDispatch ? 'Flow: Accepted by WM, dispatcher can plan now' : orderAllowsDirectVehicleSelection(item) ? 'Flow: Direct dispatcher vehicle selection' : 'Dock: Released by Warehouse Manager' }}</div>
-                                            <div>Pickup: {{ Number(item.packingAmount || 0) > 0 ? 'Packing items ready' : 'Non-packing pickup ready' }}</div>
-                                            <div>Destination: {{ item.deliveryAddr || 'Customer destination pending' }}</div>
-                                        </div>
-                                    </td>
-                                    <td class="p-3 align-top">
-                                        <div class="text-xs font-bold" :class="item.vehicleId ? 'text-blue-700 dark:text-blue-300' : (item.recommendedVehicle ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-600 dark:text-red-400')">
-                                            {{ item.vehicleId ? item.vehicle : item.recommendedVehicle?.label || 'No vehicle available' }}
-                                        </div>
-                                        <div class="mt-1 text-[11px] text-gray-500 dark:text-gray-400">
-                                            <div>{{ item.vehicleId ? 'Vehicle locked by warehouse' : orderAllowsDirectVehicleSelection(item) ? 'AI recommended for dispatcher selection' : 'Vehicle must be locked before dispatch' }}</div>
-                                            <div>Vehicle type: {{ item.vehicleType || item.recommendedVehicle?.type || 'General cargo' }}</div>
-                                            <div>Order weight: {{ item.weight || 0 }} kg</div>
-                                        </div>
-                                    </td>
-                                    <td class="p-3 align-top">
-                                        <div v-if="item.recommendedDriver" class="space-y-1">
-                                            <div class="font-bold text-gray-900 dark:text-white">{{ item.recommendedDriver.name }}</div>
-                                            <div class="text-[11px] text-gray-500 dark:text-gray-400">
-                                                <div>Status: {{ item.recommendedDriver.status }}</div>
-                                                <div>Shift used: {{ item.recommendedDriver.hours }}h</div>
-                                                <div>Load: {{ item.recommendedDriver.load }}%</div>
-                                            </div>
-                                        </div>
-                                        <div v-else class="rounded-lg border border-red-200 bg-red-50 p-2 text-[11px] text-red-700 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-300">
-                                            No driver currently available
-                                        </div>
-                                    </td>
-                                    <td class="p-3 align-top">
-                                        <span class="rounded-full px-2 py-0.5 text-[9px] font-bold" :class="riskBadgeClass(item.risk.level)">
-                                            {{ item.risk.level }}
-                                        </span>
-                                        <div class="mt-2 text-[11px] text-gray-500 dark:text-gray-400">{{ item.risk.text }}</div>
-                                    </td>
-                                    <td class="p-3 align-top">
-                                        <div class="text-[11px] leading-5 text-gray-600 dark:text-gray-300">
-                                            {{ item.recommendationReason }}
-                                        </div>
-                                    </td>
-                                    <td class="p-3 align-top">
-                                        <div v-if="deferredOrders.has(item.id)" class="flex flex-col gap-2">
-                                            <div class="rounded-lg border border-gray-200 bg-gray-50 p-2 text-[11px] font-bold text-gray-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-300">
-                                                Deferred for later review
-                                            </div>
-                                            <button @click="resumeReview(item.id)"
-                                                class="rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20">
-                                                Resume Review
-                                            </button>
-                                        </div>
-                                        <div v-else class="flex flex-col gap-2">
-                                            <button @click="assignRecommendedDriver(item)"
-                                                :disabled="!orderHasAssignableResources(item) || assigningOrderId === item.id"
-                                                class="rounded-lg border border-primary/30 bg-primary/15 px-3 py-1.5 text-xs font-bold text-primary transition-colors hover:bg-primary/25 disabled:cursor-not-allowed disabled:opacity-50">
-                                                <span v-if="assigningOrderId === item.id">Assigning...</span>
-                                                <span v-else-if="item.recommendedDriver && item.vehicleId">Assign {{ item.recommendedDriver.name }}</span>
-                                                <span v-else-if="item.recommendedDriver && item.recommendedVehicle">Assign {{ item.recommendedDriver.name }} + {{ item.recommendedVehicle.label }}</span>
-                                                <span v-else>No Resources Available</span>
-                                            </button>
-                                            <button @click="deferOrder(item.id)"
-                                                class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-700 transition-colors hover:bg-gray-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-200 dark:hover:bg-white/10">
-                                                Review Later
-                                            </button>
-                                            <div v-if="assignmentErrors[item.id]" class="text-[10px] font-bold text-red-600 dark:text-red-400">
-                                                {{ assignmentErrors[item.id] }}
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <DispatchQueueBoard />
             </div>
 
             <div class="space-y-4">
-                <div class="glass-panel rounded-xl p-5">
-                    <h3 class="mb-4 font-bold text-gray-900 dark:text-white">What AI Handles Here</h3>
-                    <div class="space-y-3">
-                        <div v-for="capability in aiCapabilities" :key="capability.title" class="rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-white/5 dark:bg-white/5">
-                            <div class="flex items-start gap-3">
-                                <span class="material-symbols-outlined text-primary">{{ capability.icon }}</span>
-                                <div>
-                                    <div class="text-sm font-bold text-gray-900 dark:text-white">{{ capability.title }}</div>
-                                    <div class="mt-1 text-[11px] leading-5 text-gray-500 dark:text-gray-400">{{ capability.description }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="glass-panel rounded-xl p-5">
-                    <h3 class="mb-4 font-bold text-gray-900 dark:text-white">Dispatch Watchlist</h3>
-                    <div v-if="watchlist.length === 0" class="text-[11px] text-gray-500 dark:text-gray-400">
-                        No driver-assignment risks are open right now.
-                    </div>
-                    <div v-else class="space-y-3">
-                        <div v-for="item in watchlist" :key="item.id" class="rounded-xl border p-3"
-                            :class="item.risk.level === 'High' ? 'border-red-200 bg-red-50 dark:border-red-500/20 dark:bg-red-500/10' : 'border-yellow-200 bg-yellow-50 dark:border-yellow-500/20 dark:bg-yellow-500/10'">
-                            <div class="flex items-start justify-between gap-2">
-                                <div>
-                                    <div class="text-sm font-bold text-gray-900 dark:text-white">{{ item.trackingCode || item.id }}</div>
-                                    <div class="mt-1 text-[11px] text-gray-500 dark:text-gray-400">{{ item.risk.text }}</div>
-                                </div>
-                                <span class="rounded-full px-2 py-0.5 text-[9px] font-bold" :class="riskBadgeClass(item.risk.level)">
-                                    {{ item.risk.level }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="glass-panel rounded-xl p-5">
-                    <h3 class="mb-4 font-bold text-gray-900 dark:text-white">Gemini Dispatch Mode</h3>
-                    <div class="space-y-3 text-[11px] leading-5 text-gray-500 dark:text-gray-400">
-                        <div class="rounded-xl border border-blue-200 bg-blue-50 p-3 dark:border-blue-500/20 dark:bg-blue-500/10">
-                            <div class="font-bold text-blue-800 dark:text-blue-300">Rule engine stays in control</div>
-                            <div class="mt-1">One driver gets one order. Standard warehouse jobs keep the warehouse vehicle lock, while direct recurring/vendor non-packing jobs let dispatcher confirm the AI vehicle suggestion.</div>
-                        </div>
-                        <div class="rounded-xl border border-primary/20 bg-primary/10 p-3">
-                            <div class="font-bold text-gray-900 dark:text-white">Gemini assists with reasoning</div>
-                            <div class="mt-1">Best driver suggestion, delay prediction, no-driver alerts, reassignment suggestions, and plain-language explanations.</div>
-                        </div>
-                    </div>
-                </div>
+                <AssignmentSidePanel />
             </div>
         </div>
 
-        <div class="glass-panel rounded-xl p-6">
-            <h3 class="mb-4 font-bold text-gray-900 dark:text-white">AI Dispatch Assistant Policy</h3>
-            <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
-                <div class="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
-                    <div class="mb-2 text-sm font-bold text-gray-900 dark:text-white">Rules</div>
-                    <div class="text-[11px] leading-5 text-gray-500 dark:text-gray-400">
-                        Order must be accepted and ready. Standard warehouse flow requires a released vehicle lock. Direct recurring/vendor non-packing flow allows dispatcher vehicle selection with AI support.
-                    </div>
-                </div>
-                <div class="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
-                    <div class="mb-2 text-sm font-bold text-gray-900 dark:text-white">AI Support</div>
-                    <div class="text-[11px] leading-5 text-gray-500 dark:text-gray-400">
-                        AI recommends the best available driver, predicts dispatch delay, flags missing resources, and explains why the recommendation fits the job.
-                    </div>
-                </div>
-                <div class="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-white/5 dark:bg-white/5">
-                    <div class="mb-2 text-sm font-bold text-gray-900 dark:text-white">Dispatcher Decision</div>
-                    <div class="text-[11px] leading-5 text-gray-500 dark:text-gray-400">
-                        Dispatcher reviews the AI suggestion, confirms the one-to-one assignment, and hands off the trip to the driver for pickup, transit, and unloading.
-                    </div>
-                </div>
-            </div>
-        </div>
+        <AssistantPolicy />
 
         <Transition enter-active-class="transition ease-out duration-300" enter-from-class="translate-y-4 opacity-0" enter-to-class="translate-y-0 opacity-100" leave-active-class="transition ease-in duration-200" leave-from-class="translate-y-0 opacity-100" leave-to-class="translate-y-4 opacity-0">
             <div v-if="saveToast" class="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-bold text-black shadow-lg">
@@ -262,8 +75,28 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import DispatchQueueBoard from './smartAssignment/DispatchQueueBoard.vue'
+import AssignmentSidePanel from './smartAssignment/AssignmentSidePanel.vue'
+import AssistantPolicy from './smartAssignment/AssistantPolicy.vue'
+import { smartAssignmentPageKey } from './smartAssignment/smartAssignmentPageContext'
+import { computed, onMounted, ref, provide } from 'vue'
 import { useDispatcherStore } from '@/stores/dispatcherStore'
+import {
+    dedupeRecurringDirectCandidates,
+    driverHasOpenAssignments,
+    isDirectDispatchAiCandidate,
+    isDriverAssignableStatus,
+    isVehicleDispatchableStatus,
+    priorityWeight,
+    safeTimestamp,
+    vehicleHasOpenAssignments,
+} from './dispatchRules'
+import {
+    buildRisk,
+    orderHasAssignableResources,
+    topDriverMatch,
+    topVehicleMatch,
+} from './smartAssignment/assignmentRules'
 
 const store = useDispatcherStore()
 
@@ -336,305 +169,29 @@ const allOrders = computed(() => {
     return [...unique.values()]
 })
 
-function normalizeDriverAvailabilityStatus(status) {
-    return String(status || '')
-        .trim()
-        .toLowerCase()
-        .replace(/[_\s]+/g, '-')
-}
-
-function isDriverAssignableStatus(status) {
-    const normalized = normalizeDriverAvailabilityStatus(status)
-    return ['active', 'idle', 'available', 'on-duty', 'online', 'on-route', 'standby', 'stand-by', 'on-break'].includes(normalized)
-}
-
-function hasOpenAssignments(driver) {
-    return (driver.activeOrders || []).some((order) => {
-        const status = String(order?.status || '').toUpperCase()
-        return !['DELIVERED', 'COMPLETED', 'CANCELLED', 'CLOSED'].includes(status)
-    })
-}
-
 const availableDrivers = computed(() =>
     (store.dispatcherDrivers || []).filter((driver) => {
         return driver.authorized
             && !driver.suspended
             && !driver.maintenance
             && isDriverAssignableStatus(driver.status)
-            && !hasOpenAssignments(driver)
+            && !driverHasOpenAssignments(driver)
     })
 )
-
-function priorityWeight(priority) {
-    const normalized = String(priority || '').toUpperCase()
-    if (normalized === 'CRITICAL' || normalized === 'URGENT') return 4
-    if (normalized === 'VIP') return 3
-    if (normalized === 'HIGH') return 2
-    if (normalized === 'MEDIUM') return 1
-    return 0
-}
-
-function safeTimestamp(value) {
-    if (!value || value === '—') return Number.MAX_SAFE_INTEGER
-    const ts = new Date(value).getTime()
-    return Number.isNaN(ts) ? Number.MAX_SAFE_INTEGER : ts
-}
-
-function formatDeadline(value) {
-    if (!value || value === '—') return 'Not scheduled'
-    const parsed = new Date(value)
-    if (Number.isNaN(parsed.getTime())) return String(value)
-    return parsed.toLocaleString('en-IN', {
-        day: '2-digit',
-        month: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-    })
-}
-
-function hoursUntil(value) {
-    if (!value || value === '—') return null
-    const parsed = new Date(value).getTime()
-    if (Number.isNaN(parsed)) return null
-    return (parsed - Date.now()) / 3_600_000
-}
-
-function orderAllowsDirectVehicleSelection(order) {
-    const type = String(order?.type || '').toUpperCase()
-    return type === 'PARCEL_PICKUP' || type === 'SERVICE_MOVE' || type === 'VENDOR'
-}
-
-function recurringRuleId(order) {
-    const notes = String(order?.deliveryNotes || '')
-    const match = notes.match(/RECURRING_RULE:([^|\n]+)/i)
-    return match?.[1] || null
-}
-
-function isDirectDispatchAiCandidate(order) {
-    const substatus = String(order?.warehouseSubstatus || '').toUpperCase()
-    return orderAllowsDirectVehicleSelection(order)
-        && !order?.driverId
-        && Number(order?.packingAmount || 0) === 0
-        && ['AWAITING_INBOUND', 'AWAITING_PICK', 'QC_PASSED', 'READY_FOR_DISPATCH', 'DISPATCHED'].includes(substatus)
-}
-
-function dedupeRecurringDirectCandidates(orders) {
-    const byRule = new Map()
-    const passthrough = []
-
-    for (const order of orders) {
-        if (!isDirectDispatchAiCandidate(order)) {
-            passthrough.push(order)
-            continue
-        }
-
-        const ruleId = recurringRuleId(order)
-        if (!ruleId) {
-            passthrough.push(order)
-            continue
-        }
-
-        const existing = byRule.get(ruleId)
-        const orderTs = safeTimestamp(order.deadline || order.createdAt)
-        const existingTs = existing ? safeTimestamp(existing.deadline || existing.createdAt) : Number.MAX_SAFE_INTEGER
-        if (!existing || orderTs < existingTs) {
-            byRule.set(ruleId, order)
-        }
-    }
-
-    return [...passthrough, ...byRule.values()]
-}
-
-function normalizeVehicleAvailabilityStatus(status) {
-    return String(status || '')
-        .trim()
-        .toLowerCase()
-        .replace(/[_\s]+/g, '-')
-}
-
-function isVehicleDispatchableStatus(status) {
-    const normalized = normalizeVehicleAvailabilityStatus(status)
-    return ['active', 'idle', 'available', 'standby', 'ready'].includes(normalized)
-}
-
-function hasVehicleOpenAssignments(vehicleId) {
-    if (!vehicleId) return false
-    return (store.activeOrders || []).some((order) => {
-        const status = String(order?.status || '').toUpperCase()
-        return String(order?.vehicleId || '') === String(vehicleId)
-            && ['ASSIGNED', 'IN_TRANSIT'].includes(status)
-    })
-}
 
 const availableVehicles = computed(() =>
     (store.filteredVehicles || []).filter((vehicle) =>
         isVehicleDispatchableStatus(vehicle.status)
-        && !hasVehicleOpenAssignments(vehicle.id)
+        && !vehicleHasOpenAssignments(vehicle.id, store.activeOrders)
     )
 )
 
-function scoreDriver(driver, order) {
-    let score = 40
-    const orderWarehouseId = order.warehouseId ? String(order.warehouseId) : ''
-    const driverHubId = driver.hubId ? String(driver.hubId) : ''
-    const locationText = `${driver.location || ''} ${driver.currentJob || ''}`.toLowerCase()
-    const warehouseText = `${order.warehouse || ''} ${order.hub || ''}`.toLowerCase().trim()
-
-    if (orderWarehouseId && driverHubId && orderWarehouseId === driverHubId) score += 30
-    if (warehouseText && locationText && locationText.includes(warehouseText.split(/\s+/)[0])) score += 12
-    if ((driver.load || 0) === 0) score += 14
-    else score += Math.max(0, 12 - Math.round((driver.load || 0) / 8))
-
-    if ((driver.hours || 0) < 3) score += 10
-    else if ((driver.hours || 0) < 6) score += 6
-    else score -= 4
-
-    if (driver.breakDue) score -= 18
-    score += Math.min(12, Math.round((driver.efficiency || 0) / 8))
-
-    if (priorityWeight(order.priority) >= 3) score += 4
-
-    return score
-}
-
-function scoreVehicle(vehicle, order) {
-    let score = 30
-    const vehicleType = String(vehicle?.type || '').trim().toLowerCase()
-    const orderVehicleType = String(order?.vehicleType || '').trim().toLowerCase()
-
-    if (vehicleType && orderVehicleType && vehicleType === orderVehicleType) score += 35
-    else if (!orderVehicleType) score += 10
-
-    const orderWeightTons = Number(order?.weight || 0) / 1000
-    const capacityTons = Number(vehicle?.cargoCapacityTons || 0)
-    if (capacityTons > 0 && orderWeightTons > 0) {
-        if (capacityTons >= orderWeightTons) score += 18
-        else score -= 25
-    }
-
-    if (priorityWeight(order.priority) >= 3) score += 6
-    return score
-}
-
-function buildDriverReasons(driver, order) {
-    const reasons = []
-    if (order.warehouseId && driver.hubId && String(order.warehouseId) === String(driver.hubId)) {
-        reasons.push('same warehouse coverage')
-    }
-    if ((driver.activeOrders?.length || 0) === 0) {
-        reasons.push('no active order assigned')
-    }
-    if ((driver.hours || 0) < 4) {
-        reasons.push('healthy shift time remaining')
-    }
-    if ((driver.efficiency || 0) >= 70) {
-        reasons.push('strong recent dispatch efficiency')
-    }
-    if (reasons.length === 0) reasons.push('best available dispatcher match')
-    return reasons.slice(0, 3)
-}
-
-function buildVehicleReasons(vehicle, order) {
-    const reasons = []
-    const vehicleType = String(vehicle?.type || '').trim().toLowerCase()
-    const orderVehicleType = String(order?.vehicleType || '').trim().toLowerCase()
-
-    if (vehicleType && orderVehicleType && vehicleType === orderVehicleType) {
-        reasons.push('matching vehicle type')
-    }
-    if (vehicle?.cargoCapacityTons) {
-        reasons.push(`capacity ${vehicle.cargoCapacityTons}t available`)
-    }
-    if (reasons.length === 0) reasons.push('best available vehicle fit')
-    return reasons.slice(0, 2)
-}
-
 function getDriverRecommendation(order, driverPool = availableDrivers.value) {
-    if (!driverPool.length) return null
-    const ranked = driverPool
-        .map((driver) => ({
-            driver,
-            score: scoreDriver(driver, order),
-            reasons: buildDriverReasons(driver, order),
-        }))
-        .sort((a, b) => b.score - a.score)
-    return ranked[0] || null
+    return topDriverMatch(order, driverPool)
 }
 
 function getVehicleRecommendation(order, vehiclePool = availableVehicles.value) {
-    if (!orderAllowsDirectVehicleSelection(order) || order.vehicleId || !vehiclePool.length) return null
-    const ranked = vehiclePool
-        .map((vehicle) => ({
-            vehicle,
-            score: scoreVehicle(vehicle, order),
-            reasons: buildVehicleReasons(vehicle, order),
-        }))
-        .sort((a, b) => b.score - a.score)
-    return ranked[0] || null
-}
-
-function buildRisk(order, recommendation, vehicleRecommendation) {
-    const deadlineHours = hoursUntil(order.deadline || order.eta)
-    if (isDirectDispatchAiCandidate(order) && !order.readyForDispatch) {
-        if (!vehicleRecommendation) {
-            return {
-                level: 'High',
-                text: 'Accepted direct-dispatch order is waiting in dispatcher review, but no free vehicle is available yet.',
-            }
-        }
-        if (!recommendation) {
-            return {
-                level: 'High',
-                text: 'Accepted direct-dispatch order has a vehicle path, but no free driver is available yet.',
-            }
-        }
-        return {
-            level: 'Low',
-            text: 'Accepted direct-dispatch order is ready for AI planning before warehouse release.',
-        }
-    }
-    if (orderAllowsDirectVehicleSelection(order) && !order.vehicleId && !vehicleRecommendation) {
-        return {
-            level: 'High',
-            text: 'Direct-dispatch order is ready, but no dispatcher-selectable vehicle is free right now.',
-        }
-    }
-    if (!recommendation) {
-        return {
-            level: 'High',
-            text: orderAllowsDirectVehicleSelection(order) && !order.vehicleId
-                ? 'AI found a vehicle path, but no free driver is currently available for this direct-dispatch order.'
-                : 'Vehicle assigned but no free driver is currently available for this released order.',
-        }
-    }
-    if (deadlineHours !== null && deadlineHours <= 2) {
-        return {
-            level: 'High',
-            text: 'Dispatch window is close. Confirm the driver quickly to avoid delay.',
-        }
-    }
-    if (recommendation.driver.breakDue || (recommendation.driver.hours || 0) >= 8) {
-        return {
-            level: 'Medium',
-            text: 'Recommended driver is nearing shift limit. Review before confirming.',
-        }
-    }
-    if (priorityWeight(order.priority) >= 3) {
-        return {
-            level: 'Medium',
-            text: 'Priority order. Confirm driver and release paperwork without delay.',
-        }
-    }
-    return {
-        level: 'Low',
-        text: 'Ready for assignment with low operational risk.',
-    }
-}
-
-function orderHasAssignableResources(item) {
-    if (!item?.recommendedDriver) return false
-    if (item.vehicleId) return true
-    return !!item.recommendedVehicle
+    return topVehicleMatch(order, vehiclePool)
 }
 
 const dispatchQueue = computed(() => {
@@ -785,4 +342,18 @@ function resumeReview(orderId) {
     deferredOrders.value = nextDeferred
     persistUiState()
 }
+
+provide(smartAssignmentPageKey, {
+    aiCapabilities,
+    assignRecommendedDriver,
+    assigningOrderId,
+    assignmentErrors,
+    deferOrder,
+    deferredOrders,
+    dispatchQueue,
+    priorityBadgeClass,
+    resumeReview,
+    riskBadgeClass,
+    watchlist,
+})
 </script>
