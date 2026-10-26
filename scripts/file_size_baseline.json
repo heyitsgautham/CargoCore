@@ -11,6 +11,5 @@
   "backend/app/services/support/sessions.py": 507,
   "backend/app/services/support/tickets.py": 562,
   "backend/app/services/warehouse_service.py": 672,
-  "driver-app/src/views/CommandCenter.vue": 510,
-  "driver-app/src/views/VehicleInspection.vue": 533
+  "driver-app/src/views/CommandCenter.vue": 510
 }
