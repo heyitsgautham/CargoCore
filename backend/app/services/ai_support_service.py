@@ -102,6 +102,21 @@ from app.services.support.sessions import (
 from app.services.support.sessions import (
     take_over_support_session as take_over_support_session,
 )
+from app.services.support.ticket_sync import (
+    mark_ai_handoff_ticket_in_progress as mark_ai_handoff_ticket_in_progress,
+)
+from app.services.support.ticket_sync import (
+    resolve_ai_handoff_escalations_for_ticket as resolve_ai_handoff_escalations_for_ticket,
+)
+from app.services.support.ticket_sync import (
+    resolve_ai_handoff_ticket_for_session as resolve_ai_handoff_ticket_for_session,
+)
+from app.services.support.ticket_sync import (
+    sync_ai_handoff_ticket as sync_ai_handoff_ticket,
+)
+from app.services.support.ticket_sync import (
+    sync_vendor_ticket_to_support_ticket as sync_vendor_ticket_to_support_ticket,
+)
 from app.services.support.tickets import (
     create_ticket as create_ticket,
 )
@@ -115,22 +130,7 @@ from app.services.support.tickets import (
     list_tickets as list_tickets,
 )
 from app.services.support.tickets import (
-    mark_ai_handoff_ticket_in_progress as mark_ai_handoff_ticket_in_progress,
-)
-from app.services.support.tickets import (
     reply_to_ticket as reply_to_ticket,
-)
-from app.services.support.tickets import (
-    resolve_ai_handoff_escalations_for_ticket as resolve_ai_handoff_escalations_for_ticket,
-)
-from app.services.support.tickets import (
-    resolve_ai_handoff_ticket_for_session as resolve_ai_handoff_ticket_for_session,
-)
-from app.services.support.tickets import (
-    sync_ai_handoff_ticket as sync_ai_handoff_ticket,
-)
-from app.services.support.tickets import (
-    sync_vendor_ticket_to_support_ticket as sync_vendor_ticket_to_support_ticket,
 )
 from app.services.support.tickets import (
     update_ticket as update_ticket,

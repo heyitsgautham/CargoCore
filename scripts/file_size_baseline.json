@@ -7,6 +7,5 @@
   "backend/app/services/orders/transitions.py": 505,
   "backend/app/services/orders/trip_intelligence.py": 525,
   "backend/app/services/support/sessions.py": 507,
-  "backend/app/services/support/tickets.py": 562,
   "backend/app/services/warehouse_service.py": 672
 }

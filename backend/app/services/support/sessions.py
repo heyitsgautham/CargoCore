@@ -32,7 +32,7 @@ from app.services.support.common import (
     TRACKING_CODE_PATTERN,
     _ensure_support_manager,
 )
-from app.services.support.tickets import mark_ai_handoff_ticket_in_progress
+from app.services.support.ticket_sync import mark_ai_handoff_ticket_in_progress
 
 
 async def _fetch_order_tracking_map(
