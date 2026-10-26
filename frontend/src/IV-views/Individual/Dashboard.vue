@@ -38,40 +38,7 @@
     <!-- Dashboard Content -->
     <div v-else class="space-y-6 sm:space-y-8">
         <!-- Stats Cards -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="glass-panel p-5 rounded-xl">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wide">Active Orders</div>
-                    <span class="material-symbols-outlined text-blue-400 text-[20px]">local_shipping</span>
-                </div>
-                <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ stats.active_orders || 0 }}</div>
-                <div class="text-amber-500 text-xs mt-1">{{ stats.pending_orders || 0 }} pending</div>
-            </div>
-            <div class="glass-panel p-5 rounded-xl">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wide">Total Spent</div>
-                    <span class="material-symbols-outlined text-purple-400 text-[20px]">payments</span>
-                </div>
-                <div class="text-3xl font-bold text-gray-900 dark:text-white">₹{{ (stats.total_spent || 0).toLocaleString() }}</div>
-                <div class="text-gray-500 text-xs mt-1">All-time</div>
-            </div>
-            <router-link to="/individual/wallet" class="glass-panel p-5 rounded-xl hover:border-green-500/30 transition-all cursor-pointer">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wide">Wallet Balance</div>
-                    <span class="material-symbols-outlined text-green-400 text-[20px]">account_balance_wallet</span>
-                </div>
-                <div class="text-3xl font-bold text-green-500">₹{{ walletBalance.toLocaleString() }}</div>
-                <div class="text-gray-500 text-xs mt-1">Available credit</div>
-            </router-link>
-            <div class="glass-panel p-5 rounded-xl">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="text-gray-500 dark:text-gray-400 text-xs font-medium uppercase tracking-wide">Completed</div>
-                    <span class="material-symbols-outlined text-green-400 text-[20px]">verified</span>
-                </div>
-                <div class="text-3xl font-bold text-green-500">{{ stats.delivered_orders || 0 }}</div>
-                <div class="text-green-500 text-xs mt-1">Successful moves</div>
-            </div>
-        </div>
+        <SummaryCards />
 
         <!-- Active Moves Status -->
         <div v-if="activeMoves.length" class="space-y-6">
@@ -253,109 +220,17 @@
         </div>
 
         <!-- Charts -->
-        <div v-if="stats.total_orders > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="glass-panel p-5 md:p-6 rounded-xl">
-                <h3 class="font-bold text-gray-900 dark:text-white mb-4">Monthly Spending</h3>
-                <div class="h-56">
-                    <Bar :data="barChartData" :options="chartOptions" />
-                </div>
-            </div>
-            <div class="glass-panel p-5 md:p-6 rounded-xl">
-                <h3 class="font-bold text-gray-900 dark:text-white mb-4">Move Status Distribution</h3>
-                <div class="h-56 flex items-center justify-center">
-                    <Doughnut :data="doughnutData" :options="doughnutOptions" />
-                </div>
-            </div>
-        </div>
+        <OrderCharts />
 
         <!-- Recent Orders -->
-        <div class="glass-panel p-5 md:p-6 rounded-xl">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="font-bold text-gray-900 dark:text-white text-lg">Recent Orders</h3>
-                <router-link to="/individual/orders"
-                    class="text-sm text-green-600 dark:text-green-400 font-bold hover:underline">View All
-                    →</router-link>
-            </div>
-
-            <!-- Empty State for Recent Orders -->
-            <div v-if="recentOrders.length === 0" class="text-center py-8">
-                <span class="material-symbols-outlined text-4xl text-gray-400 dark:text-gray-600 mb-2">inbox</span>
-                <p class="text-gray-500 dark:text-gray-400 text-sm">No orders yet. Book your first move to get started!</p>
-            </div>
-
-            <div v-else class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr
-                            class="text-xs text-gray-500 dark:text-gray-400 uppercase border-b border-gray-200 dark:border-white/5">
-                            <th class="text-left py-3 pr-4">Order ID</th>
-                            <th class="text-left py-3 pr-4">Type</th>
-                            <th class="text-left py-3 pr-4 hidden sm:table-cell">Vehicle</th>
-                            <th class="text-left py-3 pr-4 hidden sm:table-cell">Route</th>
-                            <th class="text-left py-3 pr-4">Status</th>
-                            <th class="text-right py-3">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="order in recentOrders" :key="order.id"
-                            class="border-b border-gray-100 dark:border-white/5 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-                            <td class="py-3 pr-4"><span
-                                    class="font-mono font-bold text-green-600 dark:text-green-400">{{ order.tracking_code || order.id }}</span>
-                            </td>
-                            <td class="py-3 pr-4 text-gray-700 dark:text-gray-300">{{ order.cargoType || order.order_type }}</td>
-                            <td
-                                class="py-3 pr-4 text-gray-700 dark:text-gray-300 hidden sm:table-cell uppercase text-xs">
-                                {{ order.vehicleType || order.vehicle_type }}</td>
-                            <td
-                                class="py-3 pr-4 text-gray-500 dark:text-gray-400 hidden sm:table-cell truncate max-w-[150px]">
-                                {{ (order.pickup || order.pickup_addr)?.split(',')[0] }} → {{ (order.destination || order.delivery_addr)?.split(',')[0] }}</td>
-                            <td class="py-3 pr-4"><span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase"
-                                    :class="statusBadge(order.ui_status || order.status)">{{ (order.ui_status || order.status).replace('-', ' ') }}</span></td>
-                            <td class="py-3 text-right font-bold text-gray-900 dark:text-white font-mono">₹{{
-                                Number(order.cost?.total || order.total_amount || 0).toLocaleString() }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <RecentOrdersTable />
 
         <!-- Stats -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="glass-panel p-4 rounded-xl text-center">
-                <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ stats.total_orders || 0 }}</div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Total Moves</div>
-            </div>
-            <div class="glass-panel p-4 rounded-xl text-center">
-                <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ stats.active_orders || 0 }}</div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Active</div>
-            </div>
-            <div class="glass-panel p-4 rounded-xl text-center">
-                <div class="text-2xl font-bold text-amber-600 dark:text-amber-400">{{ stats.pending_orders || 0 }}
-                </div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Pending</div>
-            </div>
-            <div class="glass-panel p-4 rounded-xl text-center">
-                <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">₹{{
-                    Number(stats.total_spent || 0).toLocaleString() }}</div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Total Spent</div>
-            </div>
-        </div>
+        <OrderTotals />
 
         <!-- Empty State (No Orders) -->
         <div v-if="stats.total_orders === 0" class="glass-panel p-8 md:p-12 rounded-xl text-center mt-8">
-            <span class="material-symbols-outlined text-6xl text-gray-400 dark:text-gray-600 mb-4">local_shipping</span>
-            <h3 class="font-bold text-xl text-gray-900 dark:text-white mb-2">No Moves Yet</h3>
-            <p class="text-gray-500 dark:text-gray-400 mb-6">Start your first move by booking a service or getting a quote.</p>
-            <div class="flex gap-4 justify-center flex-wrap">
-                <router-link to="/individual/book-move"
-                    class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors">
-                    Book a Move
-                </router-link>
-                <router-link to="/individual/quotes"
-                    class="px-6 py-2 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-700 dark:text-gray-300 rounded-lg font-bold transition-colors">
-                    Get Quote
-                </router-link>
-            </div>
+            <NoMovesYet />
         </div>
 
         <!-- Refresh Indicator -->
@@ -369,9 +244,14 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import NoMovesYet from './dashboard/NoMovesYet.vue'
+import SummaryCards from './dashboard/SummaryCards.vue'
+import OrderCharts from './dashboard/OrderCharts.vue'
+import RecentOrdersTable from './dashboard/RecentOrdersTable.vue'
+import OrderTotals from './dashboard/OrderTotals.vue'
+import { individualDashboardPageKey } from './dashboard/individualDashboardPageContext'
+import { computed, onMounted, onUnmounted, ref, watch, provide } from 'vue'
 import { useIndividualStore } from '@/stores/individualStore'
-import { Bar, Doughnut } from 'vue-chartjs'
 import { Chart as ChartJS, ArcElement, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from 'chart.js'
 import apiClient from '@/config/api'
 import { LMap, LTileLayer, LMarker, LPopup } from '@vue-leaflet/vue-leaflet'
@@ -598,4 +478,15 @@ const doughnutOptions = {
     plugins: { legend: { position: 'right', labels: { color: '#9ca3af', font: { size: 11 }, boxWidth: 12, padding: 16 } } },
     cutout: '65%',
 }
+
+provide(individualDashboardPageKey, {
+    barChartData,
+    chartOptions,
+    doughnutData,
+    doughnutOptions,
+    recentOrders,
+    stats,
+    statusBadge,
+    walletBalance,
+})
 </script>
