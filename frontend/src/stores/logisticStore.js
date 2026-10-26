@@ -3,12 +3,10 @@ import { defineStore } from 'pinia'
 import { apiRequest, authHeaders } from './logistic/api'
 
 import {
-    asArray,
-    asStringId,
     asWarehouseId,
     financeScopeFor,
-    mapReturnRecord,
 } from './logistic/mappers'
+import { mapBootstrap } from './logistic/bootstrapMapping'
 import { useLogisticTasks } from './logistic/tasks'
 import { useLogisticChats } from './logistic/chats'
 import { useLogisticNotifications } from './logistic/notifications'
@@ -18,6 +16,8 @@ import { useLogisticFleet } from './logistic/fleet'
 import { useLogisticHubs } from './logistic/hubs'
 import { useLogisticUsers } from './logistic/users'
 import { useLogisticZones } from './logistic/zones'
+import { useLogisticFinance } from './logistic/finance'
+import { useLogisticAssistant } from './logistic/assistant'
 
 export const useLogisticStore = defineStore('logistic', () => {
     const initialized = ref(false)
@@ -82,250 +82,43 @@ export const useLogisticStore = defineStore('logistic', () => {
     const { normalizeUserRecord, addUser, updateUser, deleteUser, toggleUserStatus, approveVendor, rejectVendor, lastCreatedCredentials, clearCreatedCredentials } = useLogisticUsers({ users, refresh })
 
     function hydrate(payload) {
-        const stats = payload.dashboard_stats || {}
-
-        dashboardStats.value = {
-            ordersToday: stats.orders_today || 0,
-            activeDeliveries: stats.active_deliveries || 0,
-            processing: stats.processing || 0,
-            deliverySuccess: stats.delivery_success || 0,
-            revenueToday: stats.revenue_today || 0,
-            ordersTrend: stats.orders_trend || 0,
-            revenueTrend: stats.revenue_trend || 0,
-            slaCompliance: { week: asArray(stats.sla_week), month: asArray(stats.sla_week) },
-            revenue: { week: asArray(stats.revenue_week), month: asArray(stats.revenue_week) },
-            orders: { week: asArray(stats.orders_week), month: asArray(stats.orders_week) },
+        const fields = {
+            dashboardStats,
+            hubs,
+            alerts,
+            drivers,
+            topDrivers,
+            vehicles,
+            maintenance,
+            users,
+            returns,
+            equipmentLedger,
+            zones,
+            chats,
+            escalations,
+            inventory,
+            notifications,
+            tasks,
+            aiSuggestionChips,
+            aiMessages,
+            financeSummary,
+            transactions,
+            reports,
+            financeCodRecords,
+            financeStaffRecords,
+            financeDriverRecords,
+            fleetLogs,
+            vehicleDocuments,
+            driverDocuments,
+            reportAiInsights,
+            reportDamageClaims,
+            reportSecurityLogs,
+            reportMetrics,
+            creditBalance,
         }
-
-        hubs.value = asArray(payload.hubs).map((hub) => ({
-            id: asStringId(hub.id),
-            hubCode: hub.hub_code,
-            name: hub.name,
-            location: hub.location,
-            address: hub.address,
-            lat: hub.lat || null,
-            lng: hub.lng || null,
-            manager: hub.manager,
-            managerInitials: hub.manager_initials,
-            capacity: hub.capacity,
-            efficiency: hub.efficiency,
-            staffActive: hub.staff_active,
-            staffTotal: hub.staff_total,
-            vehiclesActive: hub.vehicles_active,
-            vehiclesTotal: hub.vehicles_total,
-            processRate: hub.process_rate,
-            status: hub.status || 'Active',
-            isActive: (hub.status || 'Active') !== 'Archived',
-            statusColor: hub.status_color,
-            bg: hub.bg,
-        }))
-
-        alerts.value = asArray(payload.alerts).map((alert) => ({
-            id: asStringId(alert.id),
-            type: alert.type,
-            title: alert.title,
-            description: alert.description,
-            severity: alert.severity,
-            icon: alert.icon || 'warning',
-            timestamp: alert.timestamp,
-        }))
-
-        drivers.value = asArray(payload.drivers).map((driver) => ({
-            id: asStringId(driver.id),
-            hubId: asWarehouseId(driver.hub_id ?? driver.hubId),
-            name: driver.name,
-            status: driver.status || 'Active',
-            location: driver.location || '',
-            vehicle: driver.vehicle || '',
-            efficiency: Number(driver.efficiency ?? 0),
-            rating: Number(driver.rating ?? 0),
-            safetyIncidents: Number(driver.safety_incidents ?? driver.safetyIncidents ?? 0),
-            fuelEfficiencyScore: driver.fuel_efficiency_score || driver.fuelEfficiencyScore || '',
-            avgSpeed: driver.avg_speed || driver.avgSpeed || '',
-            phone: driver.phone || '',
-            currentJob: driver.current_job || driver.currentJob || '',
-            avatarColor: driver.avatar_color || driver.avatarColor || 'bg-blue-600',
-            chatHistory: asArray(driver.chat_history ?? driver.chatHistory),
-        }))
-
-        topDrivers.value = asArray(payload.top_drivers).map((driver) => {
-            const linkedDriver = drivers.value.find((item) =>
-                item.id === asStringId(driver.id) || item.name === driver.name
-            )
-
-            return {
-                id: asStringId(driver.id),
-                hubId: asWarehouseId(driver.hubId ?? driver.hub_id ?? linkedDriver?.hubId),
-                name: driver.name,
-                rating: Number(driver.rating ?? linkedDriver?.rating ?? 0),
-                trips: Number(driver.trips ?? 0),
-                ontime: Number(driver.ontime ?? 0),
-                avatar: driver.avatar || null,
-                avatarColor: linkedDriver?.avatarColor || 'bg-blue-600',
-                status: linkedDriver?.status || 'Active',
-                vehicle: linkedDriver?.vehicle || '',
-                currentJob: linkedDriver?.currentJob || '',
-            }
-        })
-
-        vehicles.value = asArray(payload.vehicles).map((vehicle) => ({
-            id: asStringId(vehicle.id),
-            hubId: asWarehouseId(vehicle.hub_id ?? vehicle.hubId),
-            code: vehicle.code || asStringId(vehicle.id),
-            type: vehicle.type || vehicle.vehicle_type || '',
-            model: vehicle.model || '',
-            year: vehicle.year || null,
-            licensePlate: vehicle.license_plate || vehicle.licensePlate || '',
-            status: vehicle.status || 'Active',
-            driver: vehicle.driver || 'Unassigned',
-            fuelEfficiency: vehicle.fuel_efficiency || vehicle.fuelEfficiency || '',
-            mileage: vehicle.mileage ?? 0,
-            nextService: vehicle.next_service || vehicle.nextService || '',
-            issue: vehicle.maintenance_issue || vehicle.issue || null,
-            fuelLevelPct: vehicle.fuel_level_pct ?? vehicle.fuelLevelPct ?? null,
-            rangeKm: vehicle.range_km ?? vehicle.rangeKm ?? null,
-            seatCapacity: vehicle.seat_capacity ?? vehicle.seatCapacity ?? null,
-            cargoCapacityTons: vehicle.cargo_capacity_tons ?? vehicle.cargoCapacityTons ?? null,
-            telemetryStatus: vehicle.telemetry_status || vehicle.telemetryStatus || null,
-            telemetryLastSeen: vehicle.telemetry_last_seen || vehicle.telemetryLastSeen || null,
-        }))
-
-        maintenance.value = asArray(payload.maintenance).map((item) => ({
-            id: asStringId(item.id),
-            hubId: asWarehouseId(item.hub_id ?? item.hubId),
-            issue: item.issue || '',
-            status: item.status || '',
-            statusClass: item.status_class || item.statusClass || '',
-        }))
-
-        users.value = asArray(payload.users).map(normalizeUserRecord)
-
-        returns.value = asArray(payload.returns).map(mapReturnRecord)
-
-        equipmentLedger.value = asArray(payload.equipment_ledger).map((eq) => ({
-            id: asStringId(eq.id),
-            hubId: asWarehouseId(eq.hub_id),
-            itemType: eq.item_type,
-            issuedCount: eq.issued_count,
-            returnedCount: eq.returned_count,
-            referenceCode: eq.reference_code,
-            status: eq.status,
-        }))
-
-        zones.value = asArray(payload.zones).map((zone) => ({
-            id: asStringId(zone.id),
-            hubId: asWarehouseId(zone.hub_id),
-            name: zone.name,
-            type: zone.type,
-            radius: zone.radius,
-            status: zone.status,
-            color: zone.color,
-            lat: zone.lat ?? null,
-            lng: zone.lng ?? null,
-        }))
-
-        chats.value = asArray(payload.chats).map((chat) => ({
-            id: asStringId(chat.id),
-            hubId: asWarehouseId(chat.hub_id),
-            name: chat.name,
-            time: chat.time,
-            lastMessage: chat.last_message,
-            status: chat.status,
-            phone: chat.phone,
-            muted: chat.muted,
-            messages: asArray(chat.messages),
-        }))
-
-        escalations.value = asArray(payload.escalations).map((item) => ({
-            id: asStringId(item.id),
-            hubId: asWarehouseId(item.hub_id),
-            title: item.title,
-            priority: item.priority,
-            from: item.from_name,
-            role: item.role,
-            time: item.time,
-            description: item.description,
-            actionDetails: item.action_details,
-            status: item.status,
-        }))
-
-        inventory.value = asArray(payload.inventory).map((item) => ({
-            ...item,
-            id: asStringId(item.id),
-            hubId: asWarehouseId(item.hubId),
-        }))
-
-        notifications.value = asArray(payload.notifications).map((item) => ({
-            id: asStringId(item.id),
-            title: item.title,
-            message: item.message,
-            time: item.time,
-            createdAt: item.created_at,
-            read: item.read,
-            type: item.type,
-        }))
-
-        tasks.value = asArray(payload.tasks).map((task) => ({
-            id: asStringId(task.id),
-            text: task.text,
-            status: task.status,
-            targetTime: task.target_time,
-            repeat: task.repeat,
-            createdAt: task.created_at,
-            lastAlertTime: task.last_alert_time,
-            silenced: task.silenced,
-            remaining: '',
-        }))
-
-        aiSuggestionChips.value = asArray(payload.ai_suggestion_chips)
-        aiMessages.value = asArray(payload.ai_messages).map((message, index) => ({
-            id: message.id || `ai-${index}`,
-            role: message.role,
-            text: message.text,
-            data: message.data || null,
-            time: message.time,
-        }))
-        // Bootstrap correctly computes total_revenue, total_expenses, total_payroll_due, pending_cod
-        financeSummary.value = payload.finance_summary || {}
-
-        // ── Transactions (Overview tab) ────────────────────────────────────────
-        transactions.value = asArray(payload.transactions).map((tx) => ({
-            id: asStringId(tx.id),
-            hubId: asWarehouseId(tx.hub_id),
-            transactionCode: tx.transaction_code || '',
-            date: tx.date,
-            desc: tx.desc || tx.description || '',
-            type: tx.type || tx.transaction_type || '',
-            amount: Number(tx.amount ?? 0),
-            status: tx.status || 'Completed',
-            metadataJson: tx.metadata_json || {},
-            relatedOrder: tx.related_order || null,
-        }))
-
-        // ── Report history (Reports > Analytics & History) ──────────────────────
-        reports.value = asArray(payload.reports).map((report) => ({
-            id: asStringId(report.id),
-            hubId: asWarehouseId(report.hub_id),
-            title: report.title,
-            date: report.date,
-            icon: report.icon,
-            color: report.color,
-        }))
-
-        financeCodRecords.value = asArray(payload.finance_cod_records).map((item) => ({ ...item, id: asStringId(item.id), hubId: asWarehouseId(item.hubId ?? item.hub_id ?? item.warehouse_id) }))
-        financeStaffRecords.value = asArray(payload.finance_staff_records).map((item) => ({ ...item, id: asStringId(item.id), userId: asStringId(item.userId), hubId: asWarehouseId(item.hubId ?? item.hub_id ?? item.warehouse_id) }))
-        financeDriverRecords.value = asArray(payload.finance_driver_records).map((item) => ({ ...item, id: asStringId(item.id), userId: asStringId(item.userId), hubId: asWarehouseId(item.hubId ?? item.hub_id ?? item.warehouse_id) }))
-        fleetLogs.value = payload.fleet_logs || {}
-        vehicleDocuments.value = asArray(payload.vehicle_documents).map((item) => ({ ...item, id: asStringId(item.id), hubId: asWarehouseId(item.hubId ?? item.hub_id ?? item.warehouse_id) }))
-        driverDocuments.value = asArray(payload.driver_documents).map((item) => ({ ...item, id: asStringId(item.id), driverId: asStringId(item.driverId), hubId: asWarehouseId(item.hubId ?? item.hub_id ?? item.warehouse_id) }))
-        reportAiInsights.value = asArray(payload.report_ai_insights)
-        reportDamageClaims.value = asArray(payload.report_damage_claims)
-        reportSecurityLogs.value = asArray(payload.report_security_logs)
-        reportMetrics.value = payload.report_metrics || {}
-
-        creditBalance.value = transactions.value
-            .filter((item) => item.amount > 0)
-            .reduce((sum, item) => sum + item.amount, 0)
+        for (const [key, value] of Object.entries(mapBootstrap(payload, normalizeUserRecord))) {
+            fields[key].value = value
+        }
     }
 
     async function refresh() {
@@ -482,136 +275,10 @@ export const useLogisticStore = defineStore('logistic', () => {
         if (!isSearchOpen.value) searchQuery.value = ''
     }
 
-    async function addTransaction(tx) {
-        const created = await apiRequest('/logistics/transactions', {
-            method: 'POST',
-            headers: authHeaders(),
-            body: JSON.stringify({
-                warehouse_id: tx.hubId && tx.hubId !== 'all' ? tx.hubId : null,
-                description: tx.desc,
-                transaction_type: tx.type,
-                amount: tx.amount,
-                status: tx.status || 'Completed',
-            }),
-        })
-
-        transactions.value = [{
-            id: asStringId(created.id),
-            hubId: asWarehouseId(created.hub_id),
-            transactionCode: created.transaction_code || '',
-            date: created.date,
-            desc: created.desc,
-            type: created.type,
-            amount: created.amount,
-            status: created.status,
-            metadataJson: created.metadata_json || {},
-            relatedOrder: created.related_order || null,
-        }, ...transactions.value]
-
-        if (created.amount > 0) {
-            financeSummary.value.total_revenue = (financeSummary.value.total_revenue || 0) + created.amount
-            creditBalance.value += created.amount
-        } else {
-            const expense = Math.abs(created.amount)
-            // Only update the Expenses counter — never touch Revenue.
-            // Revenue = what customers paid; Expenses = what we spent. They are separate.
-            // Capital absorbs the shortfall if expenses exceed revenue.
-            financeSummary.value.total_expenses = (financeSummary.value.total_expenses || 0) + expense
-            financeSummary.value.capital_invested = Math.max(0, (financeSummary.value.capital_invested || 0) - expense)
-        }
-    }
-
         /**
      * Fetch live finance summary from /api/v1/finance/summary.
      * Returns real DB aggregations so revenue starts at 0 on empty DB.
      */
-    async function fetchFinanceSummary(warehouseId = activeWarehouse.value) {
-        try {
-            const scope = financeScopeFor(warehouseId)
-            const query = scope === 'all' ? '' : `?warehouse_id=${encodeURIComponent(scope)}`
-            const data = await apiRequest(`/finance/summary${query}`, { headers: authHeaders() })
-            financeSummary.value = {
-                ...data,
-                _warehouseScope: scope,
-            }
-            return financeSummary.value
-        } catch (e) {
-            console.warn('[fetchFinanceSummary] failed (non-fatal):', e)
-            return financeSummary.value
-        }
-    }
-
-    async function askAiDispatcher(query) {
-        try {
-            const payload = { message: query, context: 'dispatcher' }
-            if (dispatcherAiSessionId.value) payload.session_id = dispatcherAiSessionId.value
-            const response = await apiRequest('/ai/chat', {
-                method: 'POST',
-                headers: authHeaders(),
-                body: JSON.stringify(payload),
-            })
-            if (response.session_id) dispatcherAiSessionId.value = response.session_id
-            let text = response.message || response.reply || response.text || 'No response.'
-            text = text.replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-            return { text }
-        } catch (err) {
-            return { text: 'AI engine unavailable. Please try again.' }
-        }
-    }
-
-    async function askAi(query) {
-        const userMessage = {
-            id: `user-${Date.now()}`,
-            role: 'user',
-            text: query,
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        }
-        aiMessages.value.push(userMessage)
-
-        try {
-            const payload = { message: query, context: 'logistic_manager' }
-            if (aiSessionId.value) {
-                payload.session_id = aiSessionId.value
-            }
-            const response = await apiRequest('/ai/chat', {
-                method: 'POST',
-                headers: authHeaders(),
-                body: JSON.stringify(payload),
-            })
-            if (response.session_id) {
-                aiSessionId.value = response.session_id
-            }
-            
-            let renderedText = response.message || response.reply || response.text || 'Process completed.'
-            // Convert basic markdown to HTML for Vue v-html
-            renderedText = renderedText.replace(/\n*```sql(.*?)```\n*/gs, '<br><pre class="bg-gray-800 text-green-400 p-3 text-xs rounded-xl my-2 overflow-x-auto shadow-inner">$1</pre><br>')
-                .replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>')
-                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-                .replace(/\*(.*?)\*/g, '<i>$1</i>')
-
-            const aiMessage = {
-                id: `ai-${Date.now()}`,
-                role: 'ai',
-                text: renderedText,
-                data: null,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            }
-            aiMessages.value.push(aiMessage)
-            return aiMessage
-        } catch (err) {
-            console.error('AI Query Error:', err)
-            const errorMessage = {
-                id: `ai-${Date.now()}`,
-                role: 'ai',
-                text: `<span class="text-red-500 font-bold">Error:</span> ${err.message || 'Could not connect to the AI engine. Please try again.'}`,
-                data: null,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            }
-            aiMessages.value.push(errorMessage)
-            return errorMessage
-        }
-    }
-
     const { updateReturnStatus, issueReturnRefund, scheduleReturnPickup } = useLogisticReturns({ returns, refresh })
 
     const { fetchAlerts, addAlert, resolveAlert } = useLogisticAlerts({ alerts, refresh, closeModal })
@@ -625,38 +292,6 @@ export const useLogisticStore = defineStore('logistic', () => {
     const { addHub, updateHub, archiveHub, restoreHub, deleteHub } = useLogisticHubs({ activeWarehouse, refresh })
 
     const { createZone, updateZone, deleteZone } = useLogisticZones({ hubs, refresh })
-
-    function addFunds(amount) {
-        if (amount > 0) creditBalance.value += amount
-    }
-
-    function markFinanceRecordPaid(collection, id) {
-        const targetCollections = {
-            cod: financeCodRecords.value,
-            staff: financeStaffRecords.value,
-            drivers: financeDriverRecords.value,
-        }
-        const items = targetCollections[collection]
-        if (!items) return
-        const item = items.find((entry) => entry.id === id)
-        if (item) item.status = collection === 'cod' ? 'Completed' : 'Paid'
-    }
-
-    async function runPayroll(userPayouts) {
-        // userPayouts: [{user_id, amount, record_type, name}]
-        const result = await apiRequest('/finance/payroll/run', {
-            method: 'POST',
-            headers: authHeaders(),
-            body: JSON.stringify({ user_payouts: userPayouts }),
-        })
-        // Payroll is an outflow — only update Expenses and Capital, never Revenue.
-        const total = result.total || 0
-        if (total > 0) {
-            financeSummary.value.total_expenses = (financeSummary.value.total_expenses || 0) + total
-            financeSummary.value.capital_invested = Math.max(0, (financeSummary.value.capital_invested || 0) - total)
-        }
-        return result
-    }
 
     async function uploadDocument(payload) {
         await apiRequest('/logistics/documents', {
@@ -675,6 +310,24 @@ export const useLogisticStore = defineStore('logistic', () => {
         })
         await refresh()
     }
+
+    const {
+        addTransaction,
+        fetchFinanceSummary,
+        addFunds,
+        markFinanceRecordPaid,
+        runPayroll,
+    } = useLogisticFinance({
+        activeWarehouse,
+        creditBalance,
+        financeCodRecords,
+        financeDriverRecords,
+        financeStaffRecords,
+        financeSummary,
+        transactions,
+    })
+
+    const { askAiDispatcher, askAi } = useLogisticAssistant({ aiMessages, aiSessionId, dispatcherAiSessionId })
 
     return {
         initialized,
