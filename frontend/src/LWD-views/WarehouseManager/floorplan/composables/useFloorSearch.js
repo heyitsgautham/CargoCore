@@ -53,12 +53,55 @@ export function useFloorSearch(store, zoom) {
     watch(() => store.products.length, buildIndex, { immediate: true })
 
     // ── Helpers ──────────────────────────────────────────────────
-    /** Cancellable delay – rejects with 'aborted' when signal fires */
+    /** Cancellable delay, rejects with 'aborted' when the signal fires or already has */
     function delay(ms, signal) {
         return new Promise((resolve, reject) => {
+            if (signal.aborted) return reject('aborted')
             const id = setTimeout(resolve, ms)
-            signal?.addEventListener('abort', () => { clearTimeout(id); reject('aborted') })
+            signal.addEventListener('abort', () => { clearTimeout(id); reject('aborted') })
         })
+    }
+
+    function throwIfAborted(signal) {
+        if (signal.aborted) throw 'aborted'
+    }
+
+    /**
+     * Animated drill-down to one search result, cancelling any drill-down in progress.
+     *   Step 1, FLOOR level, highlight the target section
+     *   Step 2, SECTION level, highlight the target rack
+     *   Step 3, RACK level, highlight the target cell
+     * A cancel during a zoom tween stops before the next highlight is drawn.
+     */
+    async function drillDown(entry, pauseMs) {
+        if (drillAbort) drillAbort.abort()
+        drillAbort = new AbortController()
+        const signal = drillAbort.signal
+
+        isDrillAnimating.value = true
+        try {
+            await zoom.zoomToFloor()
+            throwIfAborted(signal)
+            clearHighlights()
+            highlightedSectionIds.value = [entry.sectionId]
+            highlightedProducts.value = [entry.product]
+            await delay(pauseMs, signal)
+
+            await zoom.zoomToSection(entry.sectionId)
+            throwIfAborted(signal)
+            highlightedSectionIds.value = []
+            highlightedRackIds.value = [entry.rackId]
+            await delay(pauseMs, signal)
+
+            await zoom.zoomToRack(entry.rackId)
+            throwIfAborted(signal)
+            highlightedRackIds.value = []
+            highlightedCellKeys.value = [`${entry.rackId}:${entry.product.cell}`]
+        } catch {
+            // A newer search, navigation or clear cancelled this drill-down.
+        } finally {
+            if (!signal.aborted) isDrillAnimating.value = false
+        }
     }
 
     // ── Search Execution ────────────────────────────────────────
@@ -107,116 +150,42 @@ export function useFloorSearch(store, zoom) {
         }, 200)
     }
 
-    /**
-     * Focus on a specific search result with animated drill-down:
-     *   Step 1 – FLOOR level, highlight the target section (pulse)
-     *   Step 2 – SECTION level, highlight the target rack
-     *   Step 3 – RACK level, highlight the target cell
-     */
-    async function focusSearchResult(result, activeFloorId, setFloor, _containerSize) {
-        // Cancel any previous drill-down animation
-        if (drillAbort) drillAbort.abort()
-        drillAbort = new AbortController()
-        const signal = drillAbort.signal
+    /** Focus on a search result from the dropdown and keep the rest for next and previous. */
+    async function focusSearchResult(result, activeFloorId, setFloor) {
+        if (result.floorId !== activeFloorId) setFloor(result.floorId)
 
-        // Switch floor if needed
-        if (result.floorId !== activeFloorId) {
-            setFloor(result.floorId)
-        }
-
-        // Keep search query visible & store paths for next/prev navigation
+        // Keep the query text and the result list, but close the dropdown.
         highlightedProducts.value = searchResults.value.map(s => s.product)
         searchPaths.value = [...searchResults.value]
         currentPathIdx.value = searchResults.value.indexOf(result)
-        // Close the dropdown but keep the query text
         searchResults.value = []
 
-        isDrillAnimating.value = true
-
-        try {
-            // ── Step 1: Floor level — highlight the section ──
-            await zoom.zoomToFloor()
-            clearHighlights()
-            highlightedSectionIds.value = [result.sectionId]
-            highlightedProducts.value = [result.product]
-            await delay(1200, signal)
-
-            // ── Step 2: Section level — highlight the rack ──
-            await zoom.zoomToSection(result.sectionId)
-            highlightedSectionIds.value = []
-            highlightedRackIds.value = [result.rackId]
-            highlightedProducts.value = [result.product]
-            await delay(1200, signal)
-
-            // ── Step 3: Rack level — highlight the cell ──
-            await zoom.zoomToRack(result.rackId)
-            highlightedRackIds.value = []
-            highlightedCellKeys.value = [`${result.rackId}:${result.product.cell}`]
-            highlightedProducts.value = [result.product]
-
-        } catch (_) {
-            // Drill-down was aborted (user started a new search / navigation)
-        } finally {
-            isDrillAnimating.value = false
-        }
+        await drillDown(result, 1200)
     }
 
-    /** Navigate to the next search result (with drill-down animation) */
+    /** Navigate to the next search result */
     function nextResult(activeFloorId, setFloor) {
         if (!searchPaths.value.length) return
         currentPathIdx.value = (currentPathIdx.value + 1) % searchPaths.value.length
         navigateToPath(searchPaths.value[currentPathIdx.value], activeFloorId, setFloor)
     }
 
-    /** Navigate to the previous search result (with drill-down animation) */
+    /** Navigate to the previous search result */
     function prevResult(activeFloorId, setFloor) {
         if (!searchPaths.value.length) return
         currentPathIdx.value = (currentPathIdx.value - 1 + searchPaths.value.length) % searchPaths.value.length
         navigateToPath(searchPaths.value[currentPathIdx.value], activeFloorId, setFloor)
     }
 
-    /** Navigate and animate to a specific path entry */
     async function navigateToPath(entry, activeFloorId, setFloor) {
-        // Cancel any previous drill-down animation
-        if (drillAbort) drillAbort.abort()
-        drillAbort = new AbortController()
-        const signal = drillAbort.signal
-
         if (entry.floorId !== activeFloorId) setFloor(entry.floorId)
         highlightedProducts.value = [entry.product]
-
-        isDrillAnimating.value = true
-
-        try {
-            // Step 1: Floor – highlight section
-            await zoom.zoomToFloor()
-            clearHighlights()
-            highlightedSectionIds.value = [entry.sectionId]
-            highlightedProducts.value = [entry.product]
-            await delay(1000, signal)
-
-            // Step 2: Section – highlight rack
-            await zoom.zoomToSection(entry.sectionId)
-            highlightedSectionIds.value = []
-            highlightedRackIds.value = [entry.rackId]
-            highlightedProducts.value = [entry.product]
-            await delay(1000, signal)
-
-            // Step 3: Rack – highlight cell
-            await zoom.zoomToRack(entry.rackId)
-            highlightedRackIds.value = []
-            highlightedCellKeys.value = [`${entry.rackId}:${entry.product.cell}`]
-            highlightedProducts.value = [entry.product]
-
-        } catch (_) {
-            // aborted
-        } finally {
-            isDrillAnimating.value = false
-        }
+        await drillDown(entry, 1000)
     }
 
     function clearSearchNav() {
         if (drillAbort) drillAbort.abort()
+        isDrillAnimating.value = false
         searchQuery.value = ''
         searchPaths.value = []
         currentPathIdx.value = 0
