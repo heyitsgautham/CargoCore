@@ -61,8 +61,8 @@ from app.services.ai_chat.staff_intents import (
     _is_warehouse_workload_question,
 )
 from app.services.ai_chat.support_handoff import _answer_from_retrieved_knowledge
-from app.services.ai_chat.warehouse_answers import (
-    _build_warehouse_snapshot,
+from app.services.ai_chat.warehouse_answers import _build_warehouse_snapshot
+from app.services.ai_chat.warehouse_messages import (
     _warehouse_capacity_message,
     _warehouse_dock_message,
     _warehouse_inventory_message,
