@@ -11,7 +11,6 @@
   "frontend/src/LWD-views/WarehouseManager/Dashboard.vue": 905,
   "frontend/src/LWD-views/WarehouseManager/FloorPlan.vue": 843,
   "frontend/src/LWD-views/WarehouseManager/LaborManagement.vue": 919,
-  "frontend/src/LWD-views/WarehouseManager/ReturnsWarehouse.vue": 998,
   "frontend/src/components/HeaderMeetingScheduler.vue": 807,
   "frontend/src/pages/SignupWizard.vue": 836,
   "frontend/src/stores/logisticStore.js": 812
