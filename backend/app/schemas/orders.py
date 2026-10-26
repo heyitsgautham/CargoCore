@@ -350,3 +350,68 @@ class TripDeviationReportRequest(BaseModel):
     details: str | None = Field(default=None, max_length=280)
     latitude: float | None = None
     longitude: float | None = None
+
+
+# ── Request bodies for single-order actions ─────────────────────────────────
+
+
+class DeliveryOtpSendRequest(BaseModel):
+    force_resend: bool = False
+
+
+class PODRequest(BaseModel):
+    otp_code: str | None = None
+    image_data: str | None = None
+    images_data: list[str] = []
+    signature_data: str | None = None
+    customer_name: str | None = None
+    notes: str | None = None
+
+
+class PayOrderRequest(BaseModel):
+    payment_ref: str | None = None
+    payment_mode: str = "ONLINE"     # ONLINE | COD | PARTIAL
+    payment_method: str | None = None
+    amount: float | None = None      # defaults to order.total_amount
+    notes: str | None = None
+
+
+class HouseShiftSignoffRequest(BaseModel):
+    signature_data: str
+    customer_name: str | None = None
+    notes: str | None = None
+
+
+class JobRatingRequest(BaseModel):
+    rating: int = Field(..., ge=1, le=5)
+    feedback: str | None = None
+
+
+class CustomerRatingRequest(BaseModel):
+    rating: int = Field(..., ge=1, le=5)
+    feedback: str | None = None
+
+
+class PackingReturnItem(BaseModel):
+    name: str
+    sku: str | None = None
+    count: int = 0
+
+
+class PackingReturnRequest(BaseModel):
+    items: list[PackingReturnItem]
+    notes: str | None = None
+    submitted_at: str | None = None
+    skipped: bool = False
+
+
+class AssetLogItem(BaseModel):
+    name: str
+    sku: str | None = None
+    sent_out: int = 0
+    returned: int = 0
+
+
+class AssetLogRequest(BaseModel):
+    items: list[AssetLogItem]
+    notes: str | None = None

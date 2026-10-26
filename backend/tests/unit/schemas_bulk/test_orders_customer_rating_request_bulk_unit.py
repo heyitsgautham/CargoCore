@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from app.routers.orders import CustomerRatingRequest
+from app.schemas.orders import CustomerRatingRequest
 
 VALID_CASES = [
     {"rating": 1, "feedback": "Minimum accepted"},

@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from app.routers.orders import CustomerRatingRequest
+from app.schemas.orders import CustomerRatingRequest
 
 
 def test_customer_rating_request_accepts_valid_rating() -> None:
