@@ -7,7 +7,6 @@
   "frontend/src/IV-views/Individual/BookMove.vue": 1087,
   "frontend/src/IV-views/Vendor/Support.vue": 905,
   "frontend/src/LWD-views/Dispatcher/ManifestCenter.vue": 917,
-  "frontend/src/LWD-views/Dispatcher/OrderStatusControl.vue": 1140,
   "frontend/src/LWD-views/Dispatcher/PendingDispatchQueue.vue": 885,
   "frontend/src/LWD-views/LogisticManager/RateGovernance.vue": 917,
   "frontend/src/LWD-views/WarehouseManager/Dashboard.vue": 905,
