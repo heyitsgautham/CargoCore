@@ -71,15 +71,15 @@ from app.services.orders.transitions import (
 from app.services.orders.transitions import (
     transition_order as transition_order,
 )
+from app.services.orders.trip_commands import (
+    push_trip_command_update as push_trip_command_update,
+)
+from app.services.orders.trip_commands import (
+    report_trip_deviation as report_trip_deviation,
+)
 from app.services.orders.trip_intelligence import (
     get_trip_intelligence as get_trip_intelligence,
 )
 from app.services.orders.trip_intelligence import (
     list_trip_intelligence as list_trip_intelligence,
-)
-from app.services.orders.trip_intelligence import (
-    push_trip_command_update as push_trip_command_update,
-)
-from app.services.orders.trip_intelligence import (
-    report_trip_deviation as report_trip_deviation,
 )
