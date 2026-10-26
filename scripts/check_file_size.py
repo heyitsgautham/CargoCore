@@ -16,7 +16,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-LIMIT = 800
+LIMIT = 500
 ROOTS = ("backend/app/", "frontend/src/", "driver-app/src/")
 SUFFIXES = (".py", ".js", ".vue", ".ts")
 REPO = Path(__file__).resolve().parent.parent

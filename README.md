@@ -115,7 +115,7 @@ These are the commands CI runs in `.github/workflows/ci.yml`.
 | repo root | `npm run build` | production bundle in `frontend/dist` |
 | repo root | `npm audit --audit-level=high` | dependency audit |
 | repo root | `gitleaks git --config .gitleaks.toml .` | secret scan over the full history |
-| repo root | `python scripts/check_file_size.py` | fails when a source file passes 800 lines or a listed long file grows |
+| repo root | `python scripts/check_file_size.py` | fails when a source file passes 500 lines or a listed long file grows |
 
 The backend tests need a reachable Postgres database named `logistics_db_test`.
 `tests/conftest.py` derives its URL from `DATABASE_URL`, creates the tables and drops them afterwards.
