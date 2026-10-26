@@ -8,6 +8,7 @@ from app.config import get_settings
 from app.database import AsyncSessionLocal, engine, ro_engine
 from app.logging_config import configure_logging
 from app.middleware.logging_middleware import LoggingMiddleware
+from app.middleware.security_headers import SecurityHeadersMiddleware
 from app.routers import ai as ai_router
 from app.routers import auth as auth_router
 from app.routers import client_errors as client_errors_router
@@ -91,6 +92,7 @@ def create_app() -> FastAPI:
 
     # ── Middleware ────────────────────────────────────────────────────────────
     app.add_middleware(LoggingMiddleware)
+    app.add_middleware(SecurityHeadersMiddleware, hsts=settings.is_production)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[
