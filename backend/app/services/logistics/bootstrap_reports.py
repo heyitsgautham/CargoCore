@@ -195,6 +195,16 @@ def entity_documents(
     return vehicle_documents, driver_documents
 
 
+def weekly_order_counts(orders: Sequence[Order], today: date, weeks: int = 4) -> list[int]:
+    """Orders created in each of the last `weeks` 7-day windows, oldest window first, today included."""
+    counts = [0] * weeks
+    for order in orders:
+        days_ago = (today - order.created_at.date()).days
+        if 0 <= days_ago < weeks * 7:
+            counts[weeks - 1 - days_ago // 7] += 1
+    return counts
+
+
 def report_payloads(
     return_cases: Sequence[LogisticsReturnCase],
     notifications: Sequence[LogisticsNotification],
@@ -300,13 +310,7 @@ def report_payloads(
         },
         "rma_vs_orders": {
             "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
-            "orders": [
-                # Real per-week order counts for the last 4 weeks
-                sum(1 for o in orders if (today - o.created_at.date()).days in range(28, 21)),
-                sum(1 for o in orders if (today - o.created_at.date()).days in range(21, 14)),
-                sum(1 for o in orders if (today - o.created_at.date()).days in range(14, 7)),
-                sum(1 for o in orders if (today - o.created_at.date()).days in range(7, 0)),
-            ],
+            "orders": weekly_order_counts(orders, today),
             "rma": [max(1, len(return_cases) - 1), len(return_cases), len(return_cases), len(return_cases) + 1],
         },
         "rma_reasons": {
