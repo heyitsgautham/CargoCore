@@ -5,6 +5,5 @@
   "backend/app/services/logistics/bootstrap.py": 1050,
   "driver-app/src/stores/jobStore.js": 818,
   "frontend/src/components/HeaderMeetingScheduler.vue": 807,
-  "frontend/src/pages/SignupWizard.vue": 836,
   "frontend/src/stores/logisticStore.js": 812
 }
