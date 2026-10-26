@@ -2,7 +2,6 @@
   "backend/app/routers/ai.py": 822,
   "backend/app/routers/orders.py": 857,
   "backend/app/services/customer_service.py": 849,
-  "backend/app/services/logistics/bootstrap.py": 1050,
   "driver-app/src/stores/jobStore.js": 818,
   "frontend/src/components/HeaderMeetingScheduler.vue": 807,
   "frontend/src/stores/logisticStore.js": 812
