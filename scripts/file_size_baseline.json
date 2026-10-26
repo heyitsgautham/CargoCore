@@ -1,7 +1,7 @@
 {
   "backend/app/services/ai_chat/intents.py": 566,
   "backend/app/services/ai_chat/warehouse_answers.py": 503,
-  "backend/app/services/auth_service.py": 767,
+  "backend/app/services/auth_service.py": 725,
   "backend/app/services/dispatch_ai_service.py": 674,
   "backend/app/services/finance_service.py": 524,
   "backend/app/services/inventory_service.py": 612,

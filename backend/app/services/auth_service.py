@@ -36,6 +36,7 @@ from app.schemas.auth import (
     UserRegister,
     VerifyOTPRequest,
 )
+from app.services.auth_codes import OneTimeCodes
 from app.utils.hashing import hash_password, verify_password
 from app.utils.jwt import create_access_token, create_refresh_token, decode_token
 from app.utils.username import generate_unique_username, normalize_username
@@ -43,16 +44,12 @@ from app.utils.username import generate_unique_username, normalize_username
 # Redis key prefixes
 _BLACKLIST_PREFIX = "blacklist:"
 _RESET_PREFIX = "pwd_reset:"
-_OTP_PREFIX = "signup_otp:"
-_RESET_OTP_PREFIX = "reset_otp:"
-_LOGIN_OTP_PREFIX = "login_otp:"
 _RESET_TTL_SECONDS = 3600   # 1 hour
-_OTP_TTL_SECONDS = 600      # 10 minutes
 
-# In-memory OTP fallback when Redis is unavailable
-_otp_memory: dict[str, str] = {}
-_reset_otp_memory: dict[str, str] = {}
-_login_otp_memory: dict[str, str] = {}
+# One-time codes by purpose. Each kind falls back to process memory when Redis is unavailable.
+_signup_codes = OneTimeCodes("signup_otp:")
+_reset_codes = OneTimeCodes("reset_otp:")
+_login_codes = OneTimeCodes("login_otp:")
 settings = get_settings()
 
 # Roles allowed through the public /register endpoint (kept in sync with schema).
@@ -63,11 +60,6 @@ _APPROVAL_REJECTED = "REJECTED"
 
 
 # ── helpers ───────────────────────────────────────────────────────────────────
-
-
-def _new_otp() -> str:
-    """A six-digit one-time code from the secrets module, which is safe for authentication."""
-    return f"{secrets.randbelow(1_000_000):06d}"
 
 
 def _token_payload(user: User) -> dict:
@@ -444,12 +436,7 @@ async def forgot_password(db: AsyncSession, redis: Redis | None, data: ForgotPas
         return
 
     # Generate 6-digit OTP
-    otp = _new_otp()
-    reset_key = f"{_RESET_OTP_PREFIX}{data.email.lower()}"
-    if redis is not None:
-        await redis.setex(reset_key, _OTP_TTL_SECONDS, otp)
-    else:
-        _reset_otp_memory[data.email.lower()] = otp
+    otp = await _reset_codes.issue(redis, data.email.lower())
 
     if not settings.is_production:
         logger.info(f"[DEV] Password reset OTP for {user.email}: {otp}")
@@ -466,13 +453,8 @@ async def reset_password(
     db: AsyncSession, redis: Redis | None, data: ResetPasswordRequest
 ) -> None:
     """Validate the OTP and update the user's password hash."""
-    redis_key = f"{_RESET_OTP_PREFIX}{data.email.lower()}"
-
-    if redis is not None:
-        raw = await redis.get(redis_key)
-        stored_otp_str = raw.decode() if isinstance(raw, bytes) else (str(raw) if raw else None)
-    else:
-        stored_otp_str = _reset_otp_memory.get(data.email.lower())
+    email = data.email.lower()
+    stored_otp_str = await _reset_codes.current(redis, email)
 
     if not stored_otp_str:
         raise HTTPException(
@@ -481,6 +463,7 @@ async def reset_password(
         )
 
     if stored_otp_str != data.token:
+        await _reset_codes.record_failure(redis, email)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid verification code",
@@ -500,10 +483,7 @@ async def reset_password(
     await db.flush()
 
     # Consume the OTP (one-time use)
-    if redis is not None:
-        await redis.delete(redis_key)
-    else:
-        _reset_otp_memory.pop(data.email.lower(), None)
+    await _reset_codes.consume(redis, email)
     logger.info(f"Password reset completed for user: {user.email}")
 
 
@@ -520,13 +500,8 @@ async def send_signup_otp(db: AsyncSession, redis: Redis | None, data: SendOTPRe
             detail="A user with this email already exists",
         )
 
-    otp = _new_otp()
-    key = f"{_OTP_PREFIX}{email}"
+    otp = await _signup_codes.issue(redis, email)
     sent_at = datetime.now(UTC)
-    if redis is not None:
-        await redis.setex(key, _OTP_TTL_SECONDS, otp)
-    else:
-        _otp_memory[email] = otp
     if not settings.is_production:
         logger.info(f"[DEV] Signup OTP for {email}: {otp}")
 
@@ -559,13 +534,8 @@ async def send_signup_otp(db: AsyncSession, redis: Redis | None, data: SendOTPRe
 
 async def verify_signup_otp(redis: Redis | None, data: VerifyOTPRequest) -> OTPVerifiedResponse:
     """Verify the signup OTP sent to the user's email."""
-    key = f"{_OTP_PREFIX}{data.email.lower()}"
-
-    if redis is not None:
-        stored_otp = await redis.get(key)
-        stored_otp_str = stored_otp.decode() if isinstance(stored_otp, bytes) else (str(stored_otp) if stored_otp else None)
-    else:
-        stored_otp_str = _otp_memory.get(data.email.lower())
+    email = data.email.lower()
+    stored_otp_str = await _signup_codes.current(redis, email)
 
     if not stored_otp_str:
         raise HTTPException(
@@ -574,16 +544,14 @@ async def verify_signup_otp(redis: Redis | None, data: VerifyOTPRequest) -> OTPV
         )
 
     if stored_otp_str != data.otp:
+        await _signup_codes.record_failure(redis, email)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid or expired OTP. Please request a new one.",
         )
 
     # Consume OTP — one time use
-    if redis is not None:
-        await redis.delete(key)
-    else:
-        _otp_memory.pop(data.email.lower(), None)
+    await _signup_codes.consume(redis, email)
 
     logger.info(f"Email verified via OTP: {data.email}")
     return OTPVerifiedResponse(verified=True, message="Email verified successfully!")
@@ -616,13 +584,8 @@ async def send_login_otp(db: AsyncSession, redis: Redis | None, data: SendOTPReq
 
     _ensure_user_can_authenticate(user)
 
-    otp = _new_otp()
-    key = f"{_LOGIN_OTP_PREFIX}{email}"
+    otp = await _login_codes.issue(redis, email)
     sent_at = datetime.now(UTC)
-    if redis is not None:
-        await redis.setex(key, _OTP_TTL_SECONDS, otp)
-    else:
-        _login_otp_memory[email] = otp
     if not settings.is_production:
         logger.info(f"[DEV] Login OTP for {email}: {otp}")
 
@@ -651,24 +614,17 @@ async def send_login_otp(db: AsyncSession, redis: Redis | None, data: SendOTPReq
 async def verify_login_otp(db: AsyncSession, redis: Redis | None, data: VerifyOTPRequest) -> LoginResponse:
     """Verify a login OTP and return JWT tokens."""
     email = data.email.lower()
-    key = f"{_LOGIN_OTP_PREFIX}{email}"
-
-    if redis is not None:
-        stored = await redis.get(key)
-        stored_otp = stored.decode() if isinstance(stored, bytes) else (str(stored) if stored else None)
-    else:
-        stored_otp = _login_otp_memory.get(email)
+    stored_otp = await _login_codes.current(redis, email)
 
     if not stored_otp or stored_otp != data.otp:
+        if stored_otp:
+            await _login_codes.record_failure(redis, email)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid or expired OTP. Please request a new one.",
         )
 
-    if redis is not None:
-        await redis.delete(key)
-    else:
-        _login_otp_memory.pop(email, None)
+    await _login_codes.consume(redis, email)
 
     user = await _get_user_by_email(db, email)
     if not user:
